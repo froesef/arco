@@ -7,7 +7,9 @@
 // eslint-disable-next-line import/no-unresolved
 import Cerebras from '@cerebras/cerebras_cloud_sdk';
 import { sectionToHtml } from '../../json-to-eds.js';
-import { resolveTokens, normalizeProductUrls, getProductData } from '../../images.js';
+import {
+  resolveTokens, normalizeProductUrls, getProductData, setHeroContext,
+} from '../../images.js';
 import sanitizeHTML from '../../sanitize.js';
 import { StreamParser } from '../../stream-parser.js';
 import { unescapeHtml } from '../../da-persist.js';
@@ -198,6 +200,14 @@ export function extractTitle(firstSection) {
 
 // eslint-disable-next-line import/prefer-default-export
 export async function llmGenerate(ctx, config, env) {
+  // Set hero image context so {{hero-image:main}} resolves to a contextual image
+  setHeroContext({
+    query: ctx.request?.query,
+    useCases: ctx.rag?.useCase?.useCases,
+    intentType: ctx.rag?.intentClassification?.intentType,
+    productIds: (ctx.rag?.products || []).map((p) => p.id),
+  });
+
   const client = new Cerebras({ apiKey: env.CEREBRAS_API_KEY });
 
   // Heartbeat to keep the connection alive while waiting for LLM

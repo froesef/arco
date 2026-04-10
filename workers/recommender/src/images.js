@@ -9,6 +9,8 @@ import reviewsData from '../../../content/metadata/reviews.json';
 import accessoriesData from '../../../content/accessories/accessories.json';
 /* eslint-enable import/extensions, import/no-relative-packages */
 
+import { selectHeroImage, HERO_IMAGE_CATALOG } from './hero-images.js';
+
 const ARCO_BASE = 'https://main--arco--froesef.aem.live';
 
 // Default hero image — used when no specific product is featured
@@ -191,8 +193,26 @@ function resolveAccessoryImageToken(accessoryId) {
 
 /**
  * Resolve a {{hero-image:main}} token to a <picture> tag.
+ * When heroContext is set (via setHeroContext), uses the annotated catalog
+ * to pick a contextually appropriate image. Falls back to the default.
  */
+let currentHeroContext = null;
+
+/**
+ * Set the hero selection context for the current request.
+ * Call this before resolveTokens() so the hero image matches the query.
+ * @param {{ query?: string, useCases?: string[], intentType?: string, productIds?: string[] }} ctx
+ */
+export function setHeroContext(ctx) {
+  currentHeroContext = ctx;
+}
+
 function resolveHeroImageToken() {
+  if (currentHeroContext) {
+    const hero = selectHeroImage(currentHeroContext);
+    return `<picture><img src="${hero.url}" alt="${hero.alt}"></picture>`;
+  }
+  // Fallback: use the default hero image
   const image = absoluteImageUrl(HERO_MAIN_IMAGE);
   if (!image) return '<!-- hero-image:main unavailable -->';
   return `<picture><img src="${image}" alt="Arco espresso machine brewing a perfect shot on a sunlit kitchen counter"></picture>`;
@@ -213,6 +233,9 @@ accessories.forEach((a) => {
   if (a.image) knownImageUrls.add(absoluteImageUrl(a.image));
 });
 knownImageUrls.add(absoluteImageUrl(HERO_MAIN_IMAGE));
+HERO_IMAGE_CATALOG.forEach((entry) => {
+  knownImageUrls.add(`${ARCO_BASE}/drafts/media${entry.path}`);
+});
 
 /**
  * Remove <picture>/<img> tags with hallucinated image URLs (not from known data).
