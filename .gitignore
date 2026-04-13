@@ -1,7 +1,7 @@
 .hlx/*
 coverage/*
 logs/*
-node_modules/*
+node_modules
 
 helix-importer-ui
 .DS_Store
@@ -16,10 +16,21 @@ daTokenService.ts
 
 .env
 
+# Build output and caches
+dist
+build
+.cache
+.next
+.turbo
+.wrangler
+
 # Cloudflare Workers
 workers/*/node_modules/
 workers/*/.wrangler/
 .dev.vars
+
+# Local settings
+.claude/settings.local.json
 
 # Demo video build intermediates
 build-demo/audio/
