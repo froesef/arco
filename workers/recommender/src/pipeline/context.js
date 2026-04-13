@@ -56,6 +56,8 @@ export function createContext(body, request) {
       faqs: [],
       reviews: [],
       recipes: [],
+      comparisons: [],
+      toolContent: [],
       persona: null,
       useCase: null,
       behaviorAnalysis: null,

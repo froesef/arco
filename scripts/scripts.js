@@ -100,6 +100,8 @@ const BLOCK_ALIASES = {
   'use-case-cards': 'cards',
   'feature-highlights': 'cards',
   text: false,
+  'how-to-steps': 'recipe-steps',
+  'related-content': 'content-strip',
 };
 
 /**

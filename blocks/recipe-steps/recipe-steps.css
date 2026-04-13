@@ -1,0 +1,194 @@
+/* Recipe Steps — warm instructional layout with timeline steps */
+.recipe-steps {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.recipe-steps .recipe-steps-content {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* Header: title + description */
+.recipe-steps .recipe-steps-header h2 {
+  font-family: var(--heading-font-family);
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--dark-color);
+}
+
+.recipe-steps .recipe-steps-header p {
+  color: var(--muted-color);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* Equipment section */
+.recipe-steps .recipe-steps-equipment {
+  background-color: var(--light-color);
+  border-radius: var(--border-radius);
+  padding: 20px 24px;
+}
+
+.recipe-steps .recipe-steps-equipment p {
+  font-family: var(--heading-font-family);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+  margin-bottom: 12px;
+}
+
+.recipe-steps .recipe-steps-equipment ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.recipe-steps .recipe-steps-equipment li {
+  background: var(--background-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 0.9rem;
+  color: var(--dark-color);
+}
+
+/* Instructions: numbered steps with timeline */
+.recipe-steps .recipe-steps-instructions ol {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: recipe-step;
+}
+
+.recipe-steps .recipe-steps-instructions li {
+  position: relative;
+  padding-left: 52px;
+  padding-bottom: 24px;
+  margin-bottom: 0;
+  line-height: 1.6;
+  color: var(--dark-color);
+  font-size: 0.95rem;
+}
+
+/* Timeline connector line */
+.recipe-steps .recipe-steps-instructions li::after {
+  content: '';
+  position: absolute;
+  left: 17px;
+  top: 32px;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--border-color);
+}
+
+.recipe-steps .recipe-steps-instructions li:last-child {
+  padding-bottom: 0;
+}
+
+.recipe-steps .recipe-steps-instructions li:last-child::after {
+  display: none;
+}
+
+/* Step number circle */
+.recipe-steps .recipe-steps-instructions li::before {
+  counter-increment: recipe-step;
+  content: counter(recipe-step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  color: #fff;
+  font-family: var(--heading-font-family);
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+/* Tips section */
+.recipe-steps .recipe-steps-tips {
+  border-left: 3px solid var(--accent-color);
+  padding-left: 20px;
+  margin-top: 8px;
+}
+
+.recipe-steps .recipe-steps-tips p {
+  font-family: var(--heading-font-family);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-color);
+  margin-bottom: 12px;
+}
+
+.recipe-steps .recipe-steps-tips ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* stylelint-disable-next-line no-descending-specificity -- scoped to different container */
+.recipe-steps .recipe-steps-tips li {
+  position: relative;
+  padding-left: 20px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--muted-color);
+  line-height: 1.5;
+}
+
+.recipe-steps .recipe-steps-tips li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 8px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-color);
+  opacity: 0.4;
+}
+
+/* Generic section fallback */
+.recipe-steps .recipe-steps-section {
+  color: var(--dark-color);
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (width >= 900px) {
+  .recipe-steps .recipe-steps-header h2 {
+    font-size: 2rem;
+  }
+
+  .recipe-steps .recipe-steps-instructions li {
+    padding-left: 60px;
+    font-size: 1rem;
+  }
+
+  .recipe-steps .recipe-steps-instructions li::before {
+    width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+  }
+
+  .recipe-steps .recipe-steps-instructions li::after {
+    left: 19px;
+    top: 36px;
+  }
+}

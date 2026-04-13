@@ -14,7 +14,12 @@ const RECOMMENDER_FLOW = {
     { step: 'rag-products', config: { maxResults: 8 } },
     {
       parallel: [
-        { step: 'rag-content', config: { maxGuides: 5, maxExperiences: 3 } },
+        {
+          step: 'rag-content',
+          config: {
+            maxGuides: 5, maxExperiences: 3, maxComparisons: 2, maxRecipes: 3, maxTools: 3,
+          },
+        },
         { step: 'rag-features', config: { maxResults: 6 } },
         { step: 'rag-reviews', config: { maxResults: 6 } },
         { step: 'rag-faqs', config: { maxResults: 4 } },

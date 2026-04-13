@@ -3,9 +3,10 @@
 /**
  * Vectorize Content Indexer
  *
- * Reads content JSON files (blog, guides, experiences, bundles, tools),
- * chunks them by section, generates embeddings via Cloudflare Workers AI,
- * and upserts vectors into the arco-content Vectorize index.
+ * Reads content JSON files (blog, guides, experiences, bundles, tools,
+ * comparisons, PDPs, recipes), chunks them by section, generates embeddings
+ * via Cloudflare Workers AI, and upserts vectors into the arco-content
+ * Vectorize index.
  *
  * Usage:
  *   node scripts/index-content.js
@@ -36,7 +37,13 @@ const MAX_TEXT_CHARS = 2000; // ~500 tokens, fits bge-small context window
 const CONTENT_ROOT = resolve(import.meta.dirname, '../../../content');
 
 // Directories to index (relative to CONTENT_ROOT)
-const INDEX_DIRS = ['blog', 'guides', 'experiences', 'bundles', 'tools', 'stories'];
+const INDEX_DIRS = [
+  'blog', 'guides', 'experiences', 'bundles', 'tools',
+  'products/comparison', 'products/pdp-canonical',
+];
+
+// Single-file arrays to index (relative to CONTENT_ROOT)
+const INDEX_ARRAYS = ['recipes/recipes.json'];
 
 // ── Auth ────────────────────────────────────────────────────────────────────
 
@@ -83,6 +90,242 @@ function findJsonFiles(dir) {
 // ── Chunking ────────────────────────────────────────────────────────────────
 
 /**
+ * Chunk structured data content (tools: maintenance, pairing, calculators).
+ * Dispatches based on known array keys within data.data.
+ */
+function chunkStructuredData(data, slug, title, baseMeta, chunks) {
+  const d = data.data;
+  let chunkIdx = 0;
+
+  // Maintenance: descaling guides — data.guides[]
+  if (Array.isArray(d.guides)) {
+    baseMeta.type = 'maintenance';
+    for (const guide of d.guides) {
+      const steps = Array.isArray(guide.steps) ? guide.steps.join('. ') : '';
+      const text = `${title} — ${guide.label || guide.machine}: ${steps}. Frequency: ${guide.frequency_note || ''}`.slice(0, MAX_TEXT_CHARS);
+      chunks.push({
+        id: `${slug}--${chunkIdx}`,
+        text,
+        metadata: { ...baseMeta, sectionHeading: guide.label || guide.machine },
+      });
+      chunkIdx += 1;
+    }
+  }
+
+  // Diagnostic: symptoms — data.symptoms[]
+  if (Array.isArray(d.symptoms)) {
+    baseMeta.type = 'diagnostic';
+    for (const sym of d.symptoms) {
+      const causes = Array.isArray(sym.possible_causes)
+        ? sym.possible_causes.map((c) => `${c.cause}: ${c.fix}`).join('. ')
+        : '';
+      const text = `${title} — ${sym.symptom}: ${causes}`.slice(0, MAX_TEXT_CHARS);
+      chunks.push({
+        id: `${slug}--${chunkIdx}`,
+        text,
+        metadata: { ...baseMeta, sectionHeading: sym.symptom },
+      });
+      chunkIdx += 1;
+    }
+  }
+
+  // Care calendar: schedules — data.schedules[]
+  if (Array.isArray(d.schedules)) {
+    baseMeta.type = 'maintenance';
+    for (const sched of d.schedules) {
+      const tasks = sched.tasks || {};
+      const taskLines = Object.entries(tasks)
+        .flatMap(([freq, items]) => (Array.isArray(items) ? items.map((t) => `${freq}: ${t.task}`) : []));
+      const text = `${title} — ${sched.label || sched.machine} care schedule: ${taskLines.join('. ')}`.slice(0, MAX_TEXT_CHARS);
+      chunks.push({
+        id: `${slug}--${chunkIdx}`,
+        text,
+        metadata: { ...baseMeta, sectionHeading: sched.label || sched.machine },
+      });
+      chunkIdx += 1;
+    }
+  }
+
+  // Consumables — data.consumables[]
+  if (Array.isArray(d.consumables)) {
+    baseMeta.type = 'maintenance';
+    for (const c of d.consumables) {
+      const signs = Array.isArray(c.signs_of_wear) ? c.signs_of_wear.join(', ') : '';
+      const text = `${title} — ${c.name}: ${c.description || ''}. Signs of wear: ${signs}. ${c.replacement_notes || ''}`.slice(0, MAX_TEXT_CHARS);
+      chunks.push({
+        id: `${slug}--${chunkIdx}`,
+        text,
+        metadata: { ...baseMeta, sectionHeading: c.name },
+      });
+      chunkIdx += 1;
+    }
+  }
+
+  // Pairing: grinder-machine compatibility — data.pairings[]
+  if (Array.isArray(d.pairings)) {
+    baseMeta.type = 'pairing';
+    for (const p of d.pairings) {
+      const text = `${title} — ${p.grinder || p.origin || ''} with ${p.machine || ''}: ${p.rationale || ''}. Rating: ${p.rating || ''}`.slice(0, MAX_TEXT_CHARS);
+      chunks.push({
+        id: `${slug}--${chunkIdx}`,
+        text,
+        metadata: { ...baseMeta, sectionHeading: `${p.grinder || p.origin || ''} + ${p.machine || ''}` },
+      });
+      chunkIdx += 1;
+    }
+  }
+
+  // Upgrade paths — data.edges[]
+  if (Array.isArray(d.edges)) {
+    baseMeta.type = 'pairing';
+    for (const e of d.edges) {
+      const gains = Array.isArray(e.what_you_gain) ? e.what_you_gain.join(', ') : '';
+      const text = `${title} — Upgrade from ${e.from} to ${e.to}: ${e.rationale || ''}. You gain: ${gains}`.slice(0, MAX_TEXT_CHARS);
+      chunks.push({
+        id: `${slug}--${chunkIdx}`,
+        text,
+        metadata: { ...baseMeta, sectionHeading: `${e.from} → ${e.to}` },
+      });
+      chunkIdx += 1;
+    }
+  }
+
+  // Bean origins — data.origins[]
+  if (Array.isArray(d.origins)) {
+    baseMeta.type = 'pairing';
+    for (const o of d.origins) {
+      const text = `${title} — ${o.label}: ${o.flavour_profile || o.flavor_profile || ''}. Typical roast: ${o.typical_roast || ''}`.slice(0, MAX_TEXT_CHARS);
+      chunks.push({
+        id: `${slug}--${chunkIdx}`,
+        text,
+        metadata: { ...baseMeta, sectionHeading: o.label },
+      });
+      chunkIdx += 1;
+    }
+  }
+
+  // Filters — data.filters[]
+  if (Array.isArray(d.filters)) {
+    baseMeta.type = 'pairing';
+    for (const f of d.filters) {
+      const text = `${title} — ${f.name}: ${f.description || ''}. Type: ${f.type || ''}, capacity: ${f.capacity_litres || '?'}L`.slice(0, MAX_TEXT_CHARS);
+      chunks.push({
+        id: `${slug}--${chunkIdx}`,
+        text,
+        metadata: { ...baseMeta, sectionHeading: f.name },
+      });
+      chunkIdx += 1;
+    }
+  }
+
+  // Accessories with portafilter compatibility — data.accessories[]
+  if (Array.isArray(d.accessories)) {
+    baseMeta.type = 'pairing';
+    for (const a of d.accessories) {
+      const sizes = Array.isArray(a.compatible_sizes) ? a.compatible_sizes.join(', ') : '';
+      const text = `${title} — ${a.name}: ${a.notes || ''}. Compatible sizes: ${sizes}`.slice(0, MAX_TEXT_CHARS);
+      chunks.push({
+        id: `${slug}--${chunkIdx}`,
+        text,
+        metadata: { ...baseMeta, sectionHeading: a.name },
+      });
+      chunkIdx += 1;
+    }
+  }
+
+  // Warranty — data.warranty_terms (object, not array)
+  if (d.warranty_terms && typeof d.warranty_terms === 'object') {
+    baseMeta.type = 'maintenance';
+    const parts = Object.entries(d.warranty_terms).map(([cat, terms]) => {
+      const dur = terms.duration_years || '?';
+      const cov = terms.coverage || '';
+      return `${cat}: ${dur} years, ${cov}`;
+    });
+    const exclusions = Array.isArray(d.what_is_not_covered) ? d.what_is_not_covered.join(', ') : '';
+    const text = `${title}: ${parts.join('. ')}. Not covered: ${exclusions}`.slice(0, MAX_TEXT_CHARS);
+    chunks.push({
+      id: `${slug}--0`,
+      text,
+      metadata: { ...baseMeta, sectionHeading: 'warranty' },
+    });
+  }
+}
+
+/**
+ * Chunk comparison content (products/comparison/).
+ */
+function chunkComparison(data, slug, title, baseMeta, chunks) {
+  baseMeta.type = 'comparison';
+
+  // Chunk 1: Overview + verdict
+  const intro = data.comparison_intro || '';
+  const verdict = typeof data.verdict === 'string' ? data.verdict
+    : (data.verdict?.text || data.verdict?.summary || '');
+  const text1 = `${title}: ${intro}. Verdict: ${verdict}`.slice(0, MAX_TEXT_CHARS);
+  chunks.push({
+    id: `${slug}--overview`,
+    text: text1,
+    metadata: { ...baseMeta, sectionHeading: 'overview' },
+  });
+
+  // Chunk 2: Persona recommendations
+  if (data.recommendation_by_persona) {
+    const recs = Object.entries(data.recommendation_by_persona)
+      .map(([persona, rec]) => `${persona}: ${rec.rationale || ''}`)
+      .join('. ');
+    const text2 = `${title} — Persona recommendations: ${recs}`.slice(0, MAX_TEXT_CHARS);
+    chunks.push({
+      id: `${slug}--personas`,
+      text: text2,
+      metadata: { ...baseMeta, sectionHeading: 'persona-recommendations' },
+    });
+  }
+}
+
+/**
+ * Chunk PDP canonical content (products/pdp-canonical/).
+ */
+function chunkPDP(data, slug, title, baseMeta, chunks) {
+  baseMeta.type = 'product';
+  const name = data.name || title;
+  const desc = data.description_long || data.description_short || '';
+  const useCase = [data.use_case_headline || '', data.use_case_body || '']
+    .filter(Boolean).join('. ');
+  const text = `${name}: ${desc}. ${useCase}`.slice(0, MAX_TEXT_CHARS);
+  chunks.push({
+    id: `${slug}--0`,
+    text,
+    metadata: { ...baseMeta, sectionHeading: 'product-description', productId: data.id || slug },
+  });
+}
+
+/**
+ * Chunk a recipe item from the recipes array.
+ */
+function chunkRecipe(recipe) {
+  const slug = recipe.id || recipe.slug;
+  if (!slug) return null;
+
+  const technique = Array.isArray(recipe.technique) ? recipe.technique.join('. ') : '';
+  const tips = Array.isArray(recipe.tips) ? recipe.tips.join('. ') : '';
+  const text = `Recipe: ${recipe.name}. ${recipe.description || ''}. Technique: ${technique}. Tips: ${tips}`.slice(0, MAX_TEXT_CHARS);
+
+  return {
+    id: `recipe-${slug}--0`,
+    text,
+    metadata: {
+      slug,
+      title: recipe.name || '',
+      category: recipe.category || 'recipe',
+      difficulty: recipe.difficulty || '',
+      personaTags: '',
+      type: 'recipe',
+      sectionHeading: recipe.name || '',
+    },
+  };
+}
+
+/**
  * Extract indexable text chunks from a content JSON file.
  * Returns array of { id, text, metadata }.
  */
@@ -99,7 +342,7 @@ function chunkContent(filePath) {
   const slug = data.slug || data.id;
   if (!slug) return [];
 
-  const title = data.title || '';
+  const title = data.title || data.name || '';
   const category = data.category || filePath.split('/content/')[1]?.split('/')[0] || 'unknown';
   const difficulty = data.difficulty || '';
   const personaTags = data.persona_tags || (data.persona_tag ? [data.persona_tag] : []);
@@ -131,10 +374,9 @@ function chunkContent(filePath) {
     });
   }
 
-  // Type 2: editorial_body string (experiences)
+  // Type 2: editorial_body string (experiences, bundles)
   if (typeof data.editorial_body === 'string' && data.editorial_body.length > 0) {
     baseMeta.type = 'experience';
-    // Split long editorial into ~2000 char chunks by paragraph
     const paragraphs = data.editorial_body.split('\n\n').filter(Boolean);
     let currentChunk = '';
     let chunkIdx = 0;
@@ -160,14 +402,31 @@ function chunkContent(filePath) {
     }
   }
 
-  // Type 3: intro-only fallback (if no body or editorial_body)
-  if (chunks.length === 0 && data.intro) {
-    baseMeta.type = category;
+  // Type 3: intro or description fallback (if no body or editorial_body)
+  if (chunks.length === 0 && (data.intro || data.description)) {
+    const fallbackText = data.intro || data.description;
+    const formula = data.formula ? ` Formula: ${data.formula}` : '';
+    baseMeta.type = data.formula ? 'calculator' : category;
     chunks.push({
       id: `${slug}--0`,
-      text: `${title}: ${data.intro}`.slice(0, MAX_TEXT_CHARS),
+      text: `${title}: ${fallbackText}${formula}`.slice(0, MAX_TEXT_CHARS),
       metadata: { ...baseMeta, sectionHeading: 'intro' },
     });
+  }
+
+  // Type 4: structured data content (tools: maintenance, pairing, diagnostics)
+  if (chunks.length === 0 && data.data && typeof data.data === 'object') {
+    chunkStructuredData(data, slug, title, baseMeta, chunks);
+  }
+
+  // Type 5: comparison content (products/comparison/)
+  if (chunks.length === 0 && data.comparison_intro) {
+    chunkComparison(data, slug, title, baseMeta, chunks);
+  }
+
+  // Type 6: PDP canonical content (products/pdp-canonical/)
+  if (chunks.length === 0 && data.description_long) {
+    chunkPDP(data, slug, title, baseMeta, chunks);
   }
 
   return chunks;
@@ -249,6 +508,33 @@ async function main() {
       const chunks = chunkContent(file);
       allChunks.push(...chunks);
     }
+  }
+
+  // 1b. Index single-file arrays (e.g., recipes.json)
+  for (const arrayFile of INDEX_ARRAYS) {
+    const filePath = join(CONTENT_ROOT, arrayFile);
+    if (!existsSync(filePath)) {
+      console.log(`[${arrayFile}] File not found, skipping`);
+      continue;
+    }
+    const raw = readFileSync(filePath, 'utf-8');
+    let parsed;
+    try {
+      parsed = JSON.parse(raw);
+    } catch {
+      console.warn(`[${arrayFile}] Invalid JSON, skipping`);
+      continue;
+    }
+    const items = parsed.data || (Array.isArray(parsed) ? parsed : []);
+    let count = 0;
+    for (const item of items) {
+      const chunk = chunkRecipe(item);
+      if (chunk) {
+        allChunks.push(chunk);
+        count += 1;
+      }
+    }
+    console.log(`[${arrayFile}] Indexed ${count} items`);
   }
 
   console.log(`\nTotal chunks to index: ${allChunks.length}\n`);

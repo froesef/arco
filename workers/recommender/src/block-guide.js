@@ -284,14 +284,43 @@ IMPORTANT: NEVER invent image URLs, product URLs, product names, recipe names, o
 
 ---
 
+### recipe-steps
+Step-by-step instructional content for recipes or maintenance procedures.
+Row 1: h2 title + p description. Row 2: label p (e.g. "WHAT YOU NEED") + ul equipment list. Row 3: ol ordered steps. Row 4: label p (e.g. "PRO TIPS") + ul tips.
+
+{"block":"recipe-steps","rows":[
+  [[{"type":"h2","text":"Flat White"},{"type":"p","text":"A velvety milk coffee with a thin microfoam layer over a double ristretto."}]],
+  [[{"type":"p","text":"WHAT YOU NEED"}],[{"type":"ul","items":["Espresso machine with steam wand","Grinder","Scale","Milk pitcher"]}]],
+  [[{"type":"ol","items":["Pull a double ristretto (18g in, 30g out, 25-28 seconds)","Steam 150ml of whole milk to 60-62°C with minimal foam","Pour the milk in a steady stream — the thin microfoam integrates naturally","The finished drink should have a glossy, flat surface"]}]],
+  [[{"type":"p","text":"PRO TIPS"}],[{"type":"ul","items":["Use whole milk for the best microfoam","Less air than a latte — only 1-2 seconds of stretching","A ristretto base makes the espresso flavor shine through the milk"]}]]
+]}
+
+Use for: recipe how-tos, descaling guides, maintenance step-by-step, setup instructions.
+
+---
+
+### content-strip
+Lightweight horizontal strip of related content links, rendered as compact pills.
+Row 1: h3 heading. Row 2+: link items (one or more per row).
+
+{"block":"content-strip","rows":[
+  [[{"type":"h3","text":"Keep Learning"}]],
+  [[{"type":"link","text":"Descaling Guide","href":"/tools/maintenance/descaling-guide-by-model","style":"outline"}],[{"type":"link","text":"Bean Pairing Guide","href":"/tools/pairing-guides/bean-to-machine-pairing","style":"outline"}],[{"type":"link","text":"Primo vs Doppio","href":"/products/comparison/arco-primo-vs-arco-doppio","style":"outline"}]]
+]}
+
+Use for: related content after comparisons, recommendations, or how-to content. Low visual weight — complements heavier blocks without competing.
+
+---
+
 ## Block Selection Guidelines
 
 Vary structure based on what the query needs:
 
-- **Product comparisons** → hero + best-pick + comparison-table + verdict-card
+- **Product comparisons** → hero + best-pick + comparison-table + verdict-card + content-strip
 - **Product recommendations** → hero + product-recommendation + comparison-table + verdict-card
 - **Direct question** → hero + quick-answer + (accordion for follow-up FAQs)
-- **Recipe/drink request** → hero + cards (with {{recipe:NAME}} tokens)
+- **Recipe/drink request** → hero + recipe-steps + content-strip (related guides)
+- **Maintenance/how-to request** → hero + quick-answer + recipe-steps (maintenance steps) + content-strip
 - **Feature showcase** → hero + benefits-grid + feature-highlights + split-content
 - **Grinder questions** → hero + product-recommendation (grinder) + comparison-table (grinders) + verdict-card
 - **Budget questions** → hero + comparison-table sorted by price + verdict-card

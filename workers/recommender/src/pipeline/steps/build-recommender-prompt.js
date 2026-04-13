@@ -21,6 +21,8 @@ export async function buildRecommenderPrompt(ctx) {
     faqs: ctx.rag.faqs,
     reviews: ctx.rag.reviews,
     recipes: ctx.rag.recipes,
+    comparisons: ctx.rag.comparisons,
+    toolContent: ctx.rag.toolContent,
     persona: ctx.rag.persona,
     useCase: ctx.rag.useCase,
   };

@@ -1,0 +1,99 @@
+/* Content Strip — lightweight horizontal related-content links */
+.content-strip {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.content-strip .content-strip-heading h3,
+.content-strip .content-strip-heading h2,
+.content-strip .content-strip-heading h4 {
+  font-family: var(--heading-font-family);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted-color);
+  margin-bottom: 16px;
+}
+
+.content-strip .content-strip-items {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.content-strip .content-strip-items::-webkit-scrollbar {
+  display: none;
+}
+
+.content-strip .content-strip-pill {
+  flex-shrink: 0;
+  scroll-snap-align: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 18px;
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--dark-color);
+  background: var(--background-color);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: border-color var(--transition), background-color var(--transition), box-shadow var(--transition);
+}
+
+a.content-strip-pill:hover {
+  border-color: var(--accent-color);
+  background-color: var(--light-color);
+  box-shadow: var(--shadow-sm);
+  color: var(--accent-color);
+}
+
+/* Content type indicators via ::before pseudo-element */
+.content-strip .content-strip-pill[data-type]::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.content-strip .content-strip-pill[data-type="maintenance"]::before {
+  background-color: #5b8c5a;
+}
+
+.content-strip .content-strip-pill[data-type="pairing"]::before {
+  background-color: var(--accent-color);
+}
+
+.content-strip .content-strip-pill[data-type="comparison"]::before {
+  background-color: #4a7fb5;
+}
+
+.content-strip .content-strip-pill[data-type="recipe"]::before {
+  background-color: #c17d3f;
+}
+
+.content-strip .content-strip-pill[data-type="article"]::before {
+  background-color: #8b6bb5;
+}
+
+.content-strip .content-strip-pill[data-type="guide"]::before {
+  background-color: #5a8c8c;
+}
+
+/* Responsive: wrap on desktop */
+@media (width >= 900px) {
+  .content-strip .content-strip-items {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+}
