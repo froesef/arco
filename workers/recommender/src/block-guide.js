@@ -261,28 +261,15 @@ Use for: recipe how-tos, descaling guides, maintenance step-by-step, setup instr
 
 ---
 
-### content-strip
-Lightweight horizontal strip of related content links, rendered as compact pills.
-Row 1: h3 heading. Row 2+: link items (one or more per row).
-
-{"block":"content-strip","rows":[
-  [[{"type":"h3","text":"Keep Learning"}]],
-  [[{"type":"link","text":"Descaling Guide","href":"/tools/maintenance/descaling-guide-by-model","style":"outline"}],[{"type":"link","text":"Bean Pairing Guide","href":"/tools/pairing-guides/bean-to-machine-pairing","style":"outline"}],[{"type":"link","text":"Primo vs Doppio","href":"/products/comparison/arco-primo-vs-arco-doppio","style":"outline"}]]
-]}
-
-Use for: related content after comparisons, recommendations, or how-to content. Low visual weight — complements heavier blocks without competing.
-
----
-
 ## Block Selection Guidelines
 
 Vary structure based on what the query needs:
 
-- **Product comparisons** → hero + text (best pick) + comparison-table + content-strip
+- **Product comparisons** → hero + text (best pick) + comparison-table
 - **Product recommendations** → hero + columns (product spotlight) + comparison-table
 - **Direct question** → hero + text (answer) + (accordion for follow-up FAQs)
-- **Recipe/drink request** → hero + recipe-steps + content-strip (related guides)
-- **Maintenance/how-to request** → hero + text (answer) + recipe-steps (maintenance steps) + content-strip
+- **Recipe/drink request** → hero + recipe-steps
+- **Maintenance/how-to request** → hero + text (answer) + recipe-steps (maintenance steps)
 - **Feature showcase** → hero + columns (benefits grid) + cards (feature highlights) + columns (product spotlight)
 - **Grinder questions** → hero + columns (product spotlight with grinder) + comparison-table (grinders)
 - **Budget questions** → hero + comparison-table sorted by price + text (verdict)

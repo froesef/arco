@@ -128,7 +128,6 @@ Focus on these blocks for recommender pages:
 - **product-list**: Product grid with images, pricing, and CTAs
 - **accordion**: FAQ-style Q&A about the recommended products
 - **recipe-steps**: Step-by-step instructions for recipes or maintenance procedures
-- **content-strip**: Lightweight related content links (use after comparisons or recommendations)
 
 ## Page Structure by Scenario
 

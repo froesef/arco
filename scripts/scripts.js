@@ -101,7 +101,6 @@ const BLOCK_ALIASES = {
   'feature-highlights': 'cards',
   text: false,
   'how-to-steps': 'recipe-steps',
-  'related-content': 'content-strip',
 };
 
 // Canonical product URL map: short id → full path
