@@ -118,6 +118,7 @@
 .follow-up .follow-up-chip.chip-loading {
   position: relative;
   overflow: hidden;
+  cursor: wait;
 }
 
 .follow-up .follow-up-chip.chip-loading::after {

@@ -249,6 +249,21 @@ main > .section:first-of-type {
   margin-top: 0;
 }
 
+/* spacing between blocks within the same section */
+main > .section > div > .block {
+  margin-bottom: 48px;
+}
+
+main > .section > div > .block:last-child {
+  margin-bottom: 0;
+}
+
+@media (width >= 900px) {
+  main > .section > div > .block {
+    margin-bottom: 64px;
+  }
+}
+
 @media (width >= 900px) {
   main > .section {
     margin: 120px 0;

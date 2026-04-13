@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:main--arco--froesef.aem.live)",
+      "WebFetch(domain:ai.google.dev)",
+      "WebFetch(domain:firefly-api.adobe.io)"
+    ]
+  }
+}

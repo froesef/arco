@@ -1,4 +1,8 @@
 /* Comparison Table — clean responsive table with persona-highlighted column */
+.comparison-table {
+  margin-bottom: 48px;
+}
+
 .comparison-table .comparison-table-wrapper {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;

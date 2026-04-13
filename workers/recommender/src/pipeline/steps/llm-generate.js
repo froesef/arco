@@ -124,15 +124,17 @@ const VALID_SUGGESTION_TYPES = ['explore', 'compare', 'recipe', 'buy', 'quiz', '
 
 /**
  * Extract the primary recommended product from generated JSON sections.
- * Checks product-recommendation blocks first, then comparison-table recommended field.
+ * Checks columns blocks (product spotlights) first, then comparison-table recommended field.
  */
 function extractPrimaryProduct(rawJsonSections) {
   const imageTokenRe = /\{\{product-image:([^}]+)\}\}/;
 
-  // Strategy 1: product-recommendation block → extract product ID from token
-  const recBlock = rawJsonSections.find((s) => s.block === 'product-recommendation');
-  if (recBlock) {
-    const match = JSON.stringify(recBlock).match(imageTokenRe);
+  // Strategy 1: columns block with product image → extract product ID from token
+  const colBlock = rawJsonSections.find(
+    (s) => s.block === 'columns' && JSON.stringify(s).includes('{{product-image:'),
+  );
+  if (colBlock) {
+    const match = JSON.stringify(colBlock).match(imageTokenRe);
     if (match) {
       const data = getProductData(match[1].trim());
       if (data) return { id: data.id, name: data.name };

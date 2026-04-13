@@ -15,6 +15,7 @@ RULES YOU MUST FOLLOW:
 - Each JSON object MUST have a "block" field with the block type name
 - Each block has "rows" — an array of rows, where each row is an array of cells, and each cell is an array of content items
 - End with a suggestions JSON object (no === after it)
+- ONLY use block names listed below — any other name will cause a loading error
 
 ### Content Item Types
 
@@ -37,6 +38,8 @@ Each content item has a "type" field. Available types:
 
 ## Available Blocks
 
+IMPORTANT: You may ONLY use the following block names: hero, text, cards, columns, accordion, table, comparison-table, product-list, testimonials. No other block names are allowed.
+
 ### hero
 Full-width hero banner. ALWAYS use as the first section.
 Structure: one row, two cells — first cell for image (REQUIRED), second cell for text content.
@@ -57,19 +60,49 @@ IMPORTANT: The hero MUST ALWAYS include an image AND an h1 heading and a p descr
 
 ---
 
+### text
+Plain section content — no card or column styling. Renders as standard headings, paragraphs, lists, and links within a section.
+Use for: summaries, verdicts, direct answers, editorial content, recommendations with bullet points — any prose that should NOT be wrapped in a card grid.
+Structure: one row, one cell with all content items.
+
+**Direct answer:**
+{"block":"text","rows":[
+  [[{"type":"h2","text":"Yes, you need a grinder."},{"type":"p","text":"Pre-ground coffee loses flavor within minutes of grinding. A quality burr grinder is the single biggest upgrade for your espresso."},{"type":"p","text":"The Arco Filtro is a great starting point at $349. For maximum precision, the Zero with zero-retention burrs ensures every gram counts."}]]
+]}
+
+**Best pick summary:**
+{"block":"text","rows":[
+  [[{"type":"p","text":"BEST FOR HOME ESPRESSO"},{"type":"h2","text":"Arco Primo"},{"type":"p","text":"The Primo delivers cafe-quality shots with PID temperature control and a commercial 58mm group head. Simple, reliable, and built to last."},{"type":"p","text":"$899 | 2-Year Warranty"},{"type":"link","text":"View Primo","href":"/products/espresso-machines/primo","style":"primary"}]]
+]}
+
+**Verdict / wrap-up:**
+{"block":"text","rows":[
+  [[{"type":"h2","text":"The Verdict"},{"type":"p","text":"For most home baristas, the Arco Primo offers the best balance of quality, simplicity, and value."},{"type":"ul","items":["Choose Primo if: You want great espresso without complexity.","Choose Doppio if: You make lots of milk drinks and want to brew and steam at the same time.","Choose Nano if: Space or portability is your priority."]}]]
+]}
+
+---
+
 ### cards
 Grid of content cards. Each row = one card. First cell = image, second cell = text.
-Use for: products, recipes, features, any grid of items.
+Use for: products, recipes, features — any grid of multiple items. Do NOT use for single-item summaries or text-heavy content (use text instead).
 
+**Recipe cards (with tokens):**
 {"block":"cards","rows":[
   [[{"type":"token","value":"{{recipe:Classic Espresso}}"}]],
   [[{"type":"token","value":"{{recipe:Flat White}}"}]],
   [[{"type":"token","value":"{{recipe:Cappuccino}}"}]]
 ]}
 
-Manual card (without tokens):
+**Manual product/feature cards:**
 {"block":"cards","rows":[
   [[{"type":"image","token":"{{product-image:primo}}"}],[{"type":"p","text":"**Arco Primo**"},{"type":"p","text":"Your first step into serious espresso."},{"type":"link","text":"View Details","href":"/products/espresso-machines/primo"}]]
+]}
+
+**Feature highlight cards** (one feature per card, no images):
+{"block":"cards","rows":[
+  [[{"type":"h3","text":"PID Temperature Control"},{"type":"p","text":"Holds brew temperature within 0.5 degrees for repeatable, consistent shots every morning."}]],
+  [[{"type":"h3","text":"E61 Group Head"},{"type":"p","text":"The industry-standard thermosyphon design that keeps the group head at the ideal brewing temperature."}]],
+  [[{"type":"h3","text":"Flow Profiling"},{"type":"p","text":"Manual paddle control over flow rate — shape every phase of extraction for nuanced, complex flavors."}]]
 ]}
 
 Variants: "horizontal", "overlay", "articles"
@@ -78,11 +111,31 @@ Variants: "horizontal", "overlay", "articles"
 
 ### columns
 Side-by-side content. One row, multiple cells = columns.
-Use for: feature highlights, pros/cons, comparisons.
+Use for: feature highlights, pros/cons, comparisons, product spotlights, promotional banners, benefit grids, any 50/50 or multi-column layout.
 
+**Feature comparison:**
 {"block":"columns","rows":[[
   [{"type":"h3","text":"PID Temperature Control"},{"type":"p","text":"Precise to 0.5 degrees for consistent extraction every time."}],
   [{"type":"h3","text":"E61 Group Head"},{"type":"p","text":"The industry standard for thermal stability, shot after shot."}]
+]]}
+
+**Product spotlight** (50/50 image + text):
+{"block":"columns","rows":[[
+  [{"type":"image","token":"{{product-image:doppio}}"}],
+  [{"type":"p","text":"BEST FOR MILK DRINKS"},{"type":"h2","text":"Arco Doppio"},{"type":"p","text":"True dual boiler technology — brew espresso and steam milk simultaneously without compromise."},{"type":"p","text":"$1,599"},{"type":"link","text":"View Doppio","href":"/products/espresso-machines/doppio","style":"primary"}]
+]]}
+
+**Promotional banner** (image + CTA):
+{"block":"columns","rows":[[
+  [{"type":"image","token":"{{product-image:doppio}}"}],
+  [{"type":"h2","text":"Elevate Your Morning Ritual"},{"type":"p","text":"The Doppio brings true cafe performance home."},{"type":"link","text":"View Doppio","href":"/products/espresso-machines/doppio","style":"primary"}]
+]]}
+
+**Benefits grid** (multiple feature cells):
+{"block":"columns","rows":[[
+  [{"type":"strong","text":"Italian Engineering"},{"type":"p","text":"Every Arco machine is designed in Milan and built with commercial-grade components."}],
+  [{"type":"strong","text":"PID Precision"},{"type":"p","text":"Temperature control within 0.5 degrees for consistent, repeatable extraction."}],
+  [{"type":"strong","text":"Built to Last"},{"type":"p","text":"Stainless steel boilers, brass group heads, and a 2-year warranty on every machine."}]
 ]]}
 
 Variants: "text-center", "icons"
@@ -96,22 +149,6 @@ Expandable FAQ sections. Each row = one item. First cell = question, second cell
   [[{"type":"h3","text":"Single boiler or dual boiler?"}],[{"type":"p","text":"Single boiler machines brew and steam one at a time — great for espresso-focused users. Dual boiler lets you brew and steam simultaneously, ideal for milk drinks."}]],
   [[{"type":"h3","text":"Do I need a separate grinder?"}],[{"type":"p","text":"Yes. Freshly ground coffee makes the biggest difference in espresso quality. Pair any Arco machine with an Arco grinder for the best results."}]]
 ]}
-
----
-
-### banner
-Promotional callout sections.
-
-**banner split** — 50/50 image + text:
-{"block":"banner","variants":["split"],"rows":[[
-  [{"type":"image","token":"{{product-image:doppio}}"}],
-  [{"type":"h2","text":"Elevate Your Morning Ritual"},{"type":"p","text":"The Doppio brings true cafe performance home."},{"type":"link","text":"View Doppio","href":"/products/espresso-machines/doppio","style":"primary"}]
-]]}
-
-**banner inset** — Compact centered callout:
-{"block":"banner","variants":["inset"],"rows":[[
-  [{"type":"h2","text":"Free Shipping on All Machines"},{"type":"p","text":"Plus a 2-year warranty on every Arco product."},{"type":"link","text":"Browse Machines","href":"/products/espresso-machines","style":"primary"}]
-]]}
 
 ---
 
@@ -143,59 +180,19 @@ Use "data": {"recommended": "Product Name"} to highlight the recommended column 
 
 ---
 
-### best-pick
-Prominent top-recommendation callout. Use BEFORE comparison tables or as the lead recommendation.
-Row 1: label (ALL CAPS use-case label). Row 2: h2 product name. Row 3: description. Row 4: price + warranty. Row 5: CTA link.
+### product-list
+Product grid with images, pricing, and CTAs. Each row = one product. Two cells per row: image cell + info cell.
 
-{"block":"best-pick","rows":[
-  [[{"type":"p","text":"BEST FOR HOME ESPRESSO"}]],
-  [[{"type":"h2","text":"Arco Primo"}]],
-  [[{"type":"p","text":"The Primo delivers cafe-quality shots with PID temperature control and a commercial 58mm group head. Simple, reliable, and built to last."}]],
-  [[{"type":"p","text":"$899 | 2-Year Warranty"}]],
-  [[{"type":"link","text":"View Primo","href":"/products/espresso-machines/primo","style":"primary"}]]
+{"block":"product-list","rows":[
+  [
+    [{"type":"image","token":"{{product-image:primo}}"}],
+    [{"type":"h3","text":"Arco Primo"},{"type":"p","text":"Single boiler with PID control and 58mm commercial group head"},{"type":"p","text":"$899"},{"type":"link","text":"View Details","href":"/products/espresso-machines/primo","style":"primary"}]
+  ],
+  [
+    [{"type":"image","token":"{{product-image:doppio}}"}],
+    [{"type":"h3","text":"Arco Doppio"},{"type":"p","text":"Dual boiler with E61 group head for simultaneous brewing and steaming"},{"type":"p","text":"$1,599"},{"type":"link","text":"View Details","href":"/products/espresso-machines/doppio","style":"primary"}]
+  ]
 ]}
-
----
-
-### product-recommendation
-50/50 spotlight for one recommended product. One row, two cells: image cell + content cell.
-
-{"block":"product-recommendation","rows":[[
-  [{"type":"image","token":"{{product-image:doppio}}"}],
-  [{"type":"p","text":"BEST FOR MILK DRINKS"},{"type":"h2","text":"Arco Doppio"},{"type":"p","text":"True dual boiler technology — brew espresso and steam milk simultaneously without compromise."},{"type":"p","text":"$1,599"},{"type":"p","text":"2-Year Warranty"},{"type":"link","text":"View Doppio","href":"/products/espresso-machines/doppio","style":"primary"},{"type":"link","text":"Compare Models","href":"#comparison","style":"outline"}]
-]]}
-
----
-
-### verdict-card
-Summary recommendation card. One row, one cell: h2 heading + summary paragraph + ul with per-scenario guidance.
-Place AFTER a comparison-table to wrap up the decision.
-
-{"block":"verdict-card","rows":[[
-  [{"type":"h2","text":"The Verdict"},{"type":"p","text":"For most home baristas, the Arco Primo offers the best balance of quality, simplicity, and value."},{"type":"ul","items":["Choose Primo if: You want great espresso without complexity. PID control and a commercial group head at a fair price.","Choose Doppio if: You make lots of milk drinks and want to brew and steam at the same time.","Choose Nano if: Space or portability is your priority. Surprisingly capable for its size."]}]
-]]}
-
----
-
-### feature-highlights
-Key feature cards. Each row = one feature. One cell per row: h3 title + description paragraph.
-
-{"block":"feature-highlights","rows":[
-  [[{"type":"h3","text":"PID Temperature Control"},{"type":"p","text":"Holds brew temperature within 0.5 degrees for repeatable, consistent shots every morning."}]],
-  [[{"type":"h3","text":"E61 Group Head"},{"type":"p","text":"The industry-standard thermosyphon design that keeps the group head at the ideal brewing temperature."}]],
-  [[{"type":"h3","text":"Flow Profiling"},{"type":"p","text":"Manual paddle control over flow rate — shape every phase of extraction for nuanced, complex flavors."}]]
-]}
-
----
-
-### split-content
-50/50 image + text layout. One row, two cells: image cell + content cell.
-Variants: "reverse" (image on right), "dark" (dark background), "light" (light background)
-
-{"block":"split-content","rows":[[
-  [{"type":"image","token":"{{product-image:studio}}"}],
-  [{"type":"p","text":"FOR THE DEDICATED BARISTA"},{"type":"h2","text":"Where Art Meets Engineering"},{"type":"p","text":"The Studio's saturated group head and flow profiling system bring professional extraction control to your countertop."},{"type":"link","text":"View Studio","href":"/products/espresso-machines/studio","style":"primary"}]
-]]}
 
 ---
 
@@ -212,46 +209,11 @@ Customer testimonials. Row 1: heading. Rows 2+: two cells — empty cell + conte
 
 ---
 
-### quick-answer
-Direct answer card — use for questions with a short, clear answer.
-Row 1: short direct headline (h2). Row 2: explanation (p). Row 3 optional: extended details (p).
-
-{"block":"quick-answer","rows":[
-  [[{"type":"h2","text":"Yes, you need a grinder."}]],
-  [[{"type":"p","text":"Pre-ground coffee loses flavor within minutes of grinding. A quality burr grinder is the single biggest upgrade for your espresso."}]],
-  [[{"type":"p","text":"The Arco Filtro is a great starting point at $349. For maximum precision, the Zero with zero-retention burrs ensures every gram counts."}]]
-]}
-
----
-
-### product-cards
-Product grid with images, ratings, pricing, and CTAs.
-
-{"block":"product-cards","rows":[
-  [
-    [{"type":"image","token":"{{product-image:primo}}"}],
-    [{"type":"h3","text":"Arco Primo"},{"type":"p","text":"Single boiler with PID control and 58mm commercial group head"},{"type":"p","text":"★★★★★"},{"type":"p","text":"$899"},{"type":"link","text":"View Details","href":"/products/espresso-machines/primo","style":"primary"}]
-  ]
-]}
-
----
-
-### benefits-grid
-Feature grid with bold headlines and descriptions.
-
-{"block":"benefits-grid","rows":[[
-  [{"type":"strong","text":"Italian Engineering"},{"type":"p","text":"Every Arco machine is designed in Milan and built with commercial-grade components."}],
-  [{"type":"strong","text":"PID Precision"},{"type":"p","text":"Temperature control within 0.5 degrees for consistent, repeatable extraction."}],
-  [{"type":"strong","text":"Built to Last"},{"type":"p","text":"Stainless steel boilers, brass group heads, and a 2-year warranty on every machine."}]
-]]}
-
----
-
 ## Section Themes
 
 Add a "meta" field to any section to apply visual themes:
 
-{"block":"banner","variants":["split"],"rows":[...],"meta":{"style":"dark"}}
+{"block":"columns","rows":[...],"meta":{"style":"dark"}}
 
 Available meta options:
 - "style": "dark" (charcoal background, white text) or "light" (off-white background)
@@ -316,18 +278,18 @@ Use for: related content after comparisons, recommendations, or how-to content. 
 
 Vary structure based on what the query needs:
 
-- **Product comparisons** → hero + best-pick + comparison-table + verdict-card + content-strip
-- **Product recommendations** → hero + product-recommendation + comparison-table + verdict-card
-- **Direct question** → hero + quick-answer + (accordion for follow-up FAQs)
+- **Product comparisons** → hero + text (best pick) + comparison-table + content-strip
+- **Product recommendations** → hero + columns (product spotlight) + comparison-table
+- **Direct question** → hero + text (answer) + (accordion for follow-up FAQs)
 - **Recipe/drink request** → hero + recipe-steps + content-strip (related guides)
-- **Maintenance/how-to request** → hero + quick-answer + recipe-steps (maintenance steps) + content-strip
-- **Feature showcase** → hero + benefits-grid + feature-highlights + split-content
-- **Grinder questions** → hero + product-recommendation (grinder) + comparison-table (grinders) + verdict-card
-- **Budget questions** → hero + comparison-table sorted by price + verdict-card
-- **Beginner/getting started** → hero + quick-answer + columns (key concepts) + product-recommendation
+- **Maintenance/how-to request** → hero + text (answer) + recipe-steps (maintenance steps) + content-strip
+- **Feature showcase** → hero + columns (benefits grid) + cards (feature highlights) + columns (product spotlight)
+- **Grinder questions** → hero + columns (product spotlight with grinder) + comparison-table (grinders)
+- **Budget questions** → hero + comparison-table sorted by price + text (verdict)
+- **Beginner/getting started** → hero + text (answer) + columns (key concepts) + columns (product spotlight)
 
 Only include product-related blocks when products are genuinely relevant. Prioritize content quality.
-Mix different block types for visual variety.
+Mix different block types and patterns for visual variety.
 
 ---
 
@@ -359,7 +321,7 @@ Suggestion types: "explore", "compare" — NOTHING ELSE.
 - Queries are natural follow-up sentences
 - Tailor to what you DON'T yet know about the user
 
-FINAL CHECK: Before outputting, verify every section has a "block" field, every section is valid JSON, and sections are separated by ===.
+FINAL CHECK: Before outputting, verify every section has a "block" field from the allowed list (hero, text, cards, columns, accordion, table, comparison-table, product-list, testimonials), every section is valid JSON, and sections are separated by ===.
 `;
 
 export default EDS_BLOCK_GUIDE;

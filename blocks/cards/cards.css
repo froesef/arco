@@ -1,4 +1,8 @@
 /* Cards — soft shadows, rounded corners, image hover scale, warm accents */
+.cards {
+  margin-bottom: 48px;
+}
+
 .cards > ul {
   list-style: none;
   margin: 0;

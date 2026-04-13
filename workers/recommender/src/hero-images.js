@@ -5,12 +5,26 @@
  * Each entry includes alt text, topic keywords, and optional product associations
  * so the recommender can select contextually appropriate heroes.
  *
- * Image paths are AEM media hashed paths (relative to ARCO_BASE).
- * To add a new image: upload to DA, get the /media_xxx path from the live site,
- * and add an entry here with descriptive alt text and relevant topics.
+ * Product entries use actual product image paths from products.json.
+ * Non-product entries use the default hero image until dedicated lifestyle/story
+ * images are generated and uploaded to DA.
  */
 
+/* eslint-disable import/extensions, import/no-relative-packages */
+import productsData from '../../../content/products/products.json';
+/* eslint-enable import/extensions, import/no-relative-packages */
+
 const ARCO_BASE = 'https://main--arco--froesef.aem.live';
+
+// Default hero image — used for non-product entries
+const DEFAULT_HERO = '/media_1f7e12f4bd38e8ecf4fdc73dc84ebd9a5fd516521.jpg';
+
+// Build a product ID → image path lookup from the products data
+const productImageMap = new Map(
+  (productsData.data || [])
+    .filter((p) => p.images?.[0] || p.image)
+    .map((p) => [p.id, p.images?.[0] || p.image]),
+);
 
 // ---------------------------------------------------------------------------
 // Catalog
@@ -358,8 +372,15 @@ export function selectHeroImage({
   const topTier = scored.filter((s) => s.score === topScore);
   const selected = topTier[Math.floor(Math.random() * topTier.length)].image;
 
+  // Resolve image path: use real product image if available, else default hero
+  let imagePath = DEFAULT_HERO;
+  if (selected.productIds?.length) {
+    const productImage = productImageMap.get(selected.productIds[0]);
+    if (productImage) imagePath = productImage;
+  }
+
   return {
-    url: `${ARCO_BASE}/drafts/media${selected.path}`,
+    url: `${ARCO_BASE}${imagePath.startsWith('/') ? '' : '/'}${imagePath}`,
     alt: selected.alt,
   };
 }

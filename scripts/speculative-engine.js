@@ -106,7 +106,6 @@ export default function createSpeculativeEngine(config) {
         hoverCount: 0,
         lastHoverStart: 0,
         hoverTimer200: null,
-        hoverTimer500: null,
         got200Points: false,
       };
       buttonStates.set(element, state);
@@ -289,27 +288,17 @@ export default function createSpeculativeEngine(config) {
 
     onConfidenceChange(state);
 
-    // Dwell timers
+    // 200ms dwell guarantees speculation trigger
     state.hoverTimer200 = setTimeout(() => {
-      if (!state.got200Points) {
-        state.confidence += 20;
-        state.got200Points = true;
-        onConfidenceChange(state);
-      }
-    }, 200);
-
-    state.hoverTimer500 = setTimeout(() => {
-      // Replace 200ms points with 500ms points (+25 total, not +45)
-      if (state.got200Points) state.confidence -= 20;
-      state.confidence += 25;
+      state.confidence = Math.max(state.confidence, CONFIDENCE_THRESHOLD);
+      state.got200Points = true;
       onConfidenceChange(state);
-    }, 500);
+    }, 200);
   }
 
   function onChipLeave(e) {
     const state = getButtonState(e.currentTarget);
     clearTimeout(state.hoverTimer200);
-    clearTimeout(state.hoverTimer500);
     state.got200Points = false;
   }
 

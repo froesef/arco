@@ -104,6 +104,49 @@ const BLOCK_ALIASES = {
   'related-content': 'content-strip',
 };
 
+// Canonical product URL map: short id → full path
+const PRODUCT_URLS = {
+  primo: '/products/espresso-machines/primo',
+  doppio: '/products/espresso-machines/doppio',
+  nano: '/products/espresso-machines/nano',
+  studio: '/products/espresso-machines/studio',
+  'studio-pro': '/products/espresso-machines/studio-pro',
+  ufficio: '/products/espresso-machines/ufficio',
+  viaggio: '/products/espresso-machines/viaggio',
+  automatico: '/products/espresso-machines/automatico',
+  filtro: '/products/grinders/filtro',
+  preciso: '/products/grinders/preciso',
+  macinino: '/products/grinders/macinino',
+  zero: '/products/grinders/zero',
+  'tamper-set': '/products/accessories/tamper-set',
+  'distribution-tool': '/products/accessories/distribution-tool',
+  'precision-scale': '/products/accessories/precision-scale',
+  'milk-pitcher': '/products/accessories/milk-pitcher',
+  'knock-box': '/products/accessories/knock-box',
+  'cleaning-kit': '/products/accessories/cleaning-kit',
+  'descaling-solution': '/products/accessories/descaling-solution',
+  'group-head-brush': '/products/accessories/group-head-brush',
+  'espresso-cups': '/products/accessories/espresso-cups',
+  'double-wall-glasses': '/products/accessories/double-wall-glasses',
+  'bean-vault': '/products/accessories/bean-vault',
+  'dosing-cup': '/products/accessories/dosing-cup',
+};
+
+/**
+ * Fix short product URLs (/products/primo) to canonical form (/products/espresso-machines/primo).
+ * @param {Element} container The container to scan for links
+ */
+function fixProductLinks(container) {
+  container.querySelectorAll('a[href^="/products/"]').forEach((a) => {
+    const parts = new URL(a.href, window.location.origin).pathname.split('/').filter(Boolean);
+    // Only fix short URLs: /products/{id} (2 segments), not /products/{category}/{id} (3 segments)
+    if (parts.length === 2) {
+      const id = parts[1];
+      if (PRODUCT_URLS[id]) a.href = PRODUCT_URLS[id];
+    }
+  });
+}
+
 /**
  * Decorates the main element.
  * @param {Element} main The main element
@@ -113,6 +156,7 @@ export function decorateMain(main) {
   // hopefully forward compatible button decoration
   decorateButtons(main);
   decorateIcons(main);
+  fixProductLinks(main);
   buildAutoBlocks(main);
   decorateSections(main);
 

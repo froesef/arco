@@ -9,7 +9,7 @@ import reviewsData from '../../../content/metadata/reviews.json';
 import accessoriesData from '../../../content/accessories/accessories.json';
 /* eslint-enable import/extensions, import/no-relative-packages */
 
-import { selectHeroImage, HERO_IMAGE_CATALOG } from './hero-images.js';
+import { selectHeroImage } from './hero-images.js';
 
 const ARCO_BASE = 'https://main--arco--froesef.aem.live';
 
@@ -233,9 +233,8 @@ accessories.forEach((a) => {
   if (a.image) knownImageUrls.add(absoluteImageUrl(a.image));
 });
 knownImageUrls.add(absoluteImageUrl(HERO_MAIN_IMAGE));
-HERO_IMAGE_CATALOG.forEach((entry) => {
-  knownImageUrls.add(`${ARCO_BASE}/drafts/media${entry.path}`);
-});
+// Hero images resolve to real product images or the default hero at runtime,
+// so all valid hero URLs are already in knownImageUrls via product/default entries.
 
 /**
  * Remove <picture>/<img> tags with hallucinated image URLs (not from known data).

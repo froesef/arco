@@ -49,12 +49,16 @@ export default async function decorate(block) {
     dataRows = rows.slice(0, -1);
   }
 
-  // Header row — product names
+  // Header row — product names (preserve links if present)
   const headerCols = [...dataRows[0].children];
-  const productNames = [
-    headerCols[1]?.textContent.trim() || 'Product A',
-    headerCols[2]?.textContent.trim() || 'Product B',
-  ];
+  const productHeaders = [1, 2].map((i) => {
+    const col = headerCols[i];
+    if (!col) return { text: `Product ${i === 1 ? 'A' : 'B'}`, link: null };
+    const anchor = col.querySelector('a');
+    if (anchor) return { text: anchor.textContent.trim(), link: anchor.href };
+    return { text: col.textContent.trim(), link: null };
+  });
+  const productNames = productHeaders.map((h) => h.text);
 
   // Determine which column is recommended
   const recommendedProduct = persona ? recommendations[persona] : null;
@@ -75,10 +79,17 @@ export default async function decorate(block) {
   const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
   headerRow.innerHTML = '<th scope="col"></th>';
-  productNames.forEach((name, i) => {
+  productHeaders.forEach(({ text, link }, i) => {
     const th = document.createElement('th');
     th.scope = 'col';
-    th.textContent = name;
+    if (link) {
+      const a = document.createElement('a');
+      a.href = link;
+      a.textContent = text;
+      th.append(a);
+    } else {
+      th.textContent = text;
+    }
     if (i === recommendedCol) {
       th.classList.add('comparison-table-recommended');
       const badge = document.createElement('span');

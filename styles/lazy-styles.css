@@ -206,7 +206,18 @@ img[data-gen-image].loaded {
 }
 
 #generation-content > .section {
+  margin-bottom: 48px;
   animation: recommender-fade-in 0.4s ease both;
+}
+
+#generation-content > .section:last-child {
+  margin-bottom: 0;
+}
+
+@media (width >= 900px) {
+  #generation-content > .section {
+    margin-bottom: 64px;
+  }
 }
 
 @keyframes recommender-fade-in {
