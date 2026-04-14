@@ -36,6 +36,7 @@ const DEFAULTS = {
   output: 'tools/loadtest/results',
   prompts: 'tools/loadtest/prompts.json',
   viewport: '1280x800',
+  skipCerebras: false,
 };
 
 function parseArgs(argv) {
@@ -46,7 +47,7 @@ function parseArgs(argv) {
 
     const key = arg.slice(2);
     // Boolean flags that don't take a value
-    const booleanFlags = ['screenshots', 'regen', 'headless', 'dry-run', 'no-screenshots', 'no-headless'];
+    const booleanFlags = ['screenshots', 'regen', 'headless', 'dry-run', 'no-screenshots', 'no-headless', 'skip-cerebras'];
     if (booleanFlags.includes(key)) {
       if (key.startsWith('no-')) {
         args[key.slice(3)] = false;
@@ -92,6 +93,7 @@ export function parseConfig(argv = process.argv) {
     prompts: get('prompts', DEFAULTS.prompts),
     viewport: get('viewport', DEFAULTS.viewport),
     loadtestToken: get('loadtest-token', process.env.LOADTEST_TOKEN || ''),
+    skipCerebras: get('skip-cerebras', DEFAULTS.skipCerebras),
   };
 
   // Ensure boolean types
@@ -126,6 +128,9 @@ export function printConfig(config) {
   console.log(`  Viewport:     ${config.viewportWidth}x${config.viewportHeight}`);
   if (config.loadtestToken) {
     console.log('  Loadtest token: set (rate limit bypass enabled)');
+  }
+  if (config.skipCerebras) {
+    console.log('  Skip Cerebras: YES (dummy content mode — RAG still runs)');
   }
 
   if (config.rate > 0.5 && !config.loadtestToken) {

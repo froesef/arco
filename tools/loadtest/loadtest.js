@@ -309,6 +309,7 @@ async function main() {
     viewportWidth: config.viewportWidth,
     viewportHeight: config.viewportHeight,
     loadtestToken: config.loadtestToken,
+    skipCerebras: config.skipCerebras,
   });
   const reporter = new Reporter(outputDir);
 

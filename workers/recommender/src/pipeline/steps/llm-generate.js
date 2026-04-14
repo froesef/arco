@@ -201,6 +201,60 @@ export function extractTitle(firstSection) {
 }
 
 // eslint-disable-next-line import/prefer-default-export
+/**
+ * Dummy LLM bypass — streams pre-canned content without calling Cerebras.
+ * Activated by the X-Skip-Cerebras request header (load testing only).
+ * All upstream pipeline steps (RAG, Vectorize, embedding) still run normally.
+ */
+async function streamDummyContent(ctx) {
+  const query = ctx.request?.query || 'your query';
+  const dummySections = [
+    `<div class="section"><h1>Results for: ${query}</h1><p>This is dummy content returned by the load test bypass. Cerebras was not called.</p></div>`,
+    '<div class="section"><h2>About this product</h2><p>The Arco Studio Pro is an excellent espresso machine designed for home baristas who demand precision and consistency in every shot.</p></div>',
+    '<div class="section"><h2>Key features</h2><ul><li>PID temperature control</li><li>58mm portafilter</li><li>Built-in pressure gauge</li></ul></div>',
+  ];
+
+  ctx.timings.llmStart = Date.now();
+  ctx.timings.llmFirstToken = Date.now();
+
+  for (let i = 0; i < dummySections.length; i += 1) {
+    const html = dummySections[i];
+    ctx.llm.sections.push(html);
+    const line = JSON.stringify({ type: 'section', index: i, html });
+    ctx.ndjsonLines.push(line);
+    // eslint-disable-next-line no-await-in-loop
+    await ctx.writer.write(ctx.encoder.encode(`${line}\n`));
+  }
+
+  ctx.timings.llmLastToken = Date.now();
+  ctx.timings.llmEnd = Date.now();
+
+  const suggestions = [
+    { type: 'explore', label: 'Compare espresso machines' },
+    { type: 'explore', label: 'Best grinders for espresso' },
+  ];
+  ctx.llm.suggestions = suggestions;
+  const sugLine = JSON.stringify({ type: 'suggestions', items: suggestions });
+  ctx.ndjsonLines.push(sugLine);
+  await ctx.writer.write(ctx.encoder.encode(`${sugLine}\n`));
+
+  const debugLine = JSON.stringify({
+    type: 'debug',
+    timings: {
+      total: Date.now() - ctx.timings.start,
+      llm: ctx.timings.llmEnd - ctx.timings.llmStart,
+      dummy: true,
+    },
+    pipeline: { flow: ctx.flowId || 'default', dummy: true },
+  });
+  ctx.ndjsonLines.push(debugLine);
+  await ctx.writer.write(ctx.encoder.encode(`${debugLine}\n`));
+
+  const doneLine = JSON.stringify({ type: 'done', title: `Results for: ${query}`, usedProducts: [] });
+  ctx.ndjsonLines.push(doneLine);
+  await ctx.writer.write(ctx.encoder.encode(`${doneLine}\n`));
+}
+
 export async function llmGenerate(ctx, config, env) {
   // Set hero image context so {{hero-image:main}} resolves to a contextual image
   setHeroContext({
@@ -209,6 +263,13 @@ export async function llmGenerate(ctx, config, env) {
     intentType: ctx.rag?.intentClassification?.intentType,
     productIds: (ctx.rag?.products || []).map((p) => p.id),
   });
+
+  // Load test bypass: skip Cerebras and return dummy content
+  // Activated by X-Skip-Cerebras header — all upstream RAG steps still run
+  if (ctx.request.headers?.get('x-skip-cerebras') === 'true') {
+    await streamDummyContent(ctx);
+    return;
+  }
 
   const client = new Cerebras({ apiKey: env.CEREBRAS_API_KEY });
 

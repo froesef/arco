@@ -12,13 +12,14 @@ const MAX_CONTEXTS_PER_BROWSER = 10;
 
 export class BrowserPool {
   constructor({
-    parallel, headless, viewportWidth, viewportHeight, loadtestToken,
+    parallel, headless, viewportWidth, viewportHeight, loadtestToken, skipCerebras,
   }) {
     this.parallel = parallel;
     this.headless = headless;
     this.viewportWidth = viewportWidth;
     this.viewportHeight = viewportHeight;
     this.loadtestToken = loadtestToken || '';
+    this.skipCerebras = skipCerebras || false;
 
     this.browsers = [];
     this.availableContexts = [];
@@ -49,10 +50,12 @@ export class BrowserPool {
           ignoreHTTPSErrors: true,
         });
 
-        // Inject X-Loadtest-Token header on API requests to bypass rate limiting
-        if (this.loadtestToken) {
+        // Inject extra headers on API requests
+        if (this.loadtestToken || this.skipCerebras) {
           await context.route('**/api/generate', (route) => {
-            const headers = { ...route.request().headers(), 'x-loadtest-token': this.loadtestToken };
+            const headers = { ...route.request().headers() };
+            if (this.loadtestToken) headers['x-loadtest-token'] = this.loadtestToken;
+            if (this.skipCerebras) headers['x-skip-cerebras'] = 'true';
             route.continue({ headers });
           });
         }
