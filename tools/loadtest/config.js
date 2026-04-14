@@ -128,7 +128,7 @@ export function printConfig(config) {
     console.log('  Loadtest token: set (rate limit bypass enabled)');
   }
 
-  if (config.rate > 0.5) {
+  if (config.rate > 0.5 && !config.loadtestToken) {
     console.log(`\n  ⚠ Rate ${config.rate}/s exceeds the backend limit of 30/60s (0.5/s).`);
     if (config.rate <= 5) {
       console.log('    Using burst-then-wait strategy: 28 requests per 60s window.');
@@ -136,7 +136,14 @@ export function printConfig(config) {
     console.log('    Expect 429 responses unless rate limit is bypassed on the worker.');
   }
 
-  const estimatedMinutes = Math.ceil(config.total / Math.min(config.rate, 0.5) / 60);
-  console.log(`\n  Estimated duration: ~${estimatedMinutes} minutes`);
+  // Estimate duration: max of rate-limited time vs execution time with parallelism
+  const AVG_REQUEST_SECONDS = 2.5;
+  const rateLimitedSeconds = config.total / config.rate;
+  const executionSeconds = (config.total * AVG_REQUEST_SECONDS) / config.parallel;
+  const estimatedSeconds = Math.max(rateLimitedSeconds, executionSeconds);
+  const estMin = Math.floor(estimatedSeconds / 60);
+  const estSec = Math.ceil(estimatedSeconds % 60);
+  const estStr = estMin > 0 ? `${estMin}m ${estSec}s` : `${estSec}s`;
+  console.log(`\n  Estimated duration: ~${estStr} (assuming ~${AVG_REQUEST_SECONDS}s per request)`);
   console.log('================================\n');
 }

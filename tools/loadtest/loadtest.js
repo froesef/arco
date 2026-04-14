@@ -310,6 +310,25 @@ async function main() {
   });
   const reporter = new Reporter(outputDir);
 
+  let aborted = false;
+
+  // Graceful shutdown on Ctrl+C: write partial results before exiting
+  const handleSignal = async () => {
+    if (aborted) return; // prevent double-handling
+    aborted = true;
+    console.error('\n\nInterrupted — writing partial results...\n');
+    try {
+      await reporter.writeReports(config, rateLimiter.getStats());
+      console.log(`\nPartial results written to: ${outputDir}`);
+    } catch (e) {
+      console.error('Failed to write partial results:', e.message);
+    }
+    await browserPool.shutdown().catch(() => {});
+    process.exit(130);
+  };
+  process.on('SIGINT', handleSignal);
+  process.on('SIGTERM', handleSignal);
+
   try {
     await browserPool.initialize();
     console.log('\nStarting load test...\n');
@@ -319,7 +338,9 @@ async function main() {
     let completed = 0;
 
     for (const prompt of prompts) {
+      if (aborted) break;
       await rateLimiter.acquire();
+      if (aborted) break;
       const context = await browserPool.acquireContext();
 
       const promise = testSingleQuery(context, prompt, config, outputDir)
@@ -342,17 +363,25 @@ async function main() {
     // Wait for all in-flight
     await Promise.all(inFlight);
 
-    console.log('\n--- Test Complete ---\n');
+    if (!aborted) {
+      console.log('\n--- Test Complete ---\n');
 
-    // Write reports
-    await reporter.writeReports(config, rateLimiter.getStats());
-    console.log(`\nResults written to: ${outputDir}`);
+      // Write reports
+      await reporter.writeReports(config, rateLimiter.getStats());
+      console.log(`\nResults written to: ${outputDir}`);
+    }
   } finally {
-    await browserPool.shutdown();
+    process.off('SIGINT', handleSignal);
+    process.off('SIGTERM', handleSignal);
+    if (!aborted) await browserPool.shutdown();
   }
 }
 
 main().catch((err) => {
+  if (err.message?.includes('has been closed') || err.message?.includes('Target closed')) {
+    // Browser was closed during shutdown — already handled
+    return;
+  }
   console.error('Fatal error:', err);
   process.exit(1);
 });
