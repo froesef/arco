@@ -7,7 +7,10 @@
     "lint:js": "eslint .",
     "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\"",
     "lint": "npm run lint:js && npm run lint:css",
-    "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix"
+    "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
+    "loadtest": "node tools/loadtest/loadtest.js",
+    "loadtest:quick": "node tools/loadtest/loadtest.js --total 10 --parallel 2",
+    "loadtest:generate-prompts": "node tools/loadtest/generate-prompts.js"
   },
   "repository": {
     "type": "git",

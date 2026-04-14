@@ -1,0 +1,5002 @@
+[
+  {
+    "id": 1,
+    "query": "What do you suggest for the Arco Viaggio",
+    "category": "product-specific"
+  },
+  {
+    "id": 2,
+    "query": "How long does the Macinino take to heat up?",
+    "category": "product-specific"
+  },
+  {
+    "id": 3,
+    "query": "Can the Studio make good cappuccinos?",
+    "category": "product-specific"
+  },
+  {
+    "id": 4,
+    "query": "Is the Macinino worth $549?",
+    "category": "product-specific"
+  },
+  {
+    "id": 5,
+    "query": "What can you tell me about the Macinino?",
+    "category": "product-specific"
+  },
+  {
+    "id": 6,
+    "query": "I'm thinking about buying the Primo",
+    "category": "product-specific"
+  },
+  {
+    "id": 7,
+    "query": "Can the Nano make good milk drinks?",
+    "category": "product-specific"
+  },
+  {
+    "id": 8,
+    "query": "Is the Arco Nano a good espresso machine?",
+    "category": "product-specific"
+  },
+  {
+    "id": 9,
+    "query": "What colors does the Automatico come in?",
+    "category": "product-specific"
+  },
+  {
+    "id": 10,
+    "query": "Is the Arco Filtro a good grinder?",
+    "category": "product-specific"
+  },
+  {
+    "id": 11,
+    "query": "What's special about the Filtro grinder?",
+    "category": "product-specific"
+  },
+  {
+    "id": 12,
+    "query": "I'd like to know about the Arco Automatico",
+    "category": "product-specific"
+  },
+  {
+    "id": 13,
+    "query": "What accessories come with the Nano?",
+    "category": "product-specific"
+  },
+  {
+    "id": 14,
+    "query": "Pros and cons of the Ufficio",
+    "category": "product-specific"
+  },
+  {
+    "id": 15,
+    "query": "How long does the Preciso take to heat up?",
+    "category": "product-specific"
+  },
+  {
+    "id": 16,
+    "query": "Detailed review of the Arco Macinino",
+    "category": "product-specific"
+  },
+  {
+    "id": 17,
+    "query": "How long does the Zero take to heat up?",
+    "category": "product-specific"
+  },
+  {
+    "id": 18,
+    "query": "Is the Filtro worth $349?",
+    "category": "product-specific"
+  },
+  {
+    "id": 19,
+    "query": "Is the Preciso worth $449?",
+    "category": "product-specific"
+  },
+  {
+    "id": 20,
+    "query": "I'm thinking about buying the Nano, is it any good",
+    "category": "product-specific"
+  },
+  {
+    "id": 21,
+    "query": "Is the Arco Macinino a good grinder?",
+    "category": "product-specific"
+  },
+  {
+    "id": 22,
+    "query": "Can the Macinino make good lattes?",
+    "category": "product-specific"
+  },
+  {
+    "id": 23,
+    "query": "How does the Zero compare to other grinders in its price range?",
+    "category": "product-specific"
+  },
+  {
+    "id": 24,
+    "query": "What can you tell me about the Doppio?",
+    "category": "product-specific"
+  },
+  {
+    "id": 25,
+    "query": "Is the Doppio worth $1599?",
+    "category": "product-specific"
+  },
+  {
+    "id": 26,
+    "query": "What's special about the Ufficio espresso machine?",
+    "category": "product-specific"
+  },
+  {
+    "id": 27,
+    "query": "What colors does the Ufficio come in?",
+    "category": "product-specific"
+  },
+  {
+    "id": 28,
+    "query": "Can you recommend the Arco Doppio",
+    "category": "product-specific"
+  },
+  {
+    "id": 29,
+    "query": "I'd like to know about the Arco Macinino",
+    "category": "product-specific"
+  },
+  {
+    "id": 30,
+    "query": "Is the Arco Viaggio a good espresso machine?",
+    "category": "product-specific"
+  },
+  {
+    "id": 31,
+    "query": "What can you tell me about the Filtro?",
+    "category": "product-specific"
+  },
+  {
+    "id": 32,
+    "query": "Is the Studio worth $2299?",
+    "category": "product-specific"
+  },
+  {
+    "id": 33,
+    "query": "Detailed review of the Arco Nano",
+    "category": "product-specific"
+  },
+  {
+    "id": 34,
+    "query": "What's the best the Arco Viaggio",
+    "category": "product-specific"
+  },
+  {
+    "id": 35,
+    "query": "What colors does the Viaggio come in?",
+    "category": "product-specific"
+  },
+  {
+    "id": 36,
+    "query": "Tell me about the Arco Preciso",
+    "category": "product-specific"
+  },
+  {
+    "id": 37,
+    "query": "What's special about the Studio Pro espresso machine?",
+    "category": "product-specific"
+  },
+  {
+    "id": 38,
+    "query": "Studio features and specifications",
+    "category": "product-specific"
+  },
+  {
+    "id": 39,
+    "query": "Is the Arco Ufficio a good espresso machine?",
+    "category": "product-specific"
+  },
+  {
+    "id": 40,
+    "query": "Is the Studio Pro worth $3499?",
+    "category": "product-specific"
+  },
+  {
+    "id": 41,
+    "query": "How does the Ufficio compare to other espresso machines in its price range?",
+    "category": "product-specific"
+  },
+  {
+    "id": 42,
+    "query": "I'm thinking about buying the Ufficio",
+    "category": "product-specific"
+  },
+  {
+    "id": 43,
+    "query": "Can the Macinino make good espresso?",
+    "category": "product-specific"
+  },
+  {
+    "id": 44,
+    "query": "Can the Nano make good cappuccinos?",
+    "category": "product-specific"
+  },
+  {
+    "id": 45,
+    "query": "Detailed review of the Arco Viaggio",
+    "category": "product-specific"
+  },
+  {
+    "id": 46,
+    "query": "What colors does the Preciso come in?",
+    "category": "product-specific"
+  },
+  {
+    "id": 47,
+    "query": "How does the Viaggio compare to other espresso machines in its price range?",
+    "category": "product-specific"
+  },
+  {
+    "id": 48,
+    "query": "Is the Ufficio worth $4299?",
+    "category": "product-specific"
+  },
+  {
+    "id": 49,
+    "query": "I'm looking for the Arco Macinino",
+    "category": "product-specific"
+  },
+  {
+    "id": 50,
+    "query": "Is the Arco Studio a good espresso machine?",
+    "category": "product-specific"
+  },
+  {
+    "id": 51,
+    "query": "How long does the Viaggio take to heat up?",
+    "category": "product-specific"
+  },
+  {
+    "id": 52,
+    "query": "What accessories come with the Studio?",
+    "category": "product-specific"
+  },
+  {
+    "id": 53,
+    "query": "Can the Primo make good milk drinks?",
+    "category": "product-specific"
+  },
+  {
+    "id": 54,
+    "query": "Is the Arco Automatico a good espresso machine?",
+    "category": "product-specific"
+  },
+  {
+    "id": 55,
+    "query": "How long does the Studio take to heat up?",
+    "category": "product-specific"
+  },
+  {
+    "id": 56,
+    "query": "Detailed review of the Arco Preciso",
+    "category": "product-specific"
+  },
+  {
+    "id": 57,
+    "query": "Pros and cons of the Doppio",
+    "category": "product-specific"
+  },
+  {
+    "id": 58,
+    "query": "Who is the Arco Preciso really best for?",
+    "category": "product-specific"
+  },
+  {
+    "id": 59,
+    "query": "What colors does the Filtro come in?",
+    "category": "product-specific"
+  },
+  {
+    "id": 60,
+    "query": "What can you tell me about the Viaggio?",
+    "category": "product-specific"
+  },
+  {
+    "id": 61,
+    "query": "Pros and cons of the Preciso",
+    "category": "product-specific"
+  },
+  {
+    "id": 62,
+    "query": "Detailed review of the Arco Studio",
+    "category": "product-specific"
+  },
+  {
+    "id": 63,
+    "query": "What colors does the Zero come in?",
+    "category": "product-specific"
+  },
+  {
+    "id": 64,
+    "query": "Is the Arco Doppio a good espresso machine?",
+    "category": "product-specific"
+  },
+  {
+    "id": 65,
+    "query": "Is the Arco Zero a good grinder?",
+    "category": "product-specific"
+  },
+  {
+    "id": 66,
+    "query": "Pros and cons of the Zero",
+    "category": "product-specific"
+  },
+  {
+    "id": 67,
+    "query": "Can the Viaggio make good espresso?",
+    "category": "product-specific"
+  },
+  {
+    "id": 68,
+    "query": "How long does the Studio Pro take to heat up?",
+    "category": "product-specific"
+  },
+  {
+    "id": 69,
+    "query": "Pros and cons of the Filtro",
+    "category": "product-specific"
+  },
+  {
+    "id": 70,
+    "query": "Who is the Arco Primo really best for?",
+    "category": "product-specific"
+  },
+  {
+    "id": 71,
+    "query": "I'm thinking about buying the Ufficio, is it any good",
+    "category": "product-specific"
+  },
+  {
+    "id": 72,
+    "query": "What can you tell me about the Nano?",
+    "category": "product-specific"
+  },
+  {
+    "id": 73,
+    "query": "Ufficio features and specifications",
+    "category": "product-specific"
+  },
+  {
+    "id": 74,
+    "query": "Can the Ufficio make good cappuccinos?",
+    "category": "product-specific"
+  },
+  {
+    "id": 75,
+    "query": "Preciso features and specifications",
+    "category": "product-specific"
+  },
+  {
+    "id": 76,
+    "query": "Can the Preciso make good lattes?",
+    "category": "product-specific"
+  },
+  {
+    "id": 77,
+    "query": "What would you recommend for the Arco Studio",
+    "category": "product-specific"
+  },
+  {
+    "id": 78,
+    "query": "Viaggio features and specifications",
+    "category": "product-specific"
+  },
+  {
+    "id": 79,
+    "query": "Who is the Arco Primo best for?",
+    "category": "product-specific"
+  },
+  {
+    "id": 80,
+    "query": "Can you recommend the Arco Macinino",
+    "category": "product-specific"
+  },
+  {
+    "id": 81,
+    "query": "Can the Macinino make good cappuccinos?",
+    "category": "product-specific"
+  },
+  {
+    "id": 82,
+    "query": "Filtro features and specifications",
+    "category": "product-specific"
+  },
+  {
+    "id": 83,
+    "query": "What colors does the Primo come in?",
+    "category": "product-specific"
+  },
+  {
+    "id": 84,
+    "query": "How does the Studio Pro compare to other espresso machines in its price range?",
+    "category": "product-specific"
+  },
+  {
+    "id": 85,
+    "query": "Is the Arco Preciso a good grinder?",
+    "category": "product-specific"
+  },
+  {
+    "id": 86,
+    "query": "Who is the Arco Automatico best for?",
+    "category": "product-specific"
+  },
+  {
+    "id": 87,
+    "query": "Can you recommend the Arco Automatico",
+    "category": "product-specific"
+  },
+  {
+    "id": 88,
+    "query": "Can the Studio make good milk drinks?",
+    "category": "product-specific"
+  },
+  {
+    "id": 89,
+    "query": "I want to learn about the Arco Studio",
+    "category": "product-specific"
+  },
+  {
+    "id": 90,
+    "query": "What colors does the Macinino come in?",
+    "category": "product-specific"
+  },
+  {
+    "id": 91,
+    "query": "How does the Doppio compare to other espresso machines in its price range?",
+    "category": "product-specific"
+  },
+  {
+    "id": 92,
+    "query": "How does the Studio compare to other espresso machines in its price range?",
+    "category": "product-specific"
+  },
+  {
+    "id": 93,
+    "query": "Who is the Arco Filtro best for?",
+    "category": "product-specific"
+  },
+  {
+    "id": 94,
+    "query": "What can you tell me about the Ufficio?",
+    "category": "product-specific"
+  },
+  {
+    "id": 95,
+    "query": "Who is the Arco Ufficio really best for?",
+    "category": "product-specific"
+  },
+  {
+    "id": 96,
+    "query": "Pros and cons of the Nano",
+    "category": "product-specific"
+  },
+  {
+    "id": 97,
+    "query": "What accessories come with the Studio Pro?",
+    "category": "product-specific"
+  },
+  {
+    "id": 98,
+    "query": "Can the Zero make good espresso?",
+    "category": "product-specific"
+  },
+  {
+    "id": 99,
+    "query": "How long does the Filtro take to heat up?",
+    "category": "product-specific"
+  },
+  {
+    "id": 100,
+    "query": "I'm thinking about buying the Preciso",
+    "category": "product-specific"
+  },
+  {
+    "id": 101,
+    "query": "How does the Nano compare to other espresso machines in its price range?",
+    "category": "product-specific"
+  },
+  {
+    "id": 102,
+    "query": "How does the Automatico compare to other espresso machines in its price range?",
+    "category": "product-specific"
+  },
+  {
+    "id": 103,
+    "query": "Macinino features and specifications",
+    "category": "product-specific"
+  },
+  {
+    "id": 104,
+    "query": "Primo features and specifications",
+    "category": "product-specific"
+  },
+  {
+    "id": 105,
+    "query": "What's special about the Automatico espresso machine?",
+    "category": "product-specific"
+  },
+  {
+    "id": 106,
+    "query": "Is the Zero worth $699?",
+    "category": "product-specific"
+  },
+  {
+    "id": 107,
+    "query": "What accessories come with the Ufficio?",
+    "category": "product-specific"
+  },
+  {
+    "id": 108,
+    "query": "I'm thinking about buying the Filtro",
+    "category": "product-specific"
+  },
+  {
+    "id": 109,
+    "query": "Can the Doppio make good lattes?",
+    "category": "product-specific"
+  },
+  {
+    "id": 110,
+    "query": "Show me the Arco Doppio",
+    "category": "product-specific"
+  },
+  {
+    "id": 111,
+    "query": "What's special about the Studio espresso machine?",
+    "category": "product-specific"
+  },
+  {
+    "id": 112,
+    "query": "I'm interested in the Arco Studio Pro",
+    "category": "product-specific"
+  },
+  {
+    "id": 113,
+    "query": "Detailed review of the Arco Zero",
+    "category": "product-specific"
+  },
+  {
+    "id": 114,
+    "query": "What accessories come with the Preciso?",
+    "category": "product-specific"
+  },
+  {
+    "id": 115,
+    "query": "Pros and cons of the Primo",
+    "category": "product-specific"
+  },
+  {
+    "id": 116,
+    "query": "What colors does the Doppio come in?",
+    "category": "product-specific"
+  },
+  {
+    "id": 117,
+    "query": "Pros and cons of the Automatico",
+    "category": "product-specific"
+  },
+  {
+    "id": 118,
+    "query": "What can you tell me about the Studio Pro?",
+    "category": "product-specific"
+  },
+  {
+    "id": 119,
+    "query": "Pros and cons of the Macinino",
+    "category": "product-specific"
+  },
+  {
+    "id": 120,
+    "query": "Who is the Arco Studio Pro really best for?",
+    "category": "product-specific"
+  },
+  {
+    "id": 121,
+    "query": "What accessories come with the Zero?",
+    "category": "product-specific"
+  },
+  {
+    "id": 122,
+    "query": "Automatico features and specifications",
+    "category": "product-specific"
+  },
+  {
+    "id": 123,
+    "query": "Detailed review of the Arco Automatico",
+    "category": "product-specific"
+  },
+  {
+    "id": 124,
+    "query": "What's special about the Preciso grinder?",
+    "category": "product-specific"
+  },
+  {
+    "id": 125,
+    "query": "Can the Preciso make good espresso?",
+    "category": "product-specific"
+  },
+  {
+    "id": 126,
+    "query": "Detailed review of the Arco Filtro",
+    "category": "product-specific"
+  },
+  {
+    "id": 127,
+    "query": "What do you suggest for the Arco Zero",
+    "category": "product-specific"
+  },
+  {
+    "id": 128,
+    "query": "What accessories come with the Doppio?",
+    "category": "product-specific"
+  },
+  {
+    "id": 129,
+    "query": "Can the Ufficio make good espresso?",
+    "category": "product-specific"
+  },
+  {
+    "id": 130,
+    "query": "Who is the Arco Studio best for?",
+    "category": "product-specific"
+  },
+  {
+    "id": 131,
+    "query": "Who is the Arco Studio Pro best for?",
+    "category": "product-specific"
+  },
+  {
+    "id": 132,
+    "query": "I'm curious about the Arco Preciso",
+    "category": "product-specific"
+  },
+  {
+    "id": 133,
+    "query": "Help me choose the Arco Studio",
+    "category": "product-specific"
+  },
+  {
+    "id": 134,
+    "query": "Can the Viaggio make good cappuccinos?",
+    "category": "product-specific"
+  },
+  {
+    "id": 135,
+    "query": "What can you tell me about the Zero?",
+    "category": "product-specific"
+  },
+  {
+    "id": 136,
+    "query": "Tell me about the Arco Doppio",
+    "category": "product-specific"
+  },
+  {
+    "id": 137,
+    "query": "Pros and cons of the Viaggio",
+    "category": "product-specific"
+  },
+  {
+    "id": 138,
+    "query": "Can the Filtro make good lattes?",
+    "category": "product-specific"
+  },
+  {
+    "id": 139,
+    "query": "How long does the Ufficio take to heat up?",
+    "category": "product-specific"
+  },
+  {
+    "id": 140,
+    "query": "Zero features and specifications",
+    "category": "product-specific"
+  },
+  {
+    "id": 141,
+    "query": "Who is the Arco Studio really best for?",
+    "category": "product-specific"
+  },
+  {
+    "id": 142,
+    "query": "Is the Automatico worth $1899?",
+    "category": "product-specific"
+  },
+  {
+    "id": 143,
+    "query": "Is the Primo worth $899?",
+    "category": "product-specific"
+  },
+  {
+    "id": 144,
+    "query": "What's special about the Primo espresso machine?",
+    "category": "product-specific"
+  },
+  {
+    "id": 145,
+    "query": "What's the best the Arco Macinino",
+    "category": "product-specific"
+  },
+  {
+    "id": 146,
+    "query": "What colors does the Studio come in?",
+    "category": "product-specific"
+  },
+  {
+    "id": 147,
+    "query": "Who is the Arco Nano really best for?",
+    "category": "product-specific"
+  },
+  {
+    "id": 148,
+    "query": "I want to learn about the Arco Primo",
+    "category": "product-specific"
+  },
+  {
+    "id": 149,
+    "query": "What's special about the Viaggio espresso machine?",
+    "category": "product-specific"
+  },
+  {
+    "id": 150,
+    "query": "I'm thinking about buying the Studio Pro, is it any good",
+    "category": "product-specific"
+  },
+  {
+    "id": 151,
+    "query": "Primo vs Ufficio",
+    "category": "comparison"
+  },
+  {
+    "id": 152,
+    "query": "single boiler vs dual boiler for a professional barista",
+    "category": "comparison"
+  },
+  {
+    "id": 153,
+    "query": "Macinino vs Filtro grinder comparison",
+    "category": "comparison"
+  },
+  {
+    "id": 154,
+    "query": "Should I get the Studio Pro or the Primo?",
+    "category": "comparison"
+  },
+  {
+    "id": 155,
+    "query": "Macinino vs Zero grinder comparison",
+    "category": "comparison"
+  },
+  {
+    "id": 156,
+    "query": "Filtro vs Preciso grinder comparison",
+    "category": "comparison"
+  },
+  {
+    "id": 157,
+    "query": "Compare the Arco Nano and Studio",
+    "category": "comparison"
+  },
+  {
+    "id": 158,
+    "query": "What's the difference between the Automatico and the Doppio?",
+    "category": "comparison"
+  },
+  {
+    "id": 159,
+    "query": "Which grinder is better, the Zero or the Filtro?",
+    "category": "comparison"
+  },
+  {
+    "id": 160,
+    "query": "Studio paired with Zero vs Viaggio paired with Filtro",
+    "category": "comparison"
+  },
+  {
+    "id": 161,
+    "query": "Compare the Arco Studio and Studio Pro",
+    "category": "comparison"
+  },
+  {
+    "id": 162,
+    "query": "What's the difference between the Primo and the Automatico?",
+    "category": "comparison"
+  },
+  {
+    "id": 163,
+    "query": "single boiler vs dual boiler for a someone new to espresso",
+    "category": "comparison"
+  },
+  {
+    "id": 164,
+    "query": "Preciso vs Macinino grinder comparison",
+    "category": "comparison"
+  },
+  {
+    "id": 165,
+    "query": "flat burr vs conical burr grinders — which should I choose?",
+    "category": "comparison"
+  },
+  {
+    "id": 166,
+    "query": "Should I get the Studio Pro or the Automatico?",
+    "category": "comparison"
+  },
+  {
+    "id": 167,
+    "query": "Is it better to invest in the machine or the grinder?",
+    "category": "comparison"
+  },
+  {
+    "id": 168,
+    "query": "Viaggio or Ufficio for cappuccinos and flat whites",
+    "category": "comparison"
+  },
+  {
+    "id": 169,
+    "query": "Studio Pro vs Doppio",
+    "category": "comparison"
+  },
+  {
+    "id": 170,
+    "query": "Is the Studio worth the upgrade from the Ufficio?",
+    "category": "comparison"
+  },
+  {
+    "id": 171,
+    "query": "Is the Nano worth the upgrade from the Doppio?",
+    "category": "comparison"
+  },
+  {
+    "id": 172,
+    "query": "Compare the Arco Studio Pro and Primo",
+    "category": "comparison"
+  },
+  {
+    "id": 173,
+    "query": "single boiler vs dual boiler for a someone upgrading from a Moka pot",
+    "category": "comparison"
+  },
+  {
+    "id": 174,
+    "query": "What's the difference between the Viaggio and the Ufficio?",
+    "category": "comparison"
+  },
+  {
+    "id": 175,
+    "query": "Should I get the Doppio or the Ufficio?",
+    "category": "comparison"
+  },
+  {
+    "id": 176,
+    "query": "Automatico paired with Preciso vs Viaggio paired with Filtro",
+    "category": "comparison"
+  },
+  {
+    "id": 177,
+    "query": "manual grinder vs the Preciso",
+    "category": "comparison"
+  },
+  {
+    "id": 178,
+    "query": "Zero vs Macinino grinder comparison",
+    "category": "comparison"
+  },
+  {
+    "id": 179,
+    "query": "Is the Viaggio worth the upgrade from the Studio Pro?",
+    "category": "comparison"
+  },
+  {
+    "id": 180,
+    "query": "manual grinder vs the Filtro",
+    "category": "comparison"
+  },
+  {
+    "id": 181,
+    "query": "Studio vs Studio Pro",
+    "category": "comparison"
+  },
+  {
+    "id": 182,
+    "query": "What's the difference between the Automatico and the Studio?",
+    "category": "comparison"
+  },
+  {
+    "id": 183,
+    "query": "Nano or Ufficio for milk-based drinks like lattes",
+    "category": "comparison"
+  },
+  {
+    "id": 184,
+    "query": "manual grinder vs the Macinino",
+    "category": "comparison"
+  },
+  {
+    "id": 185,
+    "query": "Primo vs Studio",
+    "category": "comparison"
+  },
+  {
+    "id": 186,
+    "query": "Compare the Arco Viaggio and Doppio",
+    "category": "comparison"
+  },
+  {
+    "id": 187,
+    "query": "Studio Pro vs Automatico",
+    "category": "comparison"
+  },
+  {
+    "id": 188,
+    "query": "Studio Pro or Nano for espresso and americanos",
+    "category": "comparison"
+  },
+  {
+    "id": 189,
+    "query": "Is the Nano worth the upgrade from the Studio?",
+    "category": "comparison"
+  },
+  {
+    "id": 190,
+    "query": "Studio Pro or Ufficio for just a simple morning espresso",
+    "category": "comparison"
+  },
+  {
+    "id": 191,
+    "query": "Doppio paired with Filtro vs Studio paired with Zero",
+    "category": "comparison"
+  },
+  {
+    "id": 192,
+    "query": "Should I get the Studio Pro or the Studio?",
+    "category": "comparison"
+  },
+  {
+    "id": 193,
+    "query": "What's the difference between the Ufficio and the Nano?",
+    "category": "comparison"
+  },
+  {
+    "id": 194,
+    "query": "Which grinder is better, the Preciso or the Macinino?",
+    "category": "comparison"
+  },
+  {
+    "id": 195,
+    "query": "Primo vs Studio for someone upgrading from a Moka pot",
+    "category": "comparison"
+  },
+  {
+    "id": 196,
+    "query": "Which grinder is better, the Preciso or the Zero?",
+    "category": "comparison"
+  },
+  {
+    "id": 197,
+    "query": "Ufficio vs Automatico for intermediate home barista",
+    "category": "comparison"
+  },
+  {
+    "id": 198,
+    "query": "Viaggio vs Primo",
+    "category": "comparison"
+  },
+  {
+    "id": 199,
+    "query": "Primo vs Viaggio",
+    "category": "comparison"
+  },
+  {
+    "id": 200,
+    "query": "manual grinder vs the Zero",
+    "category": "comparison"
+  },
+  {
+    "id": 201,
+    "query": "Compare the Arco Doppio and Nano",
+    "category": "comparison"
+  },
+  {
+    "id": 202,
+    "query": "Studio Pro or Primo for mostly espresso",
+    "category": "comparison"
+  },
+  {
+    "id": 203,
+    "query": "Studio paired with Preciso vs Nano paired with Filtro",
+    "category": "comparison"
+  },
+  {
+    "id": 204,
+    "query": "Compare the Arco Studio Pro and Doppio",
+    "category": "comparison"
+  },
+  {
+    "id": 205,
+    "query": "Automatico vs Studio Pro for professional barista",
+    "category": "comparison"
+  },
+  {
+    "id": 206,
+    "query": "What's the difference between the Nano and the Viaggio?",
+    "category": "comparison"
+  },
+  {
+    "id": 207,
+    "query": "Doppio paired with Preciso vs Studio Pro paired with Zero",
+    "category": "comparison"
+  },
+  {
+    "id": 208,
+    "query": "Automatico or Nano for pour-over and filter coffee",
+    "category": "comparison"
+  },
+  {
+    "id": 209,
+    "query": "single boiler vs dual boiler for a intermediate home barista",
+    "category": "comparison"
+  },
+  {
+    "id": 210,
+    "query": "Macinino vs Preciso grinder comparison",
+    "category": "comparison"
+  },
+  {
+    "id": 211,
+    "query": "Should I get the Studio or the Primo?",
+    "category": "comparison"
+  },
+  {
+    "id": 212,
+    "query": "Doppio vs Studio",
+    "category": "comparison"
+  },
+  {
+    "id": 213,
+    "query": "What's the difference between the Studio and the Automatico?",
+    "category": "comparison"
+  },
+  {
+    "id": 214,
+    "query": "What's the difference between the Doppio and the Studio?",
+    "category": "comparison"
+  },
+  {
+    "id": 215,
+    "query": "Is the Ufficio worth the upgrade from the Doppio?",
+    "category": "comparison"
+  },
+  {
+    "id": 216,
+    "query": "Ufficio or Automatico for milk-based drinks like lattes",
+    "category": "comparison"
+  },
+  {
+    "id": 217,
+    "query": "Should I get the Doppio or the Studio Pro?",
+    "category": "comparison"
+  },
+  {
+    "id": 218,
+    "query": "single boiler vs dual boiler for a experienced barista",
+    "category": "comparison"
+  },
+  {
+    "id": 219,
+    "query": "Should I get the Doppio or the Viaggio?",
+    "category": "comparison"
+  },
+  {
+    "id": 220,
+    "query": "Is the Nano worth the upgrade from the Primo?",
+    "category": "comparison"
+  },
+  {
+    "id": 221,
+    "query": "Nano or Viaggio for just a simple morning espresso",
+    "category": "comparison"
+  },
+  {
+    "id": 222,
+    "query": "Compare the Arco Studio Pro and Nano",
+    "category": "comparison"
+  },
+  {
+    "id": 223,
+    "query": "Automatico vs Primo",
+    "category": "comparison"
+  },
+  {
+    "id": 224,
+    "query": "Which grinder is better, the Zero or the Preciso?",
+    "category": "comparison"
+  },
+  {
+    "id": 225,
+    "query": "Which grinder is better, the Filtro or the Preciso?",
+    "category": "comparison"
+  },
+  {
+    "id": 226,
+    "query": "Viaggio vs Ufficio for intermediate home barista",
+    "category": "comparison"
+  },
+  {
+    "id": 227,
+    "query": "Filtro vs Zero grinder comparison",
+    "category": "comparison"
+  },
+  {
+    "id": 228,
+    "query": "Primo paired with Zero vs Nano paired with Macinino",
+    "category": "comparison"
+  },
+  {
+    "id": 229,
+    "query": "Automatico paired with Macinino vs Studio paired with Preciso",
+    "category": "comparison"
+  },
+  {
+    "id": 230,
+    "query": "Nano paired with Macinino vs Ufficio paired with Zero",
+    "category": "comparison"
+  },
+  {
+    "id": 231,
+    "query": "Is the Ufficio worth the upgrade from the Studio?",
+    "category": "comparison"
+  },
+  {
+    "id": 232,
+    "query": "Compare the Arco Viaggio and Automatico",
+    "category": "comparison"
+  },
+  {
+    "id": 233,
+    "query": "Automatico vs Viaggio for intermediate home barista",
+    "category": "comparison"
+  },
+  {
+    "id": 234,
+    "query": "Viaggio vs Automatico",
+    "category": "comparison"
+  },
+  {
+    "id": 235,
+    "query": "Viaggio or Automatico for cappuccinos and flat whites",
+    "category": "comparison"
+  },
+  {
+    "id": 236,
+    "query": "Is the Automatico worth the upgrade from the Nano?",
+    "category": "comparison"
+  },
+  {
+    "id": 237,
+    "query": "Viaggio or Studio Pro for pour-over and filter coffee",
+    "category": "comparison"
+  },
+  {
+    "id": 238,
+    "query": "Should I get the Viaggio or the Primo?",
+    "category": "comparison"
+  },
+  {
+    "id": 239,
+    "query": "Should I get the Ufficio or the Doppio?",
+    "category": "comparison"
+  },
+  {
+    "id": 240,
+    "query": "Primo paired with Macinino vs Viaggio paired with Filtro",
+    "category": "comparison"
+  },
+  {
+    "id": 241,
+    "query": "What's the difference between the Nano and the Ufficio?",
+    "category": "comparison"
+  },
+  {
+    "id": 242,
+    "query": "What's the difference between the Viaggio and the Nano?",
+    "category": "comparison"
+  },
+  {
+    "id": 243,
+    "query": "Should I get the Primo or the Nano?",
+    "category": "comparison"
+  },
+  {
+    "id": 244,
+    "query": "Should I get the Nano or the Studio Pro?",
+    "category": "comparison"
+  },
+  {
+    "id": 245,
+    "query": "Automatico vs Nano",
+    "category": "comparison"
+  },
+  {
+    "id": 246,
+    "query": "Ufficio vs Viaggio",
+    "category": "comparison"
+  },
+  {
+    "id": 247,
+    "query": "Is the Doppio worth the upgrade from the Primo?",
+    "category": "comparison"
+  },
+  {
+    "id": 248,
+    "query": "Compare the Arco Studio and Nano",
+    "category": "comparison"
+  },
+  {
+    "id": 249,
+    "query": "Which grinder is better, the Zero or the Macinino?",
+    "category": "comparison"
+  },
+  {
+    "id": 250,
+    "query": "Studio Pro vs Viaggio for professional barista",
+    "category": "comparison"
+  },
+  {
+    "id": 251,
+    "query": "What's the difference between the Primo and the Ufficio?",
+    "category": "comparison"
+  },
+  {
+    "id": 252,
+    "query": "Is the Viaggio worth the upgrade from the Automatico?",
+    "category": "comparison"
+  },
+  {
+    "id": 253,
+    "query": "Doppio paired with Macinino vs Viaggio paired with Zero",
+    "category": "comparison"
+  },
+  {
+    "id": 254,
+    "query": "Nano paired with Macinino vs Ufficio paired with Filtro",
+    "category": "comparison"
+  },
+  {
+    "id": 255,
+    "query": "Ufficio paired with Preciso vs Doppio paired with Zero",
+    "category": "comparison"
+  },
+  {
+    "id": 256,
+    "query": "Nano or Doppio for iced drinks",
+    "category": "comparison"
+  },
+  {
+    "id": 257,
+    "query": "Studio Pro vs Viaggio for someone new to espresso",
+    "category": "comparison"
+  },
+  {
+    "id": 258,
+    "query": "Should I get the Automatico or the Viaggio?",
+    "category": "comparison"
+  },
+  {
+    "id": 259,
+    "query": "Automatico vs Primo for someone switching from capsules",
+    "category": "comparison"
+  },
+  {
+    "id": 260,
+    "query": "Ufficio paired with Zero vs Doppio paired with Preciso",
+    "category": "comparison"
+  },
+  {
+    "id": 261,
+    "query": "Studio vs Doppio for someone upgrading from a Moka pot",
+    "category": "comparison"
+  },
+  {
+    "id": 262,
+    "query": "Automatico vs Doppio for intermediate home barista",
+    "category": "comparison"
+  },
+  {
+    "id": 263,
+    "query": "Nano vs Primo",
+    "category": "comparison"
+  },
+  {
+    "id": 264,
+    "query": "Studio Pro vs Primo",
+    "category": "comparison"
+  },
+  {
+    "id": 265,
+    "query": "Should I get the Doppio or the Primo?",
+    "category": "comparison"
+  },
+  {
+    "id": 266,
+    "query": "Nano vs Studio",
+    "category": "comparison"
+  },
+  {
+    "id": 267,
+    "query": "Should I get the Automatico or the Studio?",
+    "category": "comparison"
+  },
+  {
+    "id": 268,
+    "query": "What's the difference between the Ufficio and the Studio?",
+    "category": "comparison"
+  },
+  {
+    "id": 269,
+    "query": "Studio paired with Filtro vs Automatico paired with Zero",
+    "category": "comparison"
+  },
+  {
+    "id": 270,
+    "query": "Compare the Arco Primo and Studio Pro",
+    "category": "comparison"
+  },
+  {
+    "id": 271,
+    "query": "what's the minimum I should spend on an espresso machine?",
+    "category": "buying-guide"
+  },
+  {
+    "id": 272,
+    "query": "best gift for a coffee lover under $500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 273,
+    "query": "essential accessories for a new espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 274,
+    "query": "gift guide for a coffee lover",
+    "category": "buying-guide"
+  },
+  {
+    "id": 275,
+    "query": "best automatic espresso machine",
+    "category": "buying-guide"
+  },
+  {
+    "id": 276,
+    "query": "best espresso machine no budget limit",
+    "category": "buying-guide"
+  },
+  {
+    "id": 277,
+    "query": "best gift for a coffee lover under $1000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 278,
+    "query": "best manual espresso machine",
+    "category": "buying-guide"
+  },
+  {
+    "id": 279,
+    "query": "what grinder should I get under $500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 280,
+    "query": "what should I buy first, a good machine or a good grinder?",
+    "category": "buying-guide"
+  },
+  {
+    "id": 281,
+    "query": "best machine and grinder combo under $500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 282,
+    "query": "what's the best value espresso machine you offer?",
+    "category": "buying-guide"
+  },
+  {
+    "id": 283,
+    "query": "I want to stop buying Starbucks — what do I need?",
+    "category": "buying-guide"
+  },
+  {
+    "id": 284,
+    "query": "best gift for a coffee lover under $2000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 285,
+    "query": "which Arco machine has the best bang for the buck?",
+    "category": "buying-guide"
+  },
+  {
+    "id": 286,
+    "query": "I want to learn about an espresso machine under $1000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 287,
+    "query": "I have a budget of about $1763 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 288,
+    "query": "I have a budget of about $2850 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 289,
+    "query": "best machine and grinder combo no budget limit",
+    "category": "buying-guide"
+  },
+  {
+    "id": 290,
+    "query": "best espresso machine under $2500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 291,
+    "query": "I'm looking for an espresso machine under $1000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 292,
+    "query": "gift guide for someone who loves espresso",
+    "category": "buying-guide"
+  },
+  {
+    "id": 293,
+    "query": "I have a budget of about $3038 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 294,
+    "query": "What do you suggest for an espresso machine under $1000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 295,
+    "query": "I'm interested in an espresso machine around $3000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 296,
+    "query": "best machine and grinder combo under $2500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 297,
+    "query": "complete espresso starter kit recommendations",
+    "category": "buying-guide"
+  },
+  {
+    "id": 298,
+    "query": "gift guide for a home barista",
+    "category": "buying-guide"
+  },
+  {
+    "id": 299,
+    "query": "What's the best an espresso machine no budget limit",
+    "category": "buying-guide"
+  },
+  {
+    "id": 300,
+    "query": "best gift for a coffee lover around $3000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 301,
+    "query": "best espresso setup for someone new to espresso",
+    "category": "buying-guide"
+  },
+  {
+    "id": 302,
+    "query": "best portable espresso machine",
+    "category": "buying-guide"
+  },
+  {
+    "id": 303,
+    "query": "I have a budget of about $1476 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 304,
+    "query": "what grinder should I get under $2500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 305,
+    "query": "best espresso setup for intermediate home barista",
+    "category": "buying-guide"
+  },
+  {
+    "id": 306,
+    "query": "best machine and grinder combo under $1500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 307,
+    "query": "What are my options for an espresso machine no budget limit",
+    "category": "buying-guide"
+  },
+  {
+    "id": 308,
+    "query": "best gift for a coffee lover under $2500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 309,
+    "query": "I have a budget of about $3315 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 310,
+    "query": "I have a budget of about $3151 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 311,
+    "query": "What are my options for an espresso machine around $3000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 312,
+    "query": "what grinder should I get no budget limit",
+    "category": "buying-guide"
+  },
+  {
+    "id": 313,
+    "query": "What's the best an espresso machine around $3000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 314,
+    "query": "Show me an espresso machine under $1500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 315,
+    "query": "best compact espresso machine",
+    "category": "buying-guide"
+  },
+  {
+    "id": 316,
+    "query": "what grinder should I get under $2000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 317,
+    "query": "I have a budget of about $2118 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 318,
+    "query": "Help me choose an espresso machine under $2000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 319,
+    "query": "best espresso machine under $1000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 320,
+    "query": "What would you recommend for an espresso machine under $2500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 321,
+    "query": "best gift for a coffee lover no budget limit",
+    "category": "buying-guide"
+  },
+  {
+    "id": 322,
+    "query": "I'd like to know about an espresso machine under $500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 323,
+    "query": "best machine and grinder combo around $3000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 324,
+    "query": "Show me an espresso machine under $1000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 325,
+    "query": "best espresso machine under $2000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 326,
+    "query": "What's the best an espresso machine under $500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 327,
+    "query": "I'm looking for an espresso machine no budget limit",
+    "category": "buying-guide"
+  },
+  {
+    "id": 328,
+    "query": "what grinder should I get around $3000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 329,
+    "query": "What do you suggest for an espresso machine no budget limit",
+    "category": "buying-guide"
+  },
+  {
+    "id": 330,
+    "query": "best espresso machine under $500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 331,
+    "query": "I have a budget of about $1980 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 332,
+    "query": "what grinder should I get under $1500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 333,
+    "query": "I have a budget of about $1382 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 334,
+    "query": "best espresso setup for someone switching from capsules",
+    "category": "buying-guide"
+  },
+  {
+    "id": 335,
+    "query": "I have a budget of about $1180 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 336,
+    "query": "best espresso setup for someone upgrading from a Moka pot",
+    "category": "buying-guide"
+  },
+  {
+    "id": 337,
+    "query": "I have a budget of about $1575 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 338,
+    "query": "I have a budget of about $1702 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 339,
+    "query": "I have a budget of about $811 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 340,
+    "query": "best espresso machine around $3000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 341,
+    "query": "best machine and grinder combo under $1000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 342,
+    "query": "What are my options for an espresso machine under $2500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 343,
+    "query": "best espresso machine under $1500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 344,
+    "query": "best espresso setup for professional barista",
+    "category": "buying-guide"
+  },
+  {
+    "id": 345,
+    "query": "best gift for a coffee lover under $1500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 346,
+    "query": "best machine and grinder combo under $2000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 347,
+    "query": "I have a budget of about $2426 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 348,
+    "query": "I have a budget of about $2333 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 349,
+    "query": "Tell me about an espresso machine under $1500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 350,
+    "query": "gift guide for a dad who loves coffee",
+    "category": "buying-guide"
+  },
+  {
+    "id": 351,
+    "query": "I have a budget of about $2779 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 352,
+    "query": "I have a budget of about $2314 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 353,
+    "query": "I have a budget of about $1014 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 354,
+    "query": "I want to learn about an espresso machine under $2000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 355,
+    "query": "I have a budget of about $620 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 356,
+    "query": "best espresso setup for complete beginner",
+    "category": "buying-guide"
+  },
+  {
+    "id": 357,
+    "query": "best espresso setup for experienced barista",
+    "category": "buying-guide"
+  },
+  {
+    "id": 358,
+    "query": "I'm interested in an espresso machine under $1000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 359,
+    "query": "I have a budget of about $1330 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 360,
+    "query": "I have a budget of about $2859 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 361,
+    "query": "I need help finding an espresso machine under $500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 362,
+    "query": "Show me an espresso machine around $3000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 363,
+    "query": "What would you recommend for an espresso machine under $1500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 364,
+    "query": "Can you recommend an espresso machine under $2000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 365,
+    "query": "I have a budget of about $2670 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 366,
+    "query": "What would you recommend for an espresso machine around $3000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 367,
+    "query": "I want to learn about an espresso machine under $2500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 368,
+    "query": "What do you suggest for an espresso machine under $500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 369,
+    "query": "gift guide for someone who has everything",
+    "category": "buying-guide"
+  },
+  {
+    "id": 370,
+    "query": "I need help finding an espresso machine under $1500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 371,
+    "query": "I have a budget of about $1500 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 372,
+    "query": "What do you suggest for an espresso machine around $3000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 373,
+    "query": "I'd like to know about an espresso machine no budget limit",
+    "category": "buying-guide"
+  },
+  {
+    "id": 374,
+    "query": "What do you suggest for an espresso machine under $2000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 375,
+    "query": "I have a budget of about $863 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 376,
+    "query": "Tell me about an espresso machine around $3000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 377,
+    "query": "I have a budget of about $3317 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 378,
+    "query": "I have a budget of about $1860 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 379,
+    "query": "what grinder should I get under $1000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 380,
+    "query": "I have a budget of about $1317 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 381,
+    "query": "Show me an espresso machine under $2000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 382,
+    "query": "I have a budget of about $1770 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 383,
+    "query": "I have a budget of about $1788 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 384,
+    "query": "I have a budget of about $3102 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 385,
+    "query": "I have a budget of about $752 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 386,
+    "query": "I have a budget of about $3408 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 387,
+    "query": "I'd like to know about an espresso machine around $3000",
+    "category": "buying-guide"
+  },
+  {
+    "id": 388,
+    "query": "I have a budget of about $864 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 389,
+    "query": "What do you suggest for an espresso machine under $2500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 390,
+    "query": "I have a budget of about $2720 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 391,
+    "query": "Show me an espresso machine under $500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 392,
+    "query": "I have a budget of about $3363 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 393,
+    "query": "What's the best an espresso machine under $2500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 394,
+    "query": "I have a budget of about $2904 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 395,
+    "query": "I'm looking for an espresso machine under $500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 396,
+    "query": "I need help finding an espresso machine under $2500",
+    "category": "buying-guide"
+  },
+  {
+    "id": 397,
+    "query": "I have a budget of about $929 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 398,
+    "query": "I have a budget of about $1604 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 399,
+    "query": "I have a budget of about $1712 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 400,
+    "query": "I have a budget of about $1519 for an espresso setup",
+    "category": "buying-guide"
+  },
+  {
+    "id": 401,
+    "query": "I genuinely want a machine that is super quiet",
+    "category": "use-case"
+  },
+  {
+    "id": 402,
+    "query": "I want a machine that doesn't need a plumber to install",
+    "category": "use-case"
+  },
+  {
+    "id": 403,
+    "query": "machine that can make both espresso and americanos",
+    "category": "use-case"
+  },
+  {
+    "id": 404,
+    "query": "espresso machine for someone who is someone switching from capsules and drinks espresso and americanos",
+    "category": "use-case"
+  },
+  {
+    "id": 405,
+    "query": "machine that can make both espresso and pour-over",
+    "category": "use-case"
+  },
+  {
+    "id": 406,
+    "query": "best machine with a built-in grinder",
+    "category": "use-case"
+  },
+  {
+    "id": 407,
+    "query": "I need a machine that can handle 30 cups a day",
+    "category": "use-case"
+  },
+  {
+    "id": 408,
+    "query": "I drink pour-over and filter coffee — should I get a automatic machine?",
+    "category": "use-case"
+  },
+  {
+    "id": 409,
+    "query": "best machine for making espresso and americanos",
+    "category": "use-case"
+  },
+  {
+    "id": 410,
+    "query": "best setup for making a variety of coffee drinks in a food truck",
+    "category": "use-case"
+  },
+  {
+    "id": 411,
+    "query": "what's the fastest espresso machine you have?",
+    "category": "use-case"
+  },
+  {
+    "id": 412,
+    "query": "what's the best Arco machine for occasional entertaining?",
+    "category": "use-case"
+  },
+  {
+    "id": 413,
+    "query": "espresso machine for someone who is complete beginner and drinks mostly espresso",
+    "category": "use-case"
+  },
+  {
+    "id": 414,
+    "query": "compact espresso machine that fits on a narrow countertop",
+    "category": "use-case"
+  },
+  {
+    "id": 415,
+    "query": "espresso machine I can take traveling",
+    "category": "use-case"
+  },
+  {
+    "id": 416,
+    "query": "machine that can make both espresso and tea",
+    "category": "use-case"
+  },
+  {
+    "id": 417,
+    "query": "quiet espresso machine for a bedroom setup",
+    "category": "use-case"
+  },
+  {
+    "id": 418,
+    "query": "what machine do you recommend for a office break room that serves a variety of coffee drinks?",
+    "category": "use-case"
+  },
+  {
+    "id": 419,
+    "query": "quiet espresso machine for a shared apartment",
+    "category": "use-case"
+  },
+  {
+    "id": 420,
+    "query": "I host dinner parties — which machine is best for making drinks for 10 guests?",
+    "category": "use-case"
+  },
+  {
+    "id": 421,
+    "query": "best espresso machine for a open-plan kitchen",
+    "category": "use-case"
+  },
+  {
+    "id": 422,
+    "query": "best espresso machine for summer drinks",
+    "category": "use-case"
+  },
+  {
+    "id": 423,
+    "query": "I drink mostly espresso — should I get a manual machine?",
+    "category": "use-case"
+  },
+  {
+    "id": 424,
+    "query": "best espresso machine for a family",
+    "category": "use-case"
+  },
+  {
+    "id": 425,
+    "query": "best espresso machine for a retired couple",
+    "category": "use-case"
+  },
+  {
+    "id": 426,
+    "query": "best espresso machine for a restaurant",
+    "category": "use-case"
+  },
+  {
+    "id": 427,
+    "query": "best espresso machine for a rented apartment",
+    "category": "use-case"
+  },
+  {
+    "id": 428,
+    "query": "what machine do you recommend for a office break room that serves iced drinks?",
+    "category": "use-case"
+  },
+  {
+    "id": 429,
+    "query": "I make 6 coffees every morning — which machine?",
+    "category": "use-case"
+  },
+  {
+    "id": 430,
+    "query": "I need a machine that can handle 20 cups a day",
+    "category": "use-case"
+  },
+  {
+    "id": 431,
+    "query": "quiet espresso machine for early mornings",
+    "category": "use-case"
+  },
+  {
+    "id": 432,
+    "query": "best machine for someone who wants pressure profiling",
+    "category": "use-case"
+  },
+  {
+    "id": 433,
+    "query": "best setup for making espresso and americanos in a office break room",
+    "category": "use-case"
+  },
+  {
+    "id": 434,
+    "query": "what machine do you recommend for a tiny apartment that serves cappuccinos and flat whites?",
+    "category": "use-case"
+  },
+  {
+    "id": 435,
+    "query": "best espresso machine for a food truck",
+    "category": "use-case"
+  },
+  {
+    "id": 436,
+    "query": "best espresso machine for holiday season drinks",
+    "category": "use-case"
+  },
+  {
+    "id": 437,
+    "query": "best machine for making pour-over and filter coffee",
+    "category": "use-case"
+  },
+  {
+    "id": 438,
+    "query": "I drink iced drinks — should I get a super-automatic machine?",
+    "category": "use-case"
+  },
+  {
+    "id": 439,
+    "query": "I make 5 coffees every morning — which machine?",
+    "category": "use-case"
+  },
+  {
+    "id": 440,
+    "query": "what's the best Arco machine for serious daily production?",
+    "category": "use-case"
+  },
+  {
+    "id": 441,
+    "query": "best espresso machine for winter drinks",
+    "category": "use-case"
+  },
+  {
+    "id": 442,
+    "query": "what machine do you recommend for a restaurant that serves cappuccinos and flat whites?",
+    "category": "use-case"
+  },
+  {
+    "id": 443,
+    "query": "best machine for someone who hates complicated machines",
+    "category": "use-case"
+  },
+  {
+    "id": 444,
+    "query": "I need a reliable machine for restaurant",
+    "category": "use-case"
+  },
+  {
+    "id": 445,
+    "query": "espresso machine for just myself",
+    "category": "use-case"
+  },
+  {
+    "id": 446,
+    "query": "best machine for making just a simple morning espresso",
+    "category": "use-case"
+  },
+  {
+    "id": 447,
+    "query": "best espresso machine for a small kitchen",
+    "category": "use-case"
+  },
+  {
+    "id": 448,
+    "query": "best machine for making iced drinks",
+    "category": "use-case"
+  },
+  {
+    "id": 449,
+    "query": "best espresso machine for a dedicated coffee corner",
+    "category": "use-case"
+  },
+  {
+    "id": 450,
+    "query": "best espresso machine for a college student",
+    "category": "use-case"
+  },
+  {
+    "id": 451,
+    "query": "I seriously want a machine that is easy to clean",
+    "category": "use-case"
+  },
+  {
+    "id": 452,
+    "query": "I drink espresso and americanos — should I get a semi-automatic machine?",
+    "category": "use-case"
+  },
+  {
+    "id": 453,
+    "query": "espresso machine for an office of 10 people",
+    "category": "use-case"
+  },
+  {
+    "id": 454,
+    "query": "espresso machine I can take on road trips",
+    "category": "use-case"
+  },
+  {
+    "id": 455,
+    "query": "what's the best Arco machine for daily use?",
+    "category": "use-case"
+  },
+  {
+    "id": 456,
+    "query": "best espresso machine for autumn drinks",
+    "category": "use-case"
+  },
+  {
+    "id": 457,
+    "query": "machine for someone who loves Caffe Latte",
+    "category": "use-case"
+  },
+  {
+    "id": 458,
+    "query": "I need a quiet machine for office break room",
+    "category": "use-case"
+  },
+  {
+    "id": 459,
+    "query": "machine that can make both espresso and filter coffee",
+    "category": "use-case"
+  },
+  {
+    "id": 460,
+    "query": "I drink cappuccinos and flat whites — should I get a semi-automatic machine?",
+    "category": "use-case"
+  },
+  {
+    "id": 461,
+    "query": "I need a fast machine for home office",
+    "category": "use-case"
+  },
+  {
+    "id": 462,
+    "query": "espresso machine I can take to a vacation rental",
+    "category": "use-case"
+  },
+  {
+    "id": 463,
+    "query": "best machine for someone who drinks mostly milk drinks",
+    "category": "use-case"
+  },
+  {
+    "id": 464,
+    "query": "I need a machine that can handle 50 cups a day",
+    "category": "use-case"
+  },
+  {
+    "id": 465,
+    "query": "machine for someone who loves Iced Caramel Macchiato",
+    "category": "use-case"
+  },
+  {
+    "id": 466,
+    "query": "espresso machine for someone who is someone upgrading from a Moka pot and drinks pour-over and filter coffee",
+    "category": "use-case"
+  },
+  {
+    "id": 467,
+    "query": "machine for someone who loves Cappuccino",
+    "category": "use-case"
+  },
+  {
+    "id": 468,
+    "query": "I need a machine that can handle 10 cups a day",
+    "category": "use-case"
+  },
+  {
+    "id": 469,
+    "query": "plumb-in espresso machine for a kitchen renovation",
+    "category": "use-case"
+  },
+  {
+    "id": 470,
+    "query": "best machine for making mostly espresso",
+    "category": "use-case"
+  },
+  {
+    "id": 471,
+    "query": "I need a high-volume machine for open-plan kitchen",
+    "category": "use-case"
+  },
+  {
+    "id": 472,
+    "query": "espresso machine for entertaining guests",
+    "category": "use-case"
+  },
+  {
+    "id": 473,
+    "query": "best setup for making a variety of coffee drinks in a home office",
+    "category": "use-case"
+  },
+  {
+    "id": 474,
+    "query": "best machine for someone who only drinks straight espresso",
+    "category": "use-case"
+  },
+  {
+    "id": 475,
+    "query": "what machine do you recommend for a home office that serves a variety of coffee drinks?",
+    "category": "use-case"
+  },
+  {
+    "id": 476,
+    "query": "machine for someone who loves Pumpkin Spice Latte",
+    "category": "use-case"
+  },
+  {
+    "id": 477,
+    "query": "I genuinely want a machine that looks great on the counter",
+    "category": "use-case"
+  },
+  {
+    "id": 478,
+    "query": "I seriously want a machine that can handle back-to-back drinks",
+    "category": "use-case"
+  },
+  {
+    "id": 479,
+    "query": "best setup for making iced drinks in a open-plan kitchen",
+    "category": "use-case"
+  },
+  {
+    "id": 480,
+    "query": "I host dinner parties — which machine is best for making drinks for 4 guests?",
+    "category": "use-case"
+  },
+  {
+    "id": 481,
+    "query": "best espresso machine for a tiny apartment",
+    "category": "use-case"
+  },
+  {
+    "id": 482,
+    "query": "machine for someone who loves Cold Brew Coffee",
+    "category": "use-case"
+  },
+  {
+    "id": 483,
+    "query": "what machine do you recommend for a food truck that serves iced drinks?",
+    "category": "use-case"
+  },
+  {
+    "id": 484,
+    "query": "best setup for making just a simple morning espresso in a restaurant",
+    "category": "use-case"
+  },
+  {
+    "id": 485,
+    "query": "I make 4 coffees every morning — which machine?",
+    "category": "use-case"
+  },
+  {
+    "id": 486,
+    "query": "I need a high-volume machine for home office",
+    "category": "use-case"
+  },
+  {
+    "id": 487,
+    "query": "best espresso machine for a office break room",
+    "category": "use-case"
+  },
+  {
+    "id": 488,
+    "query": "quiet espresso machine for an office",
+    "category": "use-case"
+  },
+  {
+    "id": 489,
+    "query": "what machine do you recommend for a office break room that serves cappuccinos and flat whites?",
+    "category": "use-case"
+  },
+  {
+    "id": 490,
+    "query": "I host dinner parties — which machine is best for making drinks for 8 guests?",
+    "category": "use-case"
+  },
+  {
+    "id": 491,
+    "query": "what machine do you recommend for a home office that serves just a simple morning espresso?",
+    "category": "use-case"
+  },
+  {
+    "id": 492,
+    "query": "I host dinner parties — which machine is best for making drinks for 6 guests?",
+    "category": "use-case"
+  },
+  {
+    "id": 493,
+    "query": "machine for someone who loves Iced Americano",
+    "category": "use-case"
+  },
+  {
+    "id": 494,
+    "query": "espresso machine for someone who is someone new to espresso and drinks just a simple morning espresso",
+    "category": "use-case"
+  },
+  {
+    "id": 495,
+    "query": "best espresso machine for a young professional",
+    "category": "use-case"
+  },
+  {
+    "id": 496,
+    "query": "espresso machine for someone who is intermediate home barista and drinks mostly espresso",
+    "category": "use-case"
+  },
+  {
+    "id": 497,
+    "query": "machine for someone who loves Ristretto",
+    "category": "use-case"
+  },
+  {
+    "id": 498,
+    "query": "best setup for making just a simple morning espresso in a dedicated coffee corner",
+    "category": "use-case"
+  },
+  {
+    "id": 499,
+    "query": "what machine do you recommend for a home office that serves espresso and americanos?",
+    "category": "use-case"
+  },
+  {
+    "id": 500,
+    "query": "I need a high-volume machine for office break room",
+    "category": "use-case"
+  },
+  {
+    "id": 501,
+    "query": "machine for someone who loves Flat White",
+    "category": "use-case"
+  },
+  {
+    "id": 502,
+    "query": "I drink cappuccinos and flat whites — should I get a automatic machine?",
+    "category": "use-case"
+  },
+  {
+    "id": 503,
+    "query": "I drink pour-over and filter coffee — should I get a super-automatic machine?",
+    "category": "use-case"
+  },
+  {
+    "id": 504,
+    "query": "espresso machine for a family of four",
+    "category": "use-case"
+  },
+  {
+    "id": 505,
+    "query": "I need a low-maintenance machine for open-plan kitchen",
+    "category": "use-case"
+  },
+  {
+    "id": 506,
+    "query": "what machine do you recommend for a office break room that serves pour-over and filter coffee?",
+    "category": "use-case"
+  },
+  {
+    "id": 507,
+    "query": "machine for someone who loves Espresso Macchiato",
+    "category": "use-case"
+  },
+  {
+    "id": 508,
+    "query": "best machine for making milk-based drinks like lattes",
+    "category": "use-case"
+  },
+  {
+    "id": 509,
+    "query": "best machine for someone who wants to do latte art",
+    "category": "use-case"
+  },
+  {
+    "id": 510,
+    "query": "I really want a machine that looks great on the counter",
+    "category": "use-case"
+  },
+  {
+    "id": 511,
+    "query": "I really want a machine that is easy to clean",
+    "category": "use-case"
+  },
+  {
+    "id": 512,
+    "query": "what machine do you recommend for a open-plan kitchen that serves mostly espresso?",
+    "category": "use-case"
+  },
+  {
+    "id": 513,
+    "query": "what machine do you recommend for a office break room that serves espresso and americanos?",
+    "category": "use-case"
+  },
+  {
+    "id": 514,
+    "query": "espresso machine for someone who is professional barista and drinks just a simple morning espresso",
+    "category": "use-case"
+  },
+  {
+    "id": 515,
+    "query": "espresso machine I can take camping",
+    "category": "use-case"
+  },
+  {
+    "id": 516,
+    "query": "what machine do you recommend for a rented apartment that serves just a simple morning espresso?",
+    "category": "use-case"
+  },
+  {
+    "id": 517,
+    "query": "what's the best Arco machine for weekend brewing?",
+    "category": "use-case"
+  },
+  {
+    "id": 518,
+    "query": "I actually want a machine that is super quiet",
+    "category": "use-case"
+  },
+  {
+    "id": 519,
+    "query": "espresso machine I can take to the office",
+    "category": "use-case"
+  },
+  {
+    "id": 520,
+    "query": "I seriously want a machine that looks great on the counter",
+    "category": "use-case"
+  },
+  {
+    "id": 521,
+    "query": "what machine do you recommend for a small kitchen that serves cappuccinos and flat whites?",
+    "category": "use-case"
+  },
+  {
+    "id": 522,
+    "query": "I drink milk-based drinks like lattes — should I get a super-automatic machine?",
+    "category": "use-case"
+  },
+  {
+    "id": 523,
+    "query": "best setup for making espresso and americanos in a food truck",
+    "category": "use-case"
+  },
+  {
+    "id": 524,
+    "query": "I drink pour-over and filter coffee — should I get a semi-automatic machine?",
+    "category": "use-case"
+  },
+  {
+    "id": 525,
+    "query": "espresso machine for someone who is professional barista and drinks cappuccinos and flat whites",
+    "category": "use-case"
+  },
+  {
+    "id": 526,
+    "query": "machine for someone who loves Oat Milk Cappuccino",
+    "category": "use-case"
+  },
+  {
+    "id": 527,
+    "query": "I actually want a machine that can handle back-to-back drinks",
+    "category": "use-case"
+  },
+  {
+    "id": 528,
+    "query": "espresso machine for someone who is professional barista and drinks iced drinks",
+    "category": "use-case"
+  },
+  {
+    "id": 529,
+    "query": "I make 3 coffees every morning — which machine?",
+    "category": "use-case"
+  },
+  {
+    "id": 530,
+    "query": "what machine do you recommend for a tiny apartment that serves just a simple morning espresso?",
+    "category": "use-case"
+  },
+  {
+    "id": 531,
+    "query": "what's the best way to make a Cold Brew Espresso Concentrate?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 532,
+    "query": "which Arco machine is best for making Flat White?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 533,
+    "query": "how to make Vietnamese Iced Coffee at home",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 534,
+    "query": "best coffee drinks for winter",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 535,
+    "query": "easy coffee drinks I can make at home",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 536,
+    "query": "how to make coffee cocktails at home",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 537,
+    "query": "what's the difference between a Classic Espresso and a Ristretto?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 538,
+    "query": "which Arco machine is best for making Coffee Negroni Mocktail?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 539,
+    "query": "Espresso Macchiato recipe with an espresso machine",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 540,
+    "query": "tips for making amazing Vietnamese Iced Coffee",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 541,
+    "query": "what's the best way to make a Cortado?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 542,
+    "query": "Americano recipe with an espresso machine",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 543,
+    "query": "teach me how to make a perfect Lungo",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 544,
+    "query": "Dirty Chai Latte recipe with an espresso machine",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 545,
+    "query": "what grind size for Espresso Martini?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 546,
+    "query": "I want to learn to make Vietnamese Iced Coffee like a cafe",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 547,
+    "query": "tips for making cafe-quality Espresso Romano",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 548,
+    "query": "what's the best way to make a Flat White?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 549,
+    "query": "what grind size for Iced Latte?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 550,
+    "query": "teach me how to make a perfect Iced Americano",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 551,
+    "query": "best coffee drinks for holiday season",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 552,
+    "query": "tips for making perfect Oat Milk Cappuccino",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 553,
+    "query": "iced espresso drinks for hot days",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 554,
+    "query": "teach me how to make a perfect Classic Espresso",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 555,
+    "query": "I want to learn to make Pour-Over Coffee like a cafe",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 556,
+    "query": "what's the difference between a Affogato and a Americano?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 557,
+    "query": "tips for making better Iced Caramel Macchiato",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 558,
+    "query": "how to make Espresso Martini at home",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 559,
+    "query": "which Arco machine is best for making Cortado?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 560,
+    "query": "how to make Espresso Romano at home",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 561,
+    "query": "what grind size for Oat Milk Cappuccino?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 562,
+    "query": "Pumpkin Spice Latte recipe with an espresso machine",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 563,
+    "query": "which Arco machine is best for making Vietnamese Iced Coffee?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 564,
+    "query": "tips for making better Cappuccino",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 565,
+    "query": "Caffe Mocha recipe with an espresso machine",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 566,
+    "query": "Iced Latte — step by step guide",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 567,
+    "query": "what's the difference between a Iced Latte and a Flat White?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 568,
+    "query": "Classic Espresso recipe with an espresso machine",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 569,
+    "query": "how to make Affogato at home",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 570,
+    "query": "teach me how to make a perfect Americano",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 571,
+    "query": "how to make Pumpkin Spice Latte at home",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 572,
+    "query": "milk steaming tips for latte art",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 573,
+    "query": "Iced Americano recipe with an espresso machine",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 574,
+    "query": "Espresso Martini — step by step guide",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 575,
+    "query": "what grind size for Affogato?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 576,
+    "query": "Coffee Negroni Mocktail — step by step guide",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 577,
+    "query": "which Arco machine is best for making Espresso Martini?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 578,
+    "query": "which Arco machine is best for making Americano?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 579,
+    "query": "what grind size for Vietnamese Iced Coffee?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 580,
+    "query": "teach me how to make a perfect Piccolo Latte",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 581,
+    "query": "Cortado recipe with an espresso machine",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 582,
+    "query": "what grind size for Cold Brew Coffee?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 583,
+    "query": "how to make Caffe Mocha at home",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 584,
+    "query": "tips for making perfect Pour-Over Coffee",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 585,
+    "query": "milk steaming tips for cappuccino",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 586,
+    "query": "Gingerbread Latte — step by step guide",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 587,
+    "query": "how to make Oat Milk Cappuccino at home",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 588,
+    "query": "I want to learn to make Cappuccino like a cafe",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 589,
+    "query": "which Arco machine is best for making Iced Americano?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 590,
+    "query": "tips for making amazing Ristretto",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 591,
+    "query": "I want to learn to make Oat Milk Cappuccino like a cafe",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 592,
+    "query": "how to make Lavender Honey Latte at home",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 593,
+    "query": "I want to learn to make Affogato like a cafe",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 594,
+    "query": "tips for making cafe-quality Classic Espresso",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 595,
+    "query": "teach me how to make a perfect Cappuccino",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 596,
+    "query": "I want to learn to make Piccolo Latte like a cafe",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 597,
+    "query": "Affogato recipe with an espresso machine",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 598,
+    "query": "teach me how to make a perfect Shakerato",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 599,
+    "query": "tips for making cafe-quality Pour-Over Coffee",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 600,
+    "query": "tips for making perfect Espresso Romano",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 601,
+    "query": "what's the difference between a Spanish Latte and a Oat Milk Cappuccino?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 602,
+    "query": "what grind size for Caffe Mocha?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 603,
+    "query": "what grind size for Espresso Tonic?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 604,
+    "query": "best coffee drinks for autumn",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 605,
+    "query": "what's the best way to make a Cafe Cubano?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 606,
+    "query": "I want to learn to make Iced Caramel Macchiato like a cafe",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 607,
+    "query": "what grind size for Shakerato?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 608,
+    "query": "teach me how to make a perfect Lavender Honey Latte",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 609,
+    "query": "best coffee drinks for summer",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 610,
+    "query": "what's the difference between a Piccolo Latte and a Oat Milk Cappuccino?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 611,
+    "query": "which Arco machine is best for making Gingerbread Latte?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 612,
+    "query": "what's the difference between a Americano and a Pour-Over Coffee?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 613,
+    "query": "what's the best way to make a Coffee Negroni Mocktail?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 614,
+    "query": "Cappuccino recipe with an espresso machine",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 615,
+    "query": "I want to learn to make Espresso Macchiato like a cafe",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 616,
+    "query": "tips for making better Caffe Latte",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 617,
+    "query": "which Arco machine is best for making Cold Brew Espresso Concentrate?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 618,
+    "query": "what grind size for Piccolo Latte?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 619,
+    "query": "best coffee drinks for spring",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 620,
+    "query": "what's the difference between a Cold Brew Coffee and a Affogato?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 621,
+    "query": "what's the best way to make a Americano?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 622,
+    "query": "what's the best way to make a Oat Milk Cappuccino?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 623,
+    "query": "milk steaming tips for microfoam",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 624,
+    "query": "teach me how to make a perfect Vietnamese Iced Coffee",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 625,
+    "query": "Piccolo Latte recipe with an espresso machine",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 626,
+    "query": "I want to learn to make Classic Espresso like a cafe",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 627,
+    "query": "Espresso Romano recipe with an espresso machine",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 628,
+    "query": "what's the best way to make a Iced Caramel Macchiato?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 629,
+    "query": "what's the difference between a Espresso Martini and a Dirty Chai Latte?",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 630,
+    "query": "tips for making cafe-quality Shakerato",
+    "category": "recipe-drink"
+  },
+  {
+    "id": 631,
+    "query": "guide to third wave water for espresso",
+    "category": "technique"
+  },
+  {
+    "id": 632,
+    "query": "what's the role of water temperature in espresso quality?",
+    "category": "technique"
+  },
+  {
+    "id": 633,
+    "query": "how to use a bottomless portafilter",
+    "category": "technique"
+  },
+  {
+    "id": 634,
+    "query": "how to dial in espresso in under 10 minutes",
+    "category": "technique"
+  },
+  {
+    "id": 635,
+    "query": "how to calibrate a burr grinder",
+    "category": "technique"
+  },
+  {
+    "id": 636,
+    "query": "what's the ideal water temperature for espresso?",
+    "category": "technique"
+  },
+  {
+    "id": 637,
+    "query": "how often should I replace burrs on my group head?",
+    "category": "technique"
+  },
+  {
+    "id": 638,
+    "query": "Italian approach to milk drinks",
+    "category": "technique"
+  },
+  {
+    "id": 639,
+    "query": "how to distribute espresso properly",
+    "category": "technique"
+  },
+  {
+    "id": 640,
+    "query": "how often should I backflush my espresso machine?",
+    "category": "technique"
+  },
+  {
+    "id": 641,
+    "query": "how to switch between light and dark roasts on the same grinder",
+    "category": "technique"
+  },
+  {
+    "id": 642,
+    "query": "how to do latte art",
+    "category": "technique"
+  },
+  {
+    "id": 643,
+    "query": "how to tamp espresso properly",
+    "category": "technique"
+  },
+  {
+    "id": 644,
+    "query": "how to perfect my espresso",
+    "category": "technique"
+  },
+  {
+    "id": 645,
+    "query": "how to dose espresso properly",
+    "category": "technique"
+  },
+  {
+    "id": 646,
+    "query": "difference between pressurized and non-pressurized baskets",
+    "category": "technique"
+  },
+  {
+    "id": 647,
+    "query": "difference between blooming and pre-infusion",
+    "category": "technique"
+  },
+  {
+    "id": 648,
+    "query": "how to clean a grinder",
+    "category": "technique"
+  },
+  {
+    "id": 649,
+    "query": "how to improve my milk foam",
+    "category": "technique"
+  },
+  {
+    "id": 650,
+    "query": "guide to water filtration for espresso",
+    "category": "technique"
+  },
+  {
+    "id": 651,
+    "query": "why does grind consistency matter?",
+    "category": "technique"
+  },
+  {
+    "id": 652,
+    "query": "why does bean freshness matter?",
+    "category": "technique"
+  },
+  {
+    "id": 653,
+    "query": "how to reduce channeling in espresso",
+    "category": "technique"
+  },
+  {
+    "id": 654,
+    "query": "how to store coffee beans properly",
+    "category": "technique"
+  },
+  {
+    "id": 655,
+    "query": "difference between flat and conical burrs",
+    "category": "technique"
+  },
+  {
+    "id": 656,
+    "query": "what's the role of crema in espresso quality?",
+    "category": "technique"
+  },
+  {
+    "id": 657,
+    "query": "how to clean a steam wand",
+    "category": "technique"
+  },
+  {
+    "id": 658,
+    "query": "milk steaming and frothing technique",
+    "category": "technique"
+  },
+  {
+    "id": 659,
+    "query": "intermediate guide to milk texturing",
+    "category": "technique"
+  },
+  {
+    "id": 660,
+    "query": "how to switch between espresso and pour-over on the same grinder",
+    "category": "technique"
+  },
+  {
+    "id": 661,
+    "query": "understanding extraction yield and TDS",
+    "category": "technique"
+  },
+  {
+    "id": 662,
+    "query": "how to judge an espresso pull",
+    "category": "technique"
+  },
+  {
+    "id": 663,
+    "query": "RDT — what is it and why does it matter?",
+    "category": "technique"
+  },
+  {
+    "id": 664,
+    "query": "how to descale an espresso machine",
+    "category": "technique"
+  },
+  {
+    "id": 665,
+    "query": "how to perfect my crema",
+    "category": "technique"
+  },
+  {
+    "id": 666,
+    "query": "Scandinavian approach to milk drinks",
+    "category": "technique"
+  },
+  {
+    "id": 667,
+    "query": "difference between single and double shots",
+    "category": "technique"
+  },
+  {
+    "id": 668,
+    "query": "what's the ideal dose for espresso?",
+    "category": "technique"
+  },
+  {
+    "id": 669,
+    "query": "how to clean an espresso machine",
+    "category": "technique"
+  },
+  {
+    "id": 670,
+    "query": "Turkish approach to milk drinks",
+    "category": "technique"
+  },
+  {
+    "id": 671,
+    "query": "how to descale an espresso machine step by step",
+    "category": "technique"
+  },
+  {
+    "id": 672,
+    "query": "how to fix my latte art",
+    "category": "technique"
+  },
+  {
+    "id": 673,
+    "query": "how often should I replace burrs on my grinder?",
+    "category": "technique"
+  },
+  {
+    "id": 674,
+    "query": "how to judge an espresso shot",
+    "category": "technique"
+  },
+  {
+    "id": 675,
+    "query": "what's the role of grind size in espresso quality?",
+    "category": "technique"
+  },
+  {
+    "id": 676,
+    "query": "why does puck preparation matter?",
+    "category": "technique"
+  },
+  {
+    "id": 677,
+    "query": "how to dial in espresso",
+    "category": "technique"
+  },
+  {
+    "id": 678,
+    "query": "how to judge an espresso extraction",
+    "category": "technique"
+  },
+  {
+    "id": 679,
+    "query": "why does water chemistry matter?",
+    "category": "technique"
+  },
+  {
+    "id": 680,
+    "query": "Turkish approach to espresso",
+    "category": "technique"
+  },
+  {
+    "id": 681,
+    "query": "WDT — what is it and why does it matter?",
+    "category": "technique"
+  },
+  {
+    "id": 682,
+    "query": "how often should I descale my grinder?",
+    "category": "technique"
+  },
+  {
+    "id": 683,
+    "query": "what's the role of brew time in espresso quality?",
+    "category": "technique"
+  },
+  {
+    "id": 684,
+    "query": "advanced guide to grinder calibration",
+    "category": "technique"
+  },
+  {
+    "id": 685,
+    "query": "what's the best temperature for Pumpkin Spice Latte?",
+    "category": "technique"
+  },
+  {
+    "id": 686,
+    "query": "how to do latte art for beginners",
+    "category": "technique"
+  },
+  {
+    "id": 687,
+    "query": "how often should I service my steam wand?",
+    "category": "technique"
+  },
+  {
+    "id": 688,
+    "query": "what's the optimal pressure for Lavender Honey Latte?",
+    "category": "technique"
+  },
+  {
+    "id": 689,
+    "query": "how to measure an espresso shot",
+    "category": "technique"
+  },
+  {
+    "id": 690,
+    "query": "advanced guide to espresso extraction",
+    "category": "technique"
+  },
+  {
+    "id": 691,
+    "query": "tips for consistent espresso shots",
+    "category": "technique"
+  },
+  {
+    "id": 692,
+    "query": "what's the ideal brew pressure for espresso?",
+    "category": "technique"
+  },
+  {
+    "id": 693,
+    "query": "what does flow control do?",
+    "category": "technique"
+  },
+  {
+    "id": 694,
+    "query": "how to time an espresso extraction",
+    "category": "technique"
+  },
+  {
+    "id": 695,
+    "query": "backflushing — what is it and why does it matter?",
+    "category": "technique"
+  },
+  {
+    "id": 696,
+    "query": "intermediate guide to espresso extraction",
+    "category": "technique"
+  },
+  {
+    "id": 697,
+    "query": "how often should I backflush my steam wand?",
+    "category": "technique"
+  },
+  {
+    "id": 698,
+    "query": "how to evaluate an espresso shot",
+    "category": "technique"
+  },
+  {
+    "id": 699,
+    "query": "how often should I clean my group head?",
+    "category": "technique"
+  },
+  {
+    "id": 700,
+    "query": "guide to mineral content for espresso",
+    "category": "technique"
+  },
+  {
+    "id": 701,
+    "query": "what's the role of pressure in espresso quality?",
+    "category": "technique"
+  },
+  {
+    "id": 702,
+    "query": "milk steaming and frothing guide",
+    "category": "technique"
+  },
+  {
+    "id": 703,
+    "query": "how to fix my espresso",
+    "category": "technique"
+  },
+  {
+    "id": 704,
+    "query": "how to weigh an espresso shot",
+    "category": "technique"
+  },
+  {
+    "id": 705,
+    "query": "how often should I replace burrs on my steam wand?",
+    "category": "technique"
+  },
+  {
+    "id": 706,
+    "query": "how to switch between single origin and blends on the same grinder",
+    "category": "technique"
+  },
+  {
+    "id": 707,
+    "query": "what's the recommended pressure for Classic Espresso?",
+    "category": "technique"
+  },
+  {
+    "id": 708,
+    "query": "how to time an espresso pull",
+    "category": "technique"
+  },
+  {
+    "id": 709,
+    "query": "how to evaluate an espresso extraction",
+    "category": "technique"
+  },
+  {
+    "id": 710,
+    "query": "what's the recommended temperature for Dirty Chai Latte?",
+    "category": "technique"
+  },
+  {
+    "id": 711,
+    "query": "tips for more flavorful espresso shots",
+    "category": "technique"
+  },
+  {
+    "id": 712,
+    "query": "difference between 9 bar and 6 bar extraction",
+    "category": "technique"
+  },
+  {
+    "id": 713,
+    "query": "how to clean a group head",
+    "category": "technique"
+  },
+  {
+    "id": 714,
+    "query": "what's the optimal temperature for Coffee Negroni Mocktail?",
+    "category": "technique"
+  },
+  {
+    "id": 715,
+    "query": "how often should I replace burrs on my espresso machine?",
+    "category": "technique"
+  },
+  {
+    "id": 716,
+    "query": "what's the optimal dose for Espresso Martini?",
+    "category": "technique"
+  },
+  {
+    "id": 717,
+    "query": "milk steaming and frothing tutorial",
+    "category": "technique"
+  },
+  {
+    "id": 718,
+    "query": "how to master my pour-over",
+    "category": "technique"
+  },
+  {
+    "id": 719,
+    "query": "how to improve my pour-over",
+    "category": "technique"
+  },
+  {
+    "id": 720,
+    "query": "Italian approach to coffee brewing",
+    "category": "technique"
+  },
+  {
+    "id": 721,
+    "query": "guide to water chemistry for espresso",
+    "category": "technique"
+  },
+  {
+    "id": 722,
+    "query": "what does pre-infusion do?",
+    "category": "technique"
+  },
+  {
+    "id": 723,
+    "query": "what's the best ratio for Espresso Macchiato?",
+    "category": "technique"
+  },
+  {
+    "id": 724,
+    "query": "what's the correct temperature for Pumpkin Spice Latte?",
+    "category": "technique"
+  },
+  {
+    "id": 725,
+    "query": "what's the recommended pressure for Cappuccino?",
+    "category": "technique"
+  },
+  {
+    "id": 726,
+    "query": "what's the ideal grind size for espresso?",
+    "category": "technique"
+  },
+  {
+    "id": 727,
+    "query": "how to time an espresso shot",
+    "category": "technique"
+  },
+  {
+    "id": 728,
+    "query": "what's the optimal dose for Oat Milk Cappuccino?",
+    "category": "technique"
+  },
+  {
+    "id": 729,
+    "query": "how to weigh an espresso pull",
+    "category": "technique"
+  },
+  {
+    "id": 730,
+    "query": "how to improve my espresso",
+    "category": "technique"
+  },
+  {
+    "id": 731,
+    "query": "troubleshooting channeling",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 732,
+    "query": "I can't get consistent shots",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 733,
+    "query": "my milk won't froth properly — what am I doing wrong?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 734,
+    "query": "why does my grinder retention is too high?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 735,
+    "query": "my portafilter is channeling with Primo",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 736,
+    "query": "help! my shots are running too fast",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 737,
+    "query": "help! my milk won't froth properly",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 738,
+    "query": "how to fix: my machine is leaking",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 739,
+    "query": "how to fix: the pressure gauge reads too low",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 740,
+    "query": "how to fix: my espresso is watery",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 741,
+    "query": "common mistakes when using a new grinder",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 742,
+    "query": "my grinder retention is too high — what am I doing wrong?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 743,
+    "query": "how to fix: my grinder retention is too high",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 744,
+    "query": "common mistakes when cleaning an espresso machine",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 745,
+    "query": "I can't get consistent shots with my Ufficio",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 746,
+    "query": "my espresso tastes bitter — what am I doing wrong?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 747,
+    "query": "troubleshooting bitter coffee",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 748,
+    "query": "my espresso tastes sour — what am I doing wrong?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 749,
+    "query": "help! the pressure gauge reads too low",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 750,
+    "query": "troubleshooting temperature issues",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 751,
+    "query": "my grinder produces clumpy grinds",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 752,
+    "query": "why does my portafilter is channeling?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 753,
+    "query": "my machine is leaking with my Studio Pro",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 754,
+    "query": "how to fix: my machine takes forever to heat up",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 755,
+    "query": "help! I can't get consistent shots",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 756,
+    "query": "common mistakes when steaming milk",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 757,
+    "query": "my coffee tastes flat and lifeless — what am I doing wrong?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 758,
+    "query": "the pressure gauge reads too low",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 759,
+    "query": "common mistakes when dialing in",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 760,
+    "query": "how to fix: my portafilter is channeling",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 761,
+    "query": "how to fix: my shots are running too fast",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 762,
+    "query": "how to fix: my grinder produces clumpy grinds",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 763,
+    "query": "my portafilter is channeling with my Studio",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 764,
+    "query": "why does my coffee tastes flat and lifeless?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 765,
+    "query": "my espresso tastes sour",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 766,
+    "query": "why does my machine is leaking?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 767,
+    "query": "why does I can't get consistent shots?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 768,
+    "query": "why does my machine takes forever to heat up?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 769,
+    "query": "my espresso is watery with my Doppio",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 770,
+    "query": "the steam wand won't produce enough pressure with Studio Pro",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 771,
+    "query": "my grinder produces clumpy grinds — what am I doing wrong?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 772,
+    "query": "why does my espresso is watery?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 773,
+    "query": "how to fix: the steam wand won't produce enough pressure",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 774,
+    "query": "troubleshooting sour espresso",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 775,
+    "query": "why does my shots are pulling too slow?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 776,
+    "query": "help! my machine is leaking",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 777,
+    "query": "my milk won't froth properly",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 778,
+    "query": "how to fix: I can't get consistent shots",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 779,
+    "query": "my machine takes forever to heat up",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 780,
+    "query": "my machine is leaking",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 781,
+    "query": "help! my portafilter is channeling",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 782,
+    "query": "my shots are pulling too slow",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 783,
+    "query": "my espresso is watery with Studio",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 784,
+    "query": "help! my espresso is watery",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 785,
+    "query": "my shots are pulling too slow — what am I doing wrong?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 786,
+    "query": "the pressure gauge reads too low with Nano",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 787,
+    "query": "help! my grinder produces clumpy grinds",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 788,
+    "query": "common mistakes when making espresso",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 789,
+    "query": "the pressure gauge reads too low — what am I doing wrong?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 790,
+    "query": "my portafilter is channeling — what am I doing wrong?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 791,
+    "query": "the steam wand won't produce enough pressure with Doppio",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 792,
+    "query": "my espresso is watery with my Primo",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 793,
+    "query": "my milk won't froth properly with Viaggio",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 794,
+    "query": "the steam wand won't produce enough pressure",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 795,
+    "query": "my grinder retention is too high with Studio Pro",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 796,
+    "query": "why does there's no crema on my espresso?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 797,
+    "query": "there's no crema on my espresso — what am I doing wrong?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 798,
+    "query": "how to fix: my shots are pulling too slow",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 799,
+    "query": "my grinder retention is too high with Automatico",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 800,
+    "query": "why does the steam wand won't produce enough pressure?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 801,
+    "query": "my shots are pulling too slow with Viaggio",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 802,
+    "query": "my grinder retention is too high",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 803,
+    "query": "I can't get consistent shots — what am I doing wrong?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 804,
+    "query": "why does my milk won't froth properly?",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 805,
+    "query": "how to fix: my milk won't froth properly",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 806,
+    "query": "my espresso is watery",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 807,
+    "query": "troubleshooting weak crema",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 808,
+    "query": "my shots are running too fast",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 809,
+    "query": "the steam wand won't produce enough pressure with my Studio",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 810,
+    "query": "help! there's no crema on my espresso",
+    "category": "troubleshooting"
+  },
+  {
+    "id": 811,
+    "query": "what should I know before buying my first espresso machine?",
+    "category": "exploration"
+  },
+  {
+    "id": 812,
+    "query": "I want to understand the Arco brand better",
+    "category": "exploration"
+  },
+  {
+    "id": 813,
+    "query": "I'd like to know about getting into espresso at home",
+    "category": "exploration"
+  },
+  {
+    "id": 814,
+    "query": "I want to understand espresso better",
+    "category": "exploration"
+  },
+  {
+    "id": 815,
+    "query": "surprising things about coffee",
+    "category": "exploration"
+  },
+  {
+    "id": 816,
+    "query": "bestselling espresso machine",
+    "category": "exploration"
+  },
+  {
+    "id": 817,
+    "query": "what most people don't know about coffee",
+    "category": "exploration"
+  },
+  {
+    "id": 818,
+    "query": "what's the difference between light and dark roast coffee?",
+    "category": "exploration"
+  },
+  {
+    "id": 819,
+    "query": "your most popular products",
+    "category": "exploration"
+  },
+  {
+    "id": 820,
+    "query": "what's the Arco product lineup?",
+    "category": "exploration"
+  },
+  {
+    "id": 821,
+    "query": "do you offer classes?",
+    "category": "exploration"
+  },
+  {
+    "id": 822,
+    "query": "why should I choose Arco over Rancilio?",
+    "category": "exploration"
+  },
+  {
+    "id": 823,
+    "query": "what grinders do you offer?",
+    "category": "exploration"
+  },
+  {
+    "id": 824,
+    "query": "tell me about your espresso machines",
+    "category": "exploration"
+  },
+  {
+    "id": 825,
+    "query": "convince me to buy an Arco machine",
+    "category": "exploration"
+  },
+  {
+    "id": 826,
+    "query": "Arco sustainability — tell me more",
+    "category": "exploration"
+  },
+  {
+    "id": 827,
+    "query": "Show me getting into espresso at home",
+    "category": "exploration"
+  },
+  {
+    "id": 828,
+    "query": "I'm curious about home espresso — where do I start?",
+    "category": "exploration"
+  },
+  {
+    "id": 829,
+    "query": "convince me to buy an Arco machine over a cheaper brand",
+    "category": "exploration"
+  },
+  {
+    "id": 830,
+    "query": "overview of Arco's product range",
+    "category": "exploration"
+  },
+  {
+    "id": 831,
+    "query": "I love coffee but don't know anything about espresso machines",
+    "category": "exploration"
+  },
+  {
+    "id": 832,
+    "query": "I want to understand grinders better",
+    "category": "exploration"
+  },
+  {
+    "id": 833,
+    "query": "do you offer warranty?",
+    "category": "exploration"
+  },
+  {
+    "id": 834,
+    "query": "what's popular in the espresso world right now?",
+    "category": "exploration"
+  },
+  {
+    "id": 835,
+    "query": "what's the difference between washed and natural process coffee?",
+    "category": "exploration"
+  },
+  {
+    "id": 836,
+    "query": "I want to understand coffee brewing better",
+    "category": "exploration"
+  },
+  {
+    "id": 837,
+    "query": "what's new at Arco?",
+    "category": "exploration"
+  },
+  {
+    "id": 838,
+    "query": "what makes Arco different from other brands?",
+    "category": "exploration"
+  },
+  {
+    "id": 839,
+    "query": "coffee culture in Oslo",
+    "category": "exploration"
+  },
+  {
+    "id": 840,
+    "query": "what's hot in the espresso world right now?",
+    "category": "exploration"
+  },
+  {
+    "id": 841,
+    "query": "help me figure out what kind of coffee person I am",
+    "category": "exploration"
+  },
+  {
+    "id": 842,
+    "query": "what kind of espresso machine is right for me?",
+    "category": "exploration"
+  },
+  {
+    "id": 843,
+    "query": "what's the Arco story?",
+    "category": "exploration"
+  },
+  {
+    "id": 844,
+    "query": "recommendations for a someone new to espresso",
+    "category": "exploration"
+  },
+  {
+    "id": 845,
+    "query": "coffee culture in New York",
+    "category": "exploration"
+  },
+  {
+    "id": 846,
+    "query": "walk me through the Arco product lineup",
+    "category": "exploration"
+  },
+  {
+    "id": 847,
+    "query": "coffee culture in Milan",
+    "category": "exploration"
+  },
+  {
+    "id": 848,
+    "query": "why should I choose Arco over Gaggia?",
+    "category": "exploration"
+  },
+  {
+    "id": 849,
+    "query": "recommendations for a experienced barista",
+    "category": "exploration"
+  },
+  {
+    "id": 850,
+    "query": "how is Arco better compared to the competition?",
+    "category": "exploration"
+  },
+  {
+    "id": 851,
+    "query": "do you offer repairs?",
+    "category": "exploration"
+  },
+  {
+    "id": 852,
+    "query": "walk me through the Arco accessory lineup",
+    "category": "exploration"
+  },
+  {
+    "id": 853,
+    "query": "how is Arco better compared to bigger companies?",
+    "category": "exploration"
+  },
+  {
+    "id": 854,
+    "query": "what type of espresso machine is right for me?",
+    "category": "exploration"
+  },
+  {
+    "id": 855,
+    "query": "best cafes in Milan for espresso lovers",
+    "category": "exploration"
+  },
+  {
+    "id": 856,
+    "query": "Arco warranty — tell me more",
+    "category": "exploration"
+  },
+  {
+    "id": 857,
+    "query": "what most people don't know about espresso",
+    "category": "exploration"
+  },
+  {
+    "id": 858,
+    "query": "surprising things about grinders",
+    "category": "exploration"
+  },
+  {
+    "id": 859,
+    "query": "coffee culture in Vienna",
+    "category": "exploration"
+  },
+  {
+    "id": 860,
+    "query": "I'm looking for getting into espresso at home",
+    "category": "exploration"
+  },
+  {
+    "id": 861,
+    "query": "fun facts about espresso machines",
+    "category": "exploration"
+  },
+  {
+    "id": 862,
+    "query": "why should I choose Arco over other brands?",
+    "category": "exploration"
+  },
+  {
+    "id": 863,
+    "query": "what tools do I need for great espresso?",
+    "category": "exploration"
+  },
+  {
+    "id": 864,
+    "query": "what style of espresso machine is right for me?",
+    "category": "exploration"
+  },
+  {
+    "id": 865,
+    "query": "Arco manufacturing — tell me more",
+    "category": "exploration"
+  },
+  {
+    "id": 866,
+    "query": "what do you recommend for someone new to espresso?",
+    "category": "exploration"
+  },
+  {
+    "id": 867,
+    "query": "recommendations for a someone switching from capsules",
+    "category": "exploration"
+  },
+  {
+    "id": 868,
+    "query": "What's the best getting into espresso at home",
+    "category": "exploration"
+  },
+  {
+    "id": 869,
+    "query": "best cafes in Tokyo for espresso lovers",
+    "category": "exploration"
+  },
+  {
+    "id": 870,
+    "query": "fun facts about coffee",
+    "category": "exploration"
+  },
+  {
+    "id": 871,
+    "query": "recommendations for a complete beginner",
+    "category": "exploration"
+  },
+  {
+    "id": 872,
+    "query": "why should I choose Arco over Breville?",
+    "category": "exploration"
+  },
+  {
+    "id": 873,
+    "query": "what beans do I need for great espresso?",
+    "category": "exploration"
+  },
+  {
+    "id": 874,
+    "query": "what accessories do I need for great espresso?",
+    "category": "exploration"
+  },
+  {
+    "id": 875,
+    "query": "best cafes in Vienna for espresso lovers",
+    "category": "exploration"
+  },
+  {
+    "id": 876,
+    "query": "best cafes in Naples for espresso lovers",
+    "category": "exploration"
+  },
+  {
+    "id": 877,
+    "query": "walk me through the Arco machine lineup",
+    "category": "exploration"
+  },
+  {
+    "id": 878,
+    "query": "history of latte art",
+    "category": "exploration"
+  },
+  {
+    "id": 879,
+    "query": "recommendations for a someone upgrading from a Moka pot",
+    "category": "exploration"
+  },
+  {
+    "id": 880,
+    "query": "best cafes in Lisbon for espresso lovers",
+    "category": "exploration"
+  },
+  {
+    "id": 881,
+    "query": "history of the E61 group head",
+    "category": "exploration"
+  },
+  {
+    "id": 882,
+    "query": "coffee culture in Lisbon",
+    "category": "exploration"
+  },
+  {
+    "id": 883,
+    "query": "history of espresso",
+    "category": "exploration"
+  },
+  {
+    "id": 884,
+    "query": "I'm curious about getting into espresso at home",
+    "category": "exploration"
+  },
+  {
+    "id": 885,
+    "query": "history of Italian coffee culture",
+    "category": "exploration"
+  },
+  {
+    "id": 886,
+    "query": "What would you recommend for getting into espresso at home",
+    "category": "exploration"
+  },
+  {
+    "id": 887,
+    "query": "coffee culture in Melbourne",
+    "category": "exploration"
+  },
+  {
+    "id": 888,
+    "query": "history of flat white",
+    "category": "exploration"
+  },
+  {
+    "id": 889,
+    "query": "how is Arco unique compared to bigger companies?",
+    "category": "exploration"
+  },
+  {
+    "id": 890,
+    "query": "Arco design philosophy — tell me more",
+    "category": "exploration"
+  },
+  {
+    "id": 891,
+    "query": "I'm interested in getting into espresso at home",
+    "category": "exploration"
+  },
+  {
+    "id": 892,
+    "query": "what's the difference between arabica and robusta coffee?",
+    "category": "exploration"
+  },
+  {
+    "id": 893,
+    "query": "do you offer support?",
+    "category": "exploration"
+  },
+  {
+    "id": 894,
+    "query": "what's the difference between single origin and blend coffee?",
+    "category": "exploration"
+  },
+  {
+    "id": 895,
+    "query": "coffee culture in Naples",
+    "category": "exploration"
+  },
+  {
+    "id": 896,
+    "query": "coffee culture in Tokyo",
+    "category": "exploration"
+  },
+  {
+    "id": 897,
+    "query": "walk me through the Arco grinder lineup",
+    "category": "exploration"
+  },
+  {
+    "id": 898,
+    "query": "best cafes in Berlin for espresso lovers",
+    "category": "exploration"
+  },
+  {
+    "id": 899,
+    "query": "do you offer tutorials?",
+    "category": "exploration"
+  },
+  {
+    "id": 900,
+    "query": "what's trending in the espresso world right now?",
+    "category": "exploration"
+  },
+  {
+    "id": 901,
+    "query": "recommendations for a professional barista",
+    "category": "exploration"
+  },
+  {
+    "id": 902,
+    "query": "how is Arco better compared to other brands?",
+    "category": "exploration"
+  },
+  {
+    "id": 903,
+    "query": "why should I choose Arco over De'Longhi?",
+    "category": "exploration"
+  },
+  {
+    "id": 904,
+    "query": "best cafes in Oslo for espresso lovers",
+    "category": "exploration"
+  },
+  {
+    "id": 905,
+    "query": "best cafes in New York for espresso lovers",
+    "category": "exploration"
+  },
+  {
+    "id": 906,
+    "query": "best cafes in Melbourne for espresso lovers",
+    "category": "exploration"
+  },
+  {
+    "id": 907,
+    "query": "what water do I need for great espresso?",
+    "category": "exploration"
+  },
+  {
+    "id": 908,
+    "query": "recommendations for a intermediate home barista",
+    "category": "exploration"
+  },
+  {
+    "id": 909,
+    "query": "Arco quality — tell me more",
+    "category": "exploration"
+  },
+  {
+    "id": 910,
+    "query": "do you offer financing?",
+    "category": "exploration"
+  },
+  {
+    "id": 911,
+    "query": "I'm a digital nomad who refuses to compromise on coffee quality. What machine should I get?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 912,
+    "query": "I follow the World Barista Championship and know what extraction yield means. What machine should I get?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 913,
+    "query": "I just got back from Italy and want to recreate that espresso at home",
+    "category": "persona-driven"
+  },
+  {
+    "id": 914,
+    "query": "I've been using a French press for years — should I switch to espresso?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 915,
+    "query": "I want great coffee but have zero interest in the process — what do you recommend?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 916,
+    "query": "I'm hosting a holiday gathering and want to serve great coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 917,
+    "query": "I'm a new parent and need quick coffee in the morning",
+    "category": "persona-driven"
+  },
+  {
+    "id": 918,
+    "query": "I just moved into my first apartment and want a coffee setup",
+    "category": "persona-driven"
+  },
+  {
+    "id": 919,
+    "query": "my drip machine just broke — time to upgrade",
+    "category": "persona-driven"
+  },
+  {
+    "id": 920,
+    "query": "My partner and I disagree — I want espresso, they want cappuccinos",
+    "category": "persona-driven"
+  },
+  {
+    "id": 921,
+    "query": "My partner and I disagree — I want espresso, they want lattes",
+    "category": "persona-driven"
+  },
+  {
+    "id": 922,
+    "query": "I drink 6 coffees a day — what's most economical?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 923,
+    "query": "I want to impress my in-laws with homemade coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 924,
+    "query": "I'm a chef who loves coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 925,
+    "query": "I'm building a home cafe — what do I need?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 926,
+    "query": "I currently use a Moka pot and want to try espresso",
+    "category": "persona-driven"
+  },
+  {
+    "id": 927,
+    "query": "I'm experienced barista and i'm responsible for my team's coffee setup",
+    "category": "persona-driven"
+  },
+  {
+    "id": 928,
+    "query": "I'm a barista and want a serious setup for home",
+    "category": "persona-driven"
+  },
+  {
+    "id": 929,
+    "query": "I'm retiring soon and want to learn espresso as a hobby",
+    "category": "persona-driven"
+  },
+  {
+    "id": 930,
+    "query": "I'm hosting a book club and want to serve great coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 931,
+    "query": "I work from home and want to upgrade my coffee game",
+    "category": "persona-driven"
+  },
+  {
+    "id": 932,
+    "query": "I'm a engineer who just discovered specialty coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 933,
+    "query": "I follow the World Barista Championship and know what extraction yield means. My budget is under $2000",
+    "category": "persona-driven"
+  },
+  {
+    "id": 934,
+    "query": "I'm on a tight budget — guide me",
+    "category": "persona-driven"
+  },
+  {
+    "id": 935,
+    "query": "I'm a student who needs better coffee at work",
+    "category": "persona-driven"
+  },
+  {
+    "id": 936,
+    "query": "I'm a doctor who needs better coffee at work",
+    "category": "persona-driven"
+  },
+  {
+    "id": 937,
+    "query": "I want to impress my dinner guests with homemade coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 938,
+    "query": "I'm hosting a brunch and want to serve great coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 939,
+    "query": "I want great coffee but have zero interest in the process. What machine should I get?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 940,
+    "query": "I've been making espresso for a while with entry-level equipment — what do you recommend?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 941,
+    "query": "I drink 5 coffees a day — what's most economical?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 942,
+    "query": "My partner and I disagree — I want espresso, they want automatic",
+    "category": "persona-driven"
+  },
+  {
+    "id": 943,
+    "query": "I'm hosting a birthday party and want to serve great coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 944,
+    "query": "I'm someone new to espresso and i value calm mornings and simple routines",
+    "category": "persona-driven"
+  },
+  {
+    "id": 945,
+    "query": "I'm building a coffee corner — what do I need?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 946,
+    "query": "I want to impress my family with homemade coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 947,
+    "query": "I want great coffee but have zero interest in the process. My budget is under $1500",
+    "category": "persona-driven"
+  },
+  {
+    "id": 948,
+    "query": "I'm responsible for my team's coffee setup — what do you recommend?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 949,
+    "query": "my friend and I want to start a home coffee station",
+    "category": "persona-driven"
+  },
+  {
+    "id": 950,
+    "query": "my roommate and I want to start a home coffee setup",
+    "category": "persona-driven"
+  },
+  {
+    "id": 951,
+    "query": "my kid and I want to start a home coffee setup",
+    "category": "persona-driven"
+  },
+  {
+    "id": 952,
+    "query": "my spouse and I want to start a home coffee station",
+    "category": "persona-driven"
+  },
+  {
+    "id": 953,
+    "query": "my roommate and I want to start a home coffee station",
+    "category": "persona-driven"
+  },
+  {
+    "id": 954,
+    "query": "I'm hosting a game night and want to serve great coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 955,
+    "query": "I'm responsible for my team's coffee setup. My budget is under $1000",
+    "category": "persona-driven"
+  },
+  {
+    "id": 956,
+    "query": "I've been making espresso for a while with entry-level equipment. My budget is no budget limit",
+    "category": "persona-driven"
+  },
+  {
+    "id": 957,
+    "query": "My partner and I disagree — I want espresso, they want simple",
+    "category": "persona-driven"
+  },
+  {
+    "id": 958,
+    "query": "I'm looking for the best regardless of price — guide me",
+    "category": "persona-driven"
+  },
+  {
+    "id": 959,
+    "query": "my roommate and I want to start a home coffee corner",
+    "category": "persona-driven"
+  },
+  {
+    "id": 960,
+    "query": "I value calm mornings and simple routines. My budget is under $2500",
+    "category": "persona-driven"
+  },
+  {
+    "id": 961,
+    "query": "I'm experienced barista and i want great coffee but have zero interest in the process",
+    "category": "persona-driven"
+  },
+  {
+    "id": 962,
+    "query": "I currently use a AeroPress and want to try espresso",
+    "category": "persona-driven"
+  },
+  {
+    "id": 963,
+    "query": "I drink 4 coffees a day — what's most economical?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 964,
+    "query": "I'm a digital nomad who refuses to compromise on coffee quality. My budget is under $1500",
+    "category": "persona-driven"
+  },
+  {
+    "id": 965,
+    "query": "my Keurig just broke — time to upgrade",
+    "category": "persona-driven"
+  },
+  {
+    "id": 966,
+    "query": "I've been making espresso for a while with entry-level equipment. What machine should I get?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 967,
+    "query": "My partner and I disagree — I want espresso, they want filter coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 968,
+    "query": "I follow the World Barista Championship and know what extraction yield means — what do you recommend?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 969,
+    "query": "I'm experienced barista and i've been making espresso for a while with entry-level equipment",
+    "category": "persona-driven"
+  },
+  {
+    "id": 970,
+    "query": "I've been making espresso for a while with entry-level equipment. My budget is under $2000",
+    "category": "persona-driven"
+  },
+  {
+    "id": 971,
+    "query": "I currently use a drip coffee maker and want to try espresso",
+    "category": "persona-driven"
+  },
+  {
+    "id": 972,
+    "query": "I value calm mornings and simple routines. What machine should I get?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 973,
+    "query": "I'm building a coffee station — what do I need?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 974,
+    "query": "I'm a writer who just discovered specialty coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 975,
+    "query": "I'm complete beginner and i value calm mornings and simple routines",
+    "category": "persona-driven"
+  },
+  {
+    "id": 976,
+    "query": "I'm a digital nomad who refuses to compromise on coffee quality — what do you recommend?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 977,
+    "query": "I follow the World Barista Championship and know what extraction yield means. My budget is under $500",
+    "category": "persona-driven"
+  },
+  {
+    "id": 978,
+    "query": "I want to impress my friends with homemade coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 979,
+    "query": "my friend and I want to start a home coffee corner",
+    "category": "persona-driven"
+  },
+  {
+    "id": 980,
+    "query": "I'm a chef who just discovered specialty coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 981,
+    "query": "I'm complete beginner and i've been making espresso for a while with entry-level equipment",
+    "category": "persona-driven"
+  },
+  {
+    "id": 982,
+    "query": "my friend and I want to start a home coffee bar",
+    "category": "persona-driven"
+  },
+  {
+    "id": 983,
+    "query": "I'm a designer who just discovered specialty coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 984,
+    "query": "my kid and I want to start a home coffee station",
+    "category": "persona-driven"
+  },
+  {
+    "id": 985,
+    "query": "I'm a chef who wants to get into espresso",
+    "category": "persona-driven"
+  },
+  {
+    "id": 986,
+    "query": "I currently use a Chemex and want to try espresso",
+    "category": "persona-driven"
+  },
+  {
+    "id": 987,
+    "query": "I want great coffee but have zero interest in the process. My budget is under $500",
+    "category": "persona-driven"
+  },
+  {
+    "id": 988,
+    "query": "I'm responsible for my team's coffee setup. My budget is under $2500",
+    "category": "persona-driven"
+  },
+  {
+    "id": 989,
+    "query": "my Moka pot just broke — time to upgrade",
+    "category": "persona-driven"
+  },
+  {
+    "id": 990,
+    "query": "I want great coffee but have zero interest in the process. My budget is under $2500",
+    "category": "persona-driven"
+  },
+  {
+    "id": 991,
+    "query": "I value calm mornings and simple routines — what do you recommend?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 992,
+    "query": "I'm a doctor who wants to get into espresso",
+    "category": "persona-driven"
+  },
+  {
+    "id": 993,
+    "query": "I currently use a pour-over and want to try espresso",
+    "category": "persona-driven"
+  },
+  {
+    "id": 994,
+    "query": "I've been making espresso for a while with entry-level equipment. My budget is under $1000",
+    "category": "persona-driven"
+  },
+  {
+    "id": 995,
+    "query": "I'm responsible for my team's coffee setup. What machine should I get?",
+    "category": "persona-driven"
+  },
+  {
+    "id": 996,
+    "query": "my friend and I want to start a home coffee setup",
+    "category": "persona-driven"
+  },
+  {
+    "id": 997,
+    "query": "I'm a engineer who loves coffee",
+    "category": "persona-driven"
+  },
+  {
+    "id": 998,
+    "query": "I've been making espresso for a while with entry-level equipment. My budget is under $1500",
+    "category": "persona-driven"
+  },
+  {
+    "id": 999,
+    "query": "I'm professional barista and i'm a digital nomad who refuses to compromise on coffee quality",
+    "category": "persona-driven"
+  },
+  {
+    "id": 1000,
+    "query": "I drink 3 coffees a day — what's most economical?",
+    "category": "persona-driven"
+  }
+]

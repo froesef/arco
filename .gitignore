@@ -39,3 +39,6 @@ build-demo/segments/
 build-demo/recordings/
 build-demo/concat.txt
 build-demo/.venv/
+
+# Load test results
+tools/loadtest/results/

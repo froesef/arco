@@ -1,0 +1,258 @@
+#!/usr/bin/env node
+
+/**
+ * Load Testing Workbench — Main Orchestrator
+ *
+ * Usage:
+ *   node tools/loadtest/loadtest.js [options]
+ *
+ * Options:
+ *   --total N          Total requests (default: 1000)
+ *   --rate N           Max requests/second (default: 0.5)
+ *   --parallel N       Concurrent browser contexts (default: 3)
+ *   --base-url URL     Target URL (default: https://main--arco--froesef.aem.live)
+ *   --timeout N        Per-page timeout in ms (default: 120000)
+ *   --no-screenshots   Disable screenshots
+ *   --regen            Append &regen to force regeneration
+ *   --no-headless      Show browser windows
+ *   --dry-run          Print config and sample prompts, then exit
+ *   --output DIR       Output directory (default: tools/loadtest/results)
+ *   --prompts FILE     Prompt file (default: tools/loadtest/prompts.json)
+ *
+ * Examples:
+ *   node tools/loadtest/loadtest.js --total 10 --parallel 2 --no-headless
+ *   node tools/loadtest/loadtest.js --total 1000 --rate 0.5 --parallel 8
+ */
+
+import { readFile, mkdir } from 'node:fs/promises';
+import { join, resolve } from 'node:path';
+import { parseConfig, printConfig } from './config.js';
+import { RateLimiter } from './rate-limiter.js';
+import { BrowserPool } from './browser-pool.js';
+import { Reporter } from './reporter.js';
+
+// --- Utilities ---
+
+function slugify(str) {
+  return str
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 60);
+}
+
+function shuffle(arr, seed = 42) {
+  const a = [...arr];
+  let s = seed;
+  for (let i = a.length - 1; i > 0; i--) {
+    s = (s * 1664525 + 1013904223) & 0x7fffffff;
+    const j = s % (i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// --- Single page test ---
+
+async function testSingleQuery(context, prompt, config, outputDir) {
+  const page = await context.newPage();
+  const result = {
+    id: prompt.id,
+    query: prompt.query,
+    category: prompt.category,
+    startTime: Date.now(),
+    timestamps: {},
+    status: 'pending',
+    error: null,
+    consoleLogs: [],
+    screenshotPath: null,
+    sectionCount: null,
+    pageTitle: null,
+    serverReportedTime: null,
+    totalDuration: null,
+  };
+
+  page.on('console', (msg) => {
+    result.consoleLogs.push({ type: msg.type(), text: msg.text(), time: Date.now() });
+  });
+
+  try {
+    const urlParams = new URLSearchParams({ q: prompt.query });
+    if (config.regen) urlParams.append('regen', '');
+    const url = `${config.baseUrl}/?${urlParams.toString()}`;
+
+    // Navigate
+    result.timestamps.navigationStart = Date.now();
+    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: config.timeout });
+    result.timestamps.domContentLoaded = Date.now();
+
+    // Wait for first section (spinner gets 'done' class)
+    await page.waitForSelector('.generating-container.done, .section[data-section-status]', {
+      timeout: config.timeout,
+    });
+    result.timestamps.firstSection = Date.now();
+
+    // Wait for stream completion — follow-up suggestions appear
+    await page.waitForSelector('.follow-up-container', { timeout: config.timeout });
+    result.timestamps.streamComplete = Date.now();
+
+    // Wait briefly for the spinner to be removed (stream fully done)
+    await page.waitForSelector('.generating-container', { state: 'detached', timeout: 5000 })
+      .catch(() => { /* may already be removed */ });
+
+    // Extract completion time from console
+    const completeLog = result.consoleLogs.find(
+      (l) => l.text.includes('[Recommender] Complete'),
+    );
+    if (completeLog) {
+      const match = completeLog.text.match(/Complete in ([\d.]+)s/);
+      if (match) result.serverReportedTime = parseFloat(match[1]);
+    }
+
+    // Count sections
+    result.sectionCount = await page.$$eval(
+      '#generation-content > .section',
+      (els) => els.length,
+    ).catch(() => 0);
+
+    // Page title
+    result.pageTitle = await page.title().catch(() => null);
+
+    // Screenshot
+    if (config.screenshots) {
+      const filename = `${String(prompt.id).padStart(4, '0')}-${slugify(prompt.query)}.jpeg`;
+      result.screenshotPath = filename;
+      await page.screenshot({
+        path: join(outputDir, 'screenshots', filename),
+        fullPage: true,
+        type: 'jpeg',
+        quality: 80,
+      });
+    }
+
+    result.status = 'success';
+  } catch (err) {
+    result.status = 'error';
+    result.error = err.message;
+
+    // Screenshot on error for debugging
+    if (config.screenshots) {
+      try {
+        const filename = `error-${String(prompt.id).padStart(4, '0')}.jpeg`;
+        result.screenshotPath = filename;
+        await page.screenshot({
+          path: join(outputDir, 'screenshots', filename),
+          fullPage: true,
+          type: 'jpeg',
+          quality: 80,
+        });
+      } catch { /* ignore */ }
+    }
+  } finally {
+    result.endTime = Date.now();
+    result.totalDuration = result.endTime - result.startTime;
+    await page.close().catch(() => {});
+  }
+
+  return result;
+}
+
+// --- Main ---
+
+async function main() {
+  const config = parseConfig();
+  printConfig(config);
+
+  // Load prompts
+  const promptsPath = resolve(config.prompts);
+  const allPrompts = JSON.parse(await readFile(promptsPath, 'utf-8'));
+  if (!Array.isArray(allPrompts) || allPrompts.length === 0) {
+    console.error(`Error: No prompts found in ${promptsPath}. Run: node tools/loadtest/generate-prompts.js`);
+    process.exit(1);
+  }
+  console.log(`Loaded ${allPrompts.length} prompts from ${promptsPath}`);
+
+  // Shuffle and slice
+  const prompts = shuffle(allPrompts).slice(0, config.total);
+  if (config.total > allPrompts.length) {
+    console.warn(`Warning: Requested ${config.total} but only ${allPrompts.length} prompts available. Running ${prompts.length}.`);
+  }
+  console.log(`Selected ${prompts.length} prompts for this run\n`);
+
+  // Dry run: print sample and exit
+  if (config.dryRun) {
+    console.log('--- Dry Run: Sample Prompts ---');
+    const sample = prompts.slice(0, 10);
+    for (const p of sample) {
+      console.log(`  [${p.id}] (${p.category}) "${p.query}"`);
+    }
+    if (prompts.length > sample.length) {
+      console.log(`  ... and ${prompts.length - sample.length} more`);
+    }
+    console.log('\nDry run complete. Remove --dry-run to execute.');
+    return;
+  }
+
+  // Create output directory
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const outputDir = resolve(config.output, `run-${timestamp}`);
+  await mkdir(join(outputDir, 'screenshots'), { recursive: true });
+  console.log(`Output directory: ${outputDir}\n`);
+
+  // Initialize components
+  const rateLimiter = new RateLimiter(config.rate);
+  const browserPool = new BrowserPool({
+    parallel: config.parallel,
+    headless: config.headless,
+    viewportWidth: config.viewportWidth,
+    viewportHeight: config.viewportHeight,
+    loadtestToken: config.loadtestToken,
+  });
+  const reporter = new Reporter(outputDir);
+
+  try {
+    await browserPool.initialize();
+    console.log('\nStarting load test...\n');
+
+    // Work queue
+    const inFlight = new Set();
+    let completed = 0;
+
+    for (const prompt of prompts) {
+      await rateLimiter.acquire();
+      const context = await browserPool.acquireContext();
+
+      const promise = testSingleQuery(context, prompt, config, outputDir)
+        .then((result) => {
+          completed++;
+          reporter.onResult(result, completed, prompts.length);
+
+          // If we got a 429, tell the rate limiter
+          if (result.error && (result.error.includes('429') || result.error.includes('rate limit'))) {
+            rateLimiter.record429();
+          }
+
+          browserPool.releaseContext(context);
+          inFlight.delete(promise);
+        });
+
+      inFlight.add(promise);
+    }
+
+    // Wait for all in-flight
+    await Promise.all(inFlight);
+
+    console.log('\n--- Test Complete ---\n');
+
+    // Write reports
+    await reporter.writeReports(config, rateLimiter.getStats());
+    console.log(`\nResults written to: ${outputDir}`);
+  } finally {
+    await browserPool.shutdown();
+  }
+}
+
+main().catch((err) => {
+  console.error('Fatal error:', err);
+  process.exit(1);
+});

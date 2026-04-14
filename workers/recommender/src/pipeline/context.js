@@ -6,7 +6,7 @@
 export const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Loadtest-Token',
 };
 
 /**
@@ -35,6 +35,7 @@ export function createContext(body, request) {
       shownContent,
       ip,
       speculative,
+      headers: request.headers,
     },
 
     // Flow metadata
