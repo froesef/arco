@@ -221,6 +221,10 @@ export async function llmGenerate(ctx, config, env) {
     }
   }, 3000);
 
+  const LLM_TIMEOUT_MS = config.llmTimeout || 60_000;
+  const abortController = new AbortController();
+  const timeoutId = setTimeout(() => abortController.abort(), LLM_TIMEOUT_MS);
+
   ctx.timings.llmStart = Date.now();
   let completion;
   try {
@@ -233,9 +237,13 @@ export async function llmGenerate(ctx, config, env) {
       max_tokens: config.maxTokens || 4096,
       temperature: config.temperature ?? 0.7,
       stream: true,
-    });
+    }, { signal: abortController.signal });
   } catch (llmErr) {
+    clearTimeout(timeoutId);
     clearInterval(heartbeatInterval);
+    if (llmErr.name === 'AbortError' || abortController.signal.aborted) {
+      throw new Error('AI request timed out. Try a simpler query.');
+    }
     const status = llmErr.status || llmErr.statusCode;
     let msg = 'AI service unavailable. Please try again.';
     if (status === 401) msg = 'AI authentication failed. Check API key.';
@@ -252,47 +260,56 @@ export async function llmGenerate(ctx, config, env) {
   let sectionIndex = 0;
   let tokenCount = 0;
 
-  // eslint-disable-next-line no-restricted-syntax
-  for await (const chunk of completion) {
-    const content = chunk.choices?.[0]?.delta?.content;
-    if (content) {
-      if (!ctx.timings.llmFirstToken) ctx.timings.llmFirstToken = Date.now();
-      ctx.timings.llmLastToken = Date.now();
-      ctx.llm.fullText += content;
-      tokenCount += 1;
+  try {
+    // eslint-disable-next-line no-restricted-syntax
+    for await (const chunk of completion) {
+      const content = chunk.choices?.[0]?.delta?.content;
+      if (content) {
+        if (!ctx.timings.llmFirstToken) ctx.timings.llmFirstToken = Date.now();
+        ctx.timings.llmLastToken = Date.now();
+        ctx.llm.fullText += content;
+        tokenCount += 1;
 
-      // Feed to incremental parser
-      const completedSections = parser.feed(content);
-      // eslint-disable-next-line no-restricted-syntax
-      for (const section of completedSections) {
-        const { html, debug: sDebug } = processSectionDetailed(section);
+        // Feed to incremental parser
+        const completedSections = parser.feed(content);
+        // eslint-disable-next-line no-restricted-syntax
+        for (const section of completedSections) {
+          const { html, debug: sDebug } = processSectionDetailed(section);
 
-        // Skip empty blocks
-        if (!hasContent(html)) continue; // eslint-disable-line no-continue
+          // Skip empty blocks
+          if (!hasContent(html)) continue; // eslint-disable-line no-continue
 
-        ctx.llm.rawJsonSections.push(section);
-        ctx.llm.sections.push(html);
-        sectionTimings.push(sDebug.totalMs);
-        sectionDetails.push({
-          index: sectionIndex,
-          block: section.block,
-          variants: section.variants || [],
-          ...sDebug,
-        });
+          ctx.llm.rawJsonSections.push(section);
+          ctx.llm.sections.push(html);
+          sectionTimings.push(sDebug.totalMs);
+          sectionDetails.push({
+            index: sectionIndex,
+            block: section.block,
+            variants: section.variants || [],
+            ...sDebug,
+          });
 
-        // Stream this section to the client immediately
-        const line = JSON.stringify({ type: 'section', index: sectionIndex, html });
-        ctx.ndjsonLines.push(line);
-        // eslint-disable-next-line no-await-in-loop
-        await ctx.writer.write(ctx.encoder.encode(`${line}\n`));
-        sectionIndex += 1;
+          // Stream this section to the client immediately
+          const line = JSON.stringify({ type: 'section', index: sectionIndex, html });
+          ctx.ndjsonLines.push(line);
+          // eslint-disable-next-line no-await-in-loop
+          await ctx.writer.write(ctx.encoder.encode(`${line}\n`));
+          sectionIndex += 1;
+        }
       }
+      if (chunk.usage) ctx.llm.usage = chunk.usage;
+      if (chunk.x_cerebras?.usage) ctx.llm.usage = chunk.x_cerebras.usage;
     }
-    if (chunk.usage) ctx.llm.usage = chunk.usage;
-    if (chunk.x_cerebras?.usage) ctx.llm.usage = chunk.x_cerebras.usage;
+  } catch (streamErr) {
+    if (streamErr.name === 'AbortError' || abortController.signal.aborted) {
+      throw new Error('AI request timed out. Try a simpler query.');
+    }
+    throw streamErr;
+  } finally {
+    clearTimeout(timeoutId);
+    clearInterval(heartbeatInterval);
   }
 
-  clearInterval(heartbeatInterval);
   ctx.timings.llmEnd = Date.now();
 
   // Finalize: process remaining buffer (last section + suggestions)

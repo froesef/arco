@@ -262,6 +262,20 @@ function dedupeMatches(matches, maxCount) {
  * Uses a single embedding, queries CONTENT_INDEX, splits by metadata type.
  * Returns guides, experiences, comparisons, recipes, and tool content.
  */
+/**
+ * Race a promise against a timeout. Rejects with a named error on timeout.
+ */
+function withTimeout(promise, ms, label) {
+  let timer;
+  const timeout = new Promise((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+  });
+  return Promise.race([promise, timeout]).finally(() => clearTimeout(timer));
+}
+
+const EMBEDDING_TIMEOUT_MS = 10_000;
+const VECTORIZE_TIMEOUT_MS = 10_000;
+
 export async function searchContent(query, env, config = {}) {
   const timings = {
     embedding: 0, vectorize: 0, guidesMs: 0, experiencesMs: 0, fallback: false,
@@ -289,9 +303,11 @@ export async function searchContent(query, env, config = {}) {
 
   try {
     const embeddingStart = Date.now();
-    const embeddingResponse = await env.AI?.run('@cf/baai/bge-small-en-v1.5', {
-      text: [query],
-    });
+    const embeddingResponse = await withTimeout(
+      env.AI?.run('@cf/baai/bge-small-en-v1.5', { text: [query] }),
+      EMBEDDING_TIMEOUT_MS,
+      'AI embedding',
+    );
     timings.embedding = Date.now() - embeddingStart;
 
     if (!embeddingResponse?.data?.[0]) {
@@ -305,10 +321,11 @@ export async function searchContent(query, env, config = {}) {
     const embedding = embeddingResponse.data[0];
 
     const vectorizeStart = Date.now();
-    const allResults = await env.CONTENT_INDEX.query(embedding, {
-      topK: 50,
-      returnMetadata: 'all',
-    });
+    const allResults = await withTimeout(
+      env.CONTENT_INDEX.query(embedding, { topK: 50, returnMetadata: 'all' }),
+      VECTORIZE_TIMEOUT_MS,
+      'Vectorize query',
+    );
     timings.vectorize = Date.now() - vectorizeStart;
 
     const matches = allResults.matches || [];
@@ -335,7 +352,9 @@ export async function searchContent(query, env, config = {}) {
     return {
       guides, experiences, comparisons, recipes, tools, timings,
     };
-  } catch {
+  } catch (err) {
+    // Propagate timeout errors so they surface as real failures
+    if (err.message?.includes('timed out')) throw err;
     return {
       ...emptyResult,
       guides: keywordMatchGuides(query).slice(0, maxGuides),

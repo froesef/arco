@@ -6,6 +6,18 @@
  */
 
 const IMS_TOKEN_ENDPOINT = 'https://ims-na1.adobelogin.com/ims/token/v3';
+const DA_FETCH_TIMEOUT_MS = 30_000;
+
+/**
+ * Fetch with a timeout. Uses AbortSignal.timeout where available,
+ * falls back to manual AbortController.
+ */
+function fetchWithTimeout(url, options = {}, timeoutMs = DA_FETCH_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  return fetch(url, { ...options, signal: controller.signal })
+    .finally(() => clearTimeout(timer));
+}
 
 // Token cache (module-level for persistence across requests within a worker instance)
 let cachedToken = null;
@@ -21,7 +33,7 @@ async function exchangeForAccessToken(clientId, clientSecret, serviceToken) {
   formParams.append('client_secret', clientSecret);
   formParams.append('code', serviceToken);
 
-  const response = await fetch(IMS_TOKEN_ENDPOINT, {
+  const response = await fetchWithTimeout(IMS_TOKEN_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: formParams.toString(),
@@ -174,7 +186,7 @@ async function createPage(path, htmlContent, env) {
     const formData = new FormData();
     formData.append('data', new Blob([htmlContent], { type: 'text/html' }), 'index.html');
 
-    const response = await fetch(url, {
+    const response = await fetchWithTimeout(url, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${token}` },
       body: formData,
@@ -218,7 +230,7 @@ async function triggerPreview(path, env) {
 
   const attemptPreview = async (isRetry) => {
     const token = await getDAToken(env);
-    const response = await fetch(`${baseUrl}${endpoint}`, {
+    const response = await fetchWithTimeout(`${baseUrl}${endpoint}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -268,7 +280,7 @@ async function waitForPreview(path, env, maxAttempts = 10, interval = 1000) {
     i; // consumed to avoid unused-vars
     try {
       // eslint-disable-next-line no-await-in-loop
-      const response = await fetch(previewUrl, { method: 'HEAD' });
+      const response = await fetchWithTimeout(previewUrl, { method: 'HEAD' }, 5000);
       if (response.ok) return true;
     } catch {
       // Continue waiting
@@ -291,7 +303,7 @@ async function publishToLive(path, env) {
 
   const attemptPublish = async (isRetry) => {
     const token = await getDAToken(env);
-    const response = await fetch(`${baseUrl}${endpoint}`, {
+    const response = await fetchWithTimeout(`${baseUrl}${endpoint}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     });
@@ -334,7 +346,7 @@ async function purgeCache(path, env) {
   const ref = 'main';
   try {
     const token = await getDAToken(env);
-    await fetch(`${baseUrl}/cache/${env.DA_ORG}/${env.DA_REPO}/${ref}${path}`, {
+    await fetchWithTimeout(`${baseUrl}/cache/${env.DA_ORG}/${env.DA_REPO}/${ref}${path}`, {
       method: 'POST',
       headers: { Authorization: `Bearer ${token}` },
     });

@@ -42,9 +42,24 @@ export async function ragContent(ctx, config, env) {
   const start = Date.now();
   const enrichedQuery = buildEnrichedQuery(ctx);
 
+  let result;
+  try {
+    result = await searchContent(enrichedQuery, env, config);
+  } catch (err) {
+    if (err.message?.includes('AI embedding')) {
+      console.error('[RAG] AI embedding timeout:', err.message); // eslint-disable-line no-console
+      throw new Error('AI service unavailable. Please try again.');
+    }
+    if (err.message?.includes('Vectorize')) {
+      console.error('[RAG] Vectorize timeout:', err.message); // eslint-disable-line no-console
+      throw new Error('AI service unavailable. Please try again.');
+    }
+    throw err;
+  }
+
   const {
     guides, experiences, comparisons, recipes, tools, timings,
-  } = await searchContent(enrichedQuery, env, config);
+  } = result;
 
   ctx.rag.guides = guides;
   ctx.rag.experiences = experiences;
