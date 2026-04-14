@@ -105,7 +105,8 @@ function categorizeErrors(errors) {
   const breakdown = {};
   for (const r of errors) {
     let type = 'unknown';
-    if (r.error?.includes('429') || r.error?.includes('rate limit')) type = '429 rate limit';
+    if (r.error?.includes('425') || r.apiStatus === 425) type = '425 too early';
+    else if (r.error?.includes('429') || r.error?.includes('rate limit')) type = '429 rate limit';
     else if (r.error?.includes('timeout') || r.error?.includes('Timeout')) type = 'timeout';
     else if (r.error?.includes('net::') || r.error?.includes('ECONNREFUSED')) type = 'network';
     else if (r.error) type = 'other';

@@ -76,6 +76,15 @@ async function testSingleQuery(context, prompt, config, outputDir) {
     result.consoleLogs.push({ type: msg.type(), text: msg.text(), time: Date.now() });
   });
 
+  // Track HTTP responses for error detection
+  const apiResponses = [];
+  page.on('response', (response) => {
+    const url = response.url();
+    if (url.includes('/api/generate') || url.includes('/?q=')) {
+      apiResponses.push({ url, status: response.status(), statusText: response.statusText() });
+    }
+  });
+
   try {
     const urlParams = new URLSearchParams({ q: prompt.query });
     if (config.regen) urlParams.append('regen', '');
@@ -83,8 +92,17 @@ async function testSingleQuery(context, prompt, config, outputDir) {
 
     // Navigate
     result.timestamps.navigationStart = Date.now();
-    await page.goto(url, { waitUntil: 'domcontentloaded', timeout: config.timeout });
+    const response = await page.goto(url, { waitUntil: 'domcontentloaded', timeout: config.timeout });
     result.timestamps.domContentLoaded = Date.now();
+    result.httpStatus = response?.status() || null;
+
+    // Check for HTTP-level errors before waiting for content
+    if (result.httpStatus === 425) {
+      throw new Error('425 Too Early — TLS connection not ready');
+    }
+    if (result.httpStatus >= 500) {
+      throw new Error(`${result.httpStatus} Server Error`);
+    }
 
     // Wait for first section (spinner gets 'done' class)
     await page.waitForSelector('.generating-container.done, .section[data-section-status]', {
@@ -130,10 +148,25 @@ async function testSingleQuery(context, prompt, config, outputDir) {
       });
     }
 
+    // Check if the API call had issues even though the page rendered
+    const apiError = apiResponses.find((r) => r.status >= 400);
+    if (apiError) {
+      result.apiStatus = apiError.status;
+    }
+
     result.status = 'success';
   } catch (err) {
     result.status = 'error';
     result.error = err.message;
+
+    // Enrich with HTTP status info
+    const apiError = apiResponses.find((r) => r.status >= 400);
+    if (apiError) {
+      result.apiStatus = apiError.status;
+      if (apiError.status === 425 && !result.error.includes('425')) {
+        result.error = `425 Too Early (API) — ${result.error}`;
+      }
+    }
 
     // Screenshot on error for debugging
     if (config.screenshots) {
