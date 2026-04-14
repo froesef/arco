@@ -52,6 +52,61 @@ function shuffle(arr, seed = 42) {
   return a;
 }
 
+// --- Error source classification ---
+
+function classifyErrorSource(result) {
+  const err = (result.error || '').toLowerCase();
+  const consoleMsgs = result.consoleLogs.map((l) => l.text.toLowerCase()).join(' ');
+
+  // Cerebras / LLM errors — the worker wraps these with specific messages
+  if (err.includes('ai service') || err.includes('ai rate limit')
+      || err.includes('ai request timed out') || err.includes('ai authentication')
+      || consoleMsgs.includes('ai service') || consoleMsgs.includes('ai rate limit')
+      || consoleMsgs.includes('ai request timed out')) {
+    return 'cerebras';
+  }
+
+  // 425 Too Early — TLS/edge level
+  if (result.apiStatus === 425 || result.httpStatus === 425 || err.includes('425')) {
+    return 'network';
+  }
+
+  // 429 rate limit — worker-level
+  if (result.apiStatus === 429 || err.includes('429') || err.includes('rate limit')) {
+    return 'worker';
+  }
+
+  // Worker/server errors (5xx)
+  if (result.apiStatus >= 500 || result.httpStatus >= 500) {
+    return 'worker';
+  }
+
+  // Client-side timeout — no server error, just waited too long
+  if (err.includes('timeout') || err.includes('waiting for selector')) {
+    // Check if there's a hint of what the server was doing
+    if (consoleMsgs.includes('ai service') || consoleMsgs.includes('ai request')) {
+      return 'cerebras';
+    }
+    // If we got first section but timed out waiting for completion, likely LLM slow
+    if (result.timestamps.firstSection && !result.timestamps.streamComplete) {
+      return 'cerebras';
+    }
+    // If we never got first section, could be worker or vectorize
+    if (result.timestamps.domContentLoaded && !result.timestamps.firstSection) {
+      return 'worker';
+    }
+    return 'client';
+  }
+
+  // Network-level errors
+  if (err.includes('net::') || err.includes('econnrefused') || err.includes('econnreset')
+      || err.includes('err_connection') || err.includes('too early')) {
+    return 'network';
+  }
+
+  return 'unknown';
+}
+
 // --- Single page test ---
 
 async function testSingleQuery(context, prompt, config, outputDir) {
@@ -64,16 +119,24 @@ async function testSingleQuery(context, prompt, config, outputDir) {
     timestamps: {},
     status: 'pending',
     error: null,
+    errorSource: null, // 'cerebras' | 'vectorize' | 'worker' | 'network' | 'client'
     consoleLogs: [],
     screenshotPath: null,
     sectionCount: null,
     pageTitle: null,
     serverReportedTime: null,
+    serverTimings: null, // detailed backend timings from debug NDJSON
     totalDuration: null,
   };
 
   page.on('console', (msg) => {
-    result.consoleLogs.push({ type: msg.type(), text: msg.text(), time: Date.now() });
+    const entry = { type: msg.type(), text: msg.text(), time: Date.now() };
+    // Try to capture structured args (e.g. the timings object)
+    const args = msg.args();
+    if (args.length > 1) {
+      args[1].jsonValue().then((val) => { entry.data = val; }).catch(() => {});
+    }
+    result.consoleLogs.push(entry);
   });
 
   // Track HTTP responses for error detection
@@ -118,13 +181,14 @@ async function testSingleQuery(context, prompt, config, outputDir) {
     await page.waitForSelector('.generating-container', { state: 'detached', timeout: 5000 })
       .catch(() => { /* may already be removed */ });
 
-    // Extract completion time from console
+    // Extract completion time and server timings from console
     const completeLog = result.consoleLogs.find(
       (l) => l.text.includes('[Recommender] Complete'),
     );
     if (completeLog) {
       const match = completeLog.text.match(/Complete in ([\d.]+)s/);
       if (match) result.serverReportedTime = parseFloat(match[1]);
+      if (completeLog.data) result.serverTimings = completeLog.data;
     }
 
     // Count sections
@@ -167,6 +231,9 @@ async function testSingleQuery(context, prompt, config, outputDir) {
         result.error = `425 Too Early (API) — ${result.error}`;
       }
     }
+
+    // Classify error source
+    result.errorSource = classifyErrorSource(result);
 
     // Screenshot on error for debugging
     if (config.screenshots) {

@@ -13,7 +13,8 @@ export class Reporter {
     const dur = (result.totalDuration / 1000).toFixed(1);
     const query = result.query.length > 50 ? `${result.query.slice(0, 50)}...` : result.query;
     const sections = result.sectionCount != null ? ` (${result.sectionCount} sections)` : '';
-    const errorInfo = result.error ? ` (${result.error.slice(0, 40)})` : '';
+    const source = result.errorSource ? `[${result.errorSource}] ` : '';
+    const errorInfo = result.error ? ` (${source}${result.error.slice(0, 40)})` : '';
 
     const tag = result.status === 'success' ? 'SUCCESS' : 'ERROR  ';
     process.stderr.write(
@@ -50,7 +51,7 @@ export class Reporter {
         timing: computeStats(durations),
         firstSectionTiming: computeStats(firstSections),
         sectionCounts: computeStats(sectionCounts),
-        errorBreakdown: categorizeErrors(errors),
+        ...categorizeErrors(errors),
         byCategory: this._categoryBreakdown(successes),
       },
       results: this.results,
@@ -102,17 +103,23 @@ function computeStats(sorted) {
 }
 
 function categorizeErrors(errors) {
-  const breakdown = {};
+  const byType = {};
+  const bySource = {};
   for (const r of errors) {
+    // By error type (what happened)
     let type = 'unknown';
     if (r.error?.includes('425') || r.apiStatus === 425) type = '425 too early';
     else if (r.error?.includes('429') || r.error?.includes('rate limit')) type = '429 rate limit';
     else if (r.error?.includes('timeout') || r.error?.includes('Timeout')) type = 'timeout';
     else if (r.error?.includes('net::') || r.error?.includes('ECONNREFUSED')) type = 'network';
     else if (r.error) type = 'other';
-    breakdown[type] = (breakdown[type] || 0) + 1;
+    byType[type] = (byType[type] || 0) + 1;
+
+    // By error source (where it happened)
+    const source = r.errorSource || 'unknown';
+    bySource[source] = (bySource[source] || 0) + 1;
   }
-  return breakdown;
+  return { byType, bySource };
 }
 
 function formatDuration(ms) {
@@ -155,9 +162,14 @@ function formatSummary(report) {
   }
 
   if (summary.errors > 0) {
-    lines.push('Error breakdown:');
-    for (const [type, count] of Object.entries(summary.errorBreakdown)) {
+    lines.push('Errors by type (what happened):');
+    for (const [type, count] of Object.entries(summary.byType)) {
       lines.push(`  ${type}: ${count}`);
+    }
+    lines.push('');
+    lines.push('Errors by source (where it happened):');
+    for (const [source, count] of Object.entries(summary.bySource)) {
+      lines.push(`  ${source}: ${count}`);
     }
     lines.push('');
   }
