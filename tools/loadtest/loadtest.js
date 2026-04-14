@@ -200,7 +200,7 @@ async function main() {
   console.log(`Output directory: ${outputDir}\n`);
 
   // Initialize components
-  const rateLimiter = new RateLimiter(config.rate);
+  const rateLimiter = new RateLimiter(config.rate, { bypassServerLimit: !!config.loadtestToken });
   const browserPool = new BrowserPool({
     parallel: config.parallel,
     headless: config.headless,

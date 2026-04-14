@@ -11,9 +11,10 @@ const BURST_LIMIT = 28; // stay under the server's 30/60s with a 2-request margi
 const WINDOW_MS = 61_000; // 61s to be safe against clock drift
 
 export class RateLimiter {
-  constructor(ratePerSecond) {
+  constructor(ratePerSecond, { bypassServerLimit = false } = {}) {
     this.rate = ratePerSecond;
-    this.burstMode = ratePerSecond > 1;
+    this.bypass = bypassServerLimit;
+    this.burstMode = !bypassServerLimit && ratePerSecond > 1;
 
     // Stats
     this.sent = 0;
@@ -23,10 +24,10 @@ export class RateLimiter {
     if (this.burstMode) {
       this.windowStart = null;
       this.windowCount = 0;
-    } else {
-      this.intervalMs = 1000 / ratePerSecond;
-      this.lastRelease = 0;
     }
+    // Steady drip: used when rate <= 1, or when bypass is active (no burst needed)
+    this.intervalMs = 1000 / ratePerSecond;
+    this.lastRelease = 0;
 
     this._backingOff = false;
     this._backoffPromise = null;
@@ -38,7 +39,7 @@ export class RateLimiter {
       await this._backoffPromise;
     }
 
-    if (this.burstMode) {
+    if (this.burstMode && !this.bypass) {
       await this._acquireBurst();
     } else {
       await this._acquireSteady();
