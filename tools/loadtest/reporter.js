@@ -34,12 +34,16 @@ export class Reporter {
       .sort((a, b) => a - b);
     const sectionCounts = successes.map((r) => r.sectionCount).filter((v) => v != null);
 
+    const durationMs = endTime - this.startTime;
+    const durationMin = durationMs / 60_000;
+    const pagesPerMinute = durationMin > 0 ? (successes.length / durationMin) : 0;
+
     const report = {
       meta: {
         startTime: new Date(this.startTime).toISOString(),
         endTime: new Date(endTime).toISOString(),
-        durationMs: endTime - this.startTime,
-        durationFormatted: formatDuration(endTime - this.startTime),
+        durationMs,
+        durationFormatted: formatDuration(durationMs),
         config,
         rateLimiterStats,
       },
@@ -48,6 +52,7 @@ export class Reporter {
         success: successes.length,
         errors: errors.length,
         successRate: `${((successes.length / this.results.length) * 100).toFixed(1)}%`,
+        pagesPerMinute: Math.round(pagesPerMinute * 10) / 10,
         timing: computeStats(durations),
         firstSectionTiming: computeStats(firstSections),
         sectionCounts: computeStats(sectionCounts),
@@ -138,6 +143,7 @@ function formatSummary(report) {
     `Total:        ${summary.total}`,
     `Success:      ${summary.success} (${summary.successRate})`,
     `Errors:       ${summary.errors}`,
+    `Throughput:   ${summary.pagesPerMinute} pages/min`,
     '',
   ];
 
