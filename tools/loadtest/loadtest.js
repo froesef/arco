@@ -84,16 +84,18 @@ function classifyErrorSource(result) {
   // Client-side timeout — no server error, just waited too long
   if (err.includes('timeout') || err.includes('waiting for selector')) {
     // Check if there's a hint of what the server was doing
-    if (consoleMsgs.includes('ai service') || consoleMsgs.includes('ai request')) {
+    if (consoleMsgs.includes('ai service') || consoleMsgs.includes('ai request')
+        || consoleMsgs.includes('ai rate limit')) {
       return 'cerebras';
     }
     // If we got first section but timed out waiting for completion, likely LLM slow
     if (result.timestamps.firstSection && !result.timestamps.streamComplete) {
       return 'cerebras';
     }
-    // If we never got first section, could be worker or vectorize
+    // If page loaded but no sections ever streamed, the pipeline is stuck
+    // at the LLM step (most common cause under load)
     if (result.timestamps.domContentLoaded && !result.timestamps.firstSection) {
-      return 'worker';
+      return 'cerebras';
     }
     return 'client';
   }
