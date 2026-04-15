@@ -107,12 +107,6 @@ export function parseConfig(argv = process.argv) {
   config.viewportWidth = w || 1280;
   config.viewportHeight = h || 800;
 
-  // Clamp rate to safe range
-  if (config.rate > 5) {
-    console.warn(`[config] Rate ${config.rate}/s exceeds safe maximum, clamping to 5/s`);
-    config.rate = 5;
-  }
-
   return Object.freeze(config);
 }
 
