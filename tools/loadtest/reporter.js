@@ -1,6 +1,23 @@
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
+function errorCode(result) {
+  const src = result.errorSource || 'unknown';
+  const e = (result.error || '').toLowerCase();
+  const status = result.apiStatus || result.httpStatus;
+
+  let code;
+  if (status === 429 || e.includes('429') || e.includes('rate limit')) code = '429';
+  else if (status === 425 || e.includes('425')) code = '425';
+  else if (status >= 500 || e.includes('50')) code = String(status || '5xx');
+  else if (e.includes('timeout') || e.includes('timed out')) code = 'timeout';
+  else if (e.includes('abort')) code = 'abort';
+  else if (e.includes('net::') || e.includes('econnrefused') || e.includes('econnreset')) code = 'net';
+  else code = status ? String(status) : 'err';
+
+  return `${src}/${code}`;
+}
+
 export class Reporter {
   constructor(outputDir) {
     this.outputDir = outputDir;
@@ -19,8 +36,7 @@ export class Reporter {
     const dur = (result.totalDuration / 1000).toFixed(1);
     const query = result.query.length > 50 ? `${result.query.slice(0, 50)}...` : result.query;
     const sections = result.sectionCount != null ? ` (${result.sectionCount} sections)` : '';
-    const source = result.errorSource ? `[${result.errorSource}] ` : '';
-    const errorInfo = result.error ? ` (${source}${result.error.slice(0, 40)})` : '';
+    const errorInfo = result.error ? ` [${errorCode(result)}]` : '';
 
     const tag = result.status === 'success' ? 'SUCCESS' : 'ERROR  ';
     process.stderr.write(
