@@ -271,7 +271,10 @@ export async function llmGenerate(ctx, config, env) {
     return;
   }
 
-  const client = new Cerebras({ apiKey: env.CEREBRAS_API_KEY });
+  // Disable SDK auto-retries so 429/5xx surface immediately as errors
+  // rather than being silently retried with opaque backoff delays.
+  // Load tests need accurate error visibility; production can re-enable retries if desired.
+  const client = new Cerebras({ apiKey: env.CEREBRAS_API_KEY, maxRetries: 0 });
 
   // Heartbeat to keep the connection alive while waiting for LLM
   const heartbeatInterval = setInterval(async () => {
