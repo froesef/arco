@@ -38,6 +38,8 @@ const DEFAULTS = {
   viewport: '1280x800',
   skipCerebras: false,
   skipPipeline: false,
+  mode: 'browser',
+  workerUrl: 'https://arco-recommender.franklin-prod.workers.dev',
 };
 
 function parseArgs(argv) {
@@ -96,6 +98,8 @@ export function parseConfig(argv = process.argv) {
     loadtestToken: get('loadtest-token', process.env.LOADTEST_TOKEN || ''),
     skipCerebras: get('skip-cerebras', DEFAULTS.skipCerebras),
     skipPipeline: get('skip-pipeline', DEFAULTS.skipPipeline),
+    mode: get('mode', DEFAULTS.mode),
+    workerUrl: get('worker-url', DEFAULTS.workerUrl).replace(/\/$/, ''),
   };
 
   // Ensure boolean types
@@ -130,6 +134,9 @@ export function printConfig(config) {
   }
   if (config.skipPipeline) {
     console.log('  Skip Pipeline: YES (full bypass — no rate-limit, RAG, or LLM)');
+  }
+  if (config.mode === 'http') {
+    console.log(`  Mode:          HTTP (direct fetch, no browser) → ${config.workerUrl}`);
   }
 
   if (config.rate > 0.5 && !config.loadtestToken) {

@@ -30,6 +30,7 @@ import { parseConfig, printConfig } from './config.js';
 import { RateLimiter } from './rate-limiter.js';
 import { BrowserPool } from './browser-pool.js';
 import { Reporter } from './reporter.js';
+import { testSingleQueryHTTP, Semaphore } from './http-tester.js';
 
 // --- Utilities ---
 
@@ -298,21 +299,41 @@ async function main() {
   // Create output directory
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
   const outputDir = resolve(config.output, `run-${timestamp}`);
-  await mkdir(join(outputDir, 'screenshots'), { recursive: true });
+  await mkdir(config.mode === 'http' ? outputDir : join(outputDir, 'screenshots'), { recursive: true });
   console.log(`Output directory: ${outputDir}\n`);
 
   // Initialize components
   const rateLimiter = new RateLimiter(config.rate, { bypassServerLimit: !!config.loadtestToken });
-  const browserPool = new BrowserPool({
-    parallel: config.parallel,
-    headless: config.headless,
-    viewportWidth: config.viewportWidth,
-    viewportHeight: config.viewportHeight,
-    loadtestToken: config.loadtestToken,
-    skipCerebras: config.skipCerebras,
-    skipPipeline: config.skipPipeline,
-  });
   const reporter = new Reporter(outputDir);
+
+  // Build a pool abstraction that works for both browser and HTTP modes
+  let pool;
+  if (config.mode === 'http') {
+    const semaphore = new Semaphore(config.parallel);
+    pool = {
+      initialize: async () => {
+        console.log(`[http-pool] Ready: ${config.parallel} concurrent slots`);
+      },
+      acquireContext: async () => { await semaphore.acquire(); return null; },
+      releaseContext: () => semaphore.release(),
+      shutdown: async () => {},
+    };
+  } else {
+    pool = new BrowserPool({
+      parallel: config.parallel,
+      headless: config.headless,
+      viewportWidth: config.viewportWidth,
+      viewportHeight: config.viewportHeight,
+      loadtestToken: config.loadtestToken,
+      skipCerebras: config.skipCerebras,
+      skipPipeline: config.skipPipeline,
+    });
+  }
+
+  // Pick the test function based on mode
+  const runTest = config.mode === 'http'
+    ? (_ctx, prompt) => testSingleQueryHTTP(prompt, config)
+    : (ctx, prompt) => testSingleQuery(ctx, prompt, config, outputDir);
 
   let aborted = false;
 
@@ -327,14 +348,14 @@ async function main() {
     } catch (e) {
       console.error('Failed to write partial results:', e.message);
     }
-    await browserPool.shutdown().catch(() => {});
+    await pool.shutdown().catch(() => {});
     process.exit(130);
   };
   process.on('SIGINT', handleSignal);
   process.on('SIGTERM', handleSignal);
 
   try {
-    await browserPool.initialize();
+    await pool.initialize();
     reporter.onTestStart();
     console.log('\nStarting load test...\n');
 
@@ -346,9 +367,9 @@ async function main() {
       if (aborted) break;
       await rateLimiter.acquire();
       if (aborted) break;
-      const context = await browserPool.acquireContext();
+      const context = await pool.acquireContext();
 
-      const promise = testSingleQuery(context, prompt, config, outputDir)
+      const promise = runTest(context, prompt)
         .then((result) => {
           completed++;
           reporter.onResult(result, completed, prompts.length);
@@ -358,7 +379,7 @@ async function main() {
             rateLimiter.record429();
           }
 
-          browserPool.releaseContext(context);
+          pool.releaseContext(context);
           inFlight.delete(promise);
         });
 
@@ -378,7 +399,7 @@ async function main() {
   } finally {
     process.off('SIGINT', handleSignal);
     process.off('SIGTERM', handleSignal);
-    if (!aborted) await browserPool.shutdown();
+    if (!aborted) await pool.shutdown();
   }
 }
 
