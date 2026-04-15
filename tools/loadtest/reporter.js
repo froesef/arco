@@ -40,6 +40,20 @@ export class Reporter {
       .sort((a, b) => a - b);
     const sectionCounts = successes.map((r) => r.sectionCount).filter((v) => v != null);
 
+    // Phase breakdown: where does time go within each request?
+    const phasePageLoad = successes // navigationStart → domContentLoaded
+      .map((r) => (r.timestamps.domContentLoaded || 0) - r.timestamps.navigationStart)
+      .filter((v) => v > 0)
+      .sort((a, b) => a - b);
+    const phaseApiResponse = successes // domContentLoaded → firstSection
+      .map((r) => (r.timestamps.firstSection || 0) - (r.timestamps.domContentLoaded || r.timestamps.navigationStart))
+      .filter((v) => v > 0)
+      .sort((a, b) => a - b);
+    const phaseStreaming = successes // firstSection → streamComplete
+      .map((r) => (r.timestamps.streamComplete || 0) - (r.timestamps.firstSection || 0))
+      .filter((v) => v > 0)
+      .sort((a, b) => a - b);
+
     const totalDurationMs = endTime - this.startTime;
     const testDurationMs = endTime - (this.testStartTime || this.startTime);
     const testDurationMin = testDurationMs / 60_000;
@@ -67,6 +81,11 @@ export class Reporter {
         timing: computeStats(durations),
         firstSectionTiming: computeStats(firstSections),
         sectionCounts: computeStats(sectionCounts),
+        phases: {
+          pageLoad: computeStats(phasePageLoad),
+          apiResponse: computeStats(phaseApiResponse),
+          streaming: computeStats(phaseStreaming),
+        },
         ...categorizeErrors(errors),
         byCategory: this._categoryBreakdown(successes),
       },
@@ -177,6 +196,22 @@ function formatSummary(report) {
     lines.push(`  Mean:   ${(summary.firstSectionTiming.mean / 1000).toFixed(1)}s`);
     lines.push(`  Median: ${(summary.firstSectionTiming.median / 1000).toFixed(1)}s`);
     lines.push(`  P95:    ${(summary.firstSectionTiming.p95 / 1000).toFixed(1)}s`);
+    lines.push('');
+  }
+
+  const { phases } = summary;
+  if (phases?.pageLoad || phases?.apiResponse) {
+    const ms = (v) => (v != null ? `${(v / 1000).toFixed(2)}s` : 'n/a');
+    lines.push('Timing phases (mean → p95):');
+    if (phases.pageLoad) {
+      lines.push(`  Page load   (nav → DOMContentLoaded):  ${ms(phases.pageLoad.mean)} → ${ms(phases.pageLoad.p95)}`);
+    }
+    if (phases.apiResponse) {
+      lines.push(`  API response (DOM → 1st section):       ${ms(phases.apiResponse.mean)} → ${ms(phases.apiResponse.p95)}`);
+    }
+    if (phases.streaming) {
+      lines.push(`  Streaming   (1st section → done):       ${ms(phases.streaming.mean)} → ${ms(phases.streaming.p95)}`);
+    }
     lines.push('');
   }
 
