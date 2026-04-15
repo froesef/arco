@@ -30,29 +30,28 @@ export class BrowserPool {
   async initialize() {
     const browserCount = Math.max(1, Math.ceil(this.parallel / MAX_CONTEXTS_PER_BROWSER));
     const contextsPerBrowser = Math.ceil(this.parallel / browserCount);
+    const needsRouting = this.loadtestToken || this.skipCerebras || this.skipPipeline;
 
     console.log(
-      `[browser-pool] Launching ${browserCount} browser(s) `
+      `[browser-pool] Launching ${browserCount} browser(s) in parallel `
       + `with ${contextsPerBrowser} contexts each (${this.parallel} total)`,
     );
 
-    for (let b = 0; b < browserCount; b++) {
-      const browser = await chromium.launch({ headless: this.headless });
-      this.browsers.push(browser);
+    // Launch all browsers in parallel
+    this.browsers = await Promise.all(
+      Array.from({ length: browserCount }, () => chromium.launch({ headless: this.headless })),
+    );
 
-      const contextCount = Math.min(
-        contextsPerBrowser,
-        this.parallel - this.availableContexts.length,
-      );
-
-      for (let c = 0; c < contextCount; c++) {
+    // Create all contexts in parallel across all browsers
+    const allContextPromises = this.browsers.flatMap((browser, b) => {
+      const alreadyCreated = b * contextsPerBrowser;
+      const count = Math.min(contextsPerBrowser, this.parallel - alreadyCreated);
+      return Array.from({ length: count }, async () => {
         const context = await browser.newContext({
           viewport: { width: this.viewportWidth, height: this.viewportHeight },
           ignoreHTTPSErrors: true,
         });
-
-        // Inject extra headers on API requests
-        if (this.loadtestToken || this.skipCerebras || this.skipPipeline) {
+        if (needsRouting) {
           await context.route('**/api/generate', (route) => {
             const headers = { ...route.request().headers() };
             if (this.loadtestToken) headers['x-loadtest-token'] = this.loadtestToken;
@@ -61,11 +60,11 @@ export class BrowserPool {
             route.continue({ headers });
           });
         }
+        return context;
+      });
+    });
 
-        this.availableContexts.push(context);
-      }
-    }
-
+    this.availableContexts = await Promise.all(allContextPromises);
     console.log(`[browser-pool] Ready: ${this.availableContexts.length} contexts available`);
   }
 

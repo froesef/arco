@@ -335,6 +335,7 @@ async function main() {
 
   try {
     await browserPool.initialize();
+    reporter.onTestStart();
     console.log('\nStarting load test...\n');
 
     // Work queue

@@ -6,10 +6,16 @@ export class Reporter {
     this.outputDir = outputDir;
     this.results = [];
     this.startTime = Date.now();
+    this.testStartTime = null; // set by onTestStart(), excludes browser init
+  }
+
+  onTestStart() {
+    this.testStartTime = Date.now();
   }
 
   onResult(result, completed, total) {
     this.results.push(result);
+    const elapsed = ((Date.now() - (this.testStartTime || this.startTime)) / 1000).toFixed(1);
     const dur = (result.totalDuration / 1000).toFixed(1);
     const query = result.query.length > 50 ? `${result.query.slice(0, 50)}...` : result.query;
     const sections = result.sectionCount != null ? ` (${result.sectionCount} sections)` : '';
@@ -18,7 +24,7 @@ export class Reporter {
 
     const tag = result.status === 'success' ? 'SUCCESS' : 'ERROR  ';
     process.stderr.write(
-      `[${completed}/${total}] ${tag}  ${dur}s  "${query}"${sections}${errorInfo}\n`,
+      `[+${elapsed}s] [${completed}/${total}] ${tag}  ${dur}s  "${query}"${sections}${errorInfo}\n`,
     );
   }
 
@@ -34,16 +40,20 @@ export class Reporter {
       .sort((a, b) => a - b);
     const sectionCounts = successes.map((r) => r.sectionCount).filter((v) => v != null);
 
-    const durationMs = endTime - this.startTime;
-    const durationMin = durationMs / 60_000;
-    const pagesPerMinute = durationMin > 0 ? (successes.length / durationMin) : 0;
+    const totalDurationMs = endTime - this.startTime;
+    const testDurationMs = endTime - (this.testStartTime || this.startTime);
+    const testDurationMin = testDurationMs / 60_000;
+    const pagesPerMinute = testDurationMin > 0 ? (successes.length / testDurationMin) : 0;
+    const pagesPerSecond = testDurationMs > 0 ? (successes.length / (testDurationMs / 1000)) : 0;
 
     const report = {
       meta: {
         startTime: new Date(this.startTime).toISOString(),
         endTime: new Date(endTime).toISOString(),
-        durationMs,
-        durationFormatted: formatDuration(durationMs),
+        totalDurationMs,
+        testDurationMs,
+        durationFormatted: formatDuration(totalDurationMs),
+        testDurationFormatted: formatDuration(testDurationMs),
         config,
         rateLimiterStats,
       },
@@ -53,6 +63,7 @@ export class Reporter {
         errors: errors.length,
         successRate: `${((successes.length / this.results.length) * 100).toFixed(1)}%`,
         pagesPerMinute: Math.round(pagesPerMinute * 10) / 10,
+        pagesPerSecond: Math.round(pagesPerSecond * 10) / 10,
         timing: computeStats(durations),
         firstSectionTiming: computeStats(firstSections),
         sectionCounts: computeStats(sectionCounts),
@@ -136,14 +147,16 @@ function formatDuration(ms) {
 
 function formatSummary(report) {
   const { summary, meta } = report;
+  const initMs = meta.totalDurationMs - meta.testDurationMs;
+  const initStr = initMs > 1000 ? ` (browser init: ${formatDuration(initMs)})` : '';
   const lines = [
     '=== Load Test Summary ===',
     '',
-    `Duration:     ${meta.durationFormatted}`,
+    `Duration:     ${meta.testDurationFormatted}${initStr}`,
     `Total:        ${summary.total}`,
     `Success:      ${summary.success} (${summary.successRate})`,
     `Errors:       ${summary.errors}`,
-    `Throughput:   ${summary.pagesPerMinute} pages/min`,
+    `Throughput:   ${summary.pagesPerMinute} pages/min  (${summary.pagesPerSecond} pages/s)`,
     '',
   ];
 
