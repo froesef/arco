@@ -13,13 +13,62 @@ import { STEPS } from './pipeline/steps/index.js';
 const CORS_HEADERS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, X-Loadtest-Token',
+  'Access-Control-Allow-Headers': 'Content-Type, X-Loadtest-Token, X-Skip-Cerebras, X-Skip-Pipeline',
 };
+
+/**
+ * Full pipeline bypass for load testing — skips rate-limit, RAG, intent, and LLM.
+ * Activated by X-Skip-Pipeline header. Returns dummy NDJSON immediately.
+ */
+async function streamDummyPipeline(request) {
+  const { readable, writable } = new TransformStream();
+  const writer = writable.getWriter();
+  const encoder = new TextEncoder();
+
+  const streamPromise = (async () => {
+    try {
+      const sections = [
+        '<div class="section"><h1>Load test dummy page</h1><p>Pipeline bypassed — no RAG or LLM called.</p></div>',
+        '<div class="section"><h2>About this product</h2><p>Dummy content for throughput testing.</p></div>',
+        '<div class="section"><h2>Key features</h2><ul><li>Fast</li><li>Reliable</li><li>Scalable</li></ul></div>',
+      ];
+      for (let i = 0; i < sections.length; i += 1) {
+        const line = JSON.stringify({ type: 'section', index: i, html: sections[i] });
+        // eslint-disable-next-line no-await-in-loop
+        await writer.write(encoder.encode(`${line}\n`));
+      }
+      const sugLine = JSON.stringify({ type: 'suggestions', items: [{ type: 'explore', label: 'Compare espresso machines' }, { type: 'explore', label: 'Best grinders for espresso' }] });
+      await writer.write(encoder.encode(`${sugLine}\n`));
+      const doneLine = JSON.stringify({ type: 'done', title: 'Load test dummy page', usedProducts: [] });
+      await writer.write(encoder.encode(`${doneLine}\n`));
+    } finally {
+      await writer.close();
+    }
+  })();
+
+  request.ctx?.waitUntil?.(streamPromise);
+  if (!request.ctx) streamPromise.catch(() => {});
+
+  return new Response(readable, {
+    headers: {
+      ...CORS_HEADERS,
+      'Content-Type': 'application/x-ndjson',
+      'Transfer-Encoding': 'chunked',
+      'Cache-Control': 'no-cache',
+    },
+  });
+}
 
 /**
  * Main handler: streams NDJSON sections via composable pipeline steps.
  */
 async function handleGenerate(request, env) {
+  // Full pipeline bypass: skips rate-limit, RAG, intent classification, and LLM.
+  // Use to measure pure Cloudflare Worker + network overhead during load tests.
+  if (request.headers.get('x-skip-pipeline') === 'true') {
+    return streamDummyPipeline(request);
+  }
+
   let body;
   try {
     body = await request.json();

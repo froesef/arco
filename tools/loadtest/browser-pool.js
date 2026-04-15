@@ -12,7 +12,7 @@ const MAX_CONTEXTS_PER_BROWSER = 10;
 
 export class BrowserPool {
   constructor({
-    parallel, headless, viewportWidth, viewportHeight, loadtestToken, skipCerebras,
+    parallel, headless, viewportWidth, viewportHeight, loadtestToken, skipCerebras, skipPipeline,
   }) {
     this.parallel = parallel;
     this.headless = headless;
@@ -20,6 +20,7 @@ export class BrowserPool {
     this.viewportHeight = viewportHeight;
     this.loadtestToken = loadtestToken || '';
     this.skipCerebras = skipCerebras || false;
+    this.skipPipeline = skipPipeline || false;
 
     this.browsers = [];
     this.availableContexts = [];
@@ -51,11 +52,12 @@ export class BrowserPool {
         });
 
         // Inject extra headers on API requests
-        if (this.loadtestToken || this.skipCerebras) {
+        if (this.loadtestToken || this.skipCerebras || this.skipPipeline) {
           await context.route('**/api/generate', (route) => {
             const headers = { ...route.request().headers() };
             if (this.loadtestToken) headers['x-loadtest-token'] = this.loadtestToken;
             if (this.skipCerebras) headers['x-skip-cerebras'] = 'true';
+            if (this.skipPipeline) headers['x-skip-pipeline'] = 'true';
             route.continue({ headers });
           });
         }

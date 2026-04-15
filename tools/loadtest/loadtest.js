@@ -310,6 +310,7 @@ async function main() {
     viewportHeight: config.viewportHeight,
     loadtestToken: config.loadtestToken,
     skipCerebras: config.skipCerebras,
+    skipPipeline: config.skipPipeline,
   });
   const reporter = new Reporter(outputDir);
 
