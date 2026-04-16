@@ -38,7 +38,7 @@ Each content item has a "type" field. Available types:
 
 ## Available Blocks
 
-IMPORTANT: You may ONLY use the following block names: hero, text, cards, columns, accordion, table, comparison-table, product-list, testimonials. No other block names are allowed.
+IMPORTANT: You may ONLY use the following block names: hero, text, cards, columns, accordion, table, comparison-table, product-list, testimonials, quote, experience-cta, blog-card, article-excerpt, recipe-steps. No other block names are allowed.
 
 ### hero
 Full-width hero banner. ALWAYS use as the first section.
@@ -241,6 +241,8 @@ Use tokens to include real product, recipe, or review data. They resolve to full
 Use tokens via content items:
 - For images: {"type":"image","token":"{{product-image:primo}}"} or {"type":"image","token":"{{hero-image:main}}"}
 - For full cards/content: {"type":"token","value":"{{recipe:Classic Espresso}}"}
+- For article rows: {"type":"token","value":"{{story:SLUG}}"} — use as a token-only row (single-cell row with one token item)
+- For experience rows: {"type":"token","value":"{{experience:SLUG}}"} — use as a token-only row
 
 IMPORTANT: NEVER invent image URLs, product URLs, product names, recipe names, or IDs. For product and recipe images, ALWAYS use tokens — they resolve to real images automatically. Tokens with hallucinated names/IDs will resolve to empty HTML comments and produce broken output — only use names and IDs from the provided data.
 
@@ -261,19 +263,97 @@ Use for: recipe how-tos, descaling guides, maintenance step-by-step, setup instr
 
 ---
 
+### quote
+A full-width editorial pull quote. Two rows: first row = quote text, second row = attribution.
+Use for: a compelling customer or expert quote that adds trust after a product recommendation.
+
+{"block":"quote","rows":[
+  [[{"type":"p","text":"The Doppio is the first home machine I've used that genuinely competes with the commercial equipment in my cafe. The temperature stability is remarkable."}]],
+  [[{"type":"p","text":"Sarah K., Head Barista at Bloom Coffee"}]]
+]}
+
+Use sparingly — one per page, between a product spotlight and comparison section.
+
+---
+
+### experience-cta
+Teaser cards for curated Arco experience journeys. Each row = one experience.
+Structure per row: two cells — first cell = image (use {{product-image:ID}} of anchor product), second cell = info.
+Info cell: em = archetype label, h3 = headline, p = hook line, a = CTA link.
+Use with {{experience:SLUG}} tokens OR author manually.
+
+**Using tokens (recommended):**
+{"block":"experience-cta","rows":[
+  [[{"type":"token","value":"{{experience:morning-minimalist}}"}]],
+  [[{"type":"token","value":"{{experience:the-upgrade-path}}"}]]
+]}
+
+**Authoring manually:**
+{"block":"experience-cta","rows":[
+  [
+    [{"type":"image","token":"{{product-image:primo}}"}],
+    [{"type":"p","text":"Morning Minimalist"},{"type":"h3","text":"One cup. No compromise."},{"type":"p","text":"For the person who believes fewer things, done well, is the whole point."},{"type":"link","text":"Explore this journey","href":"/experiences/morning-minimalist"}]
+  ]
+]}
+
+Use for: closing a personalized page with the matching experience journey. Best as the final content section before suggestions.
+
+---
+
+### blog-card
+Image-heavy editorial cards for blog post previews. Each row = one article.
+Structure per row: two cells — first cell = image, second cell = info (em = tag, h3 = title, p = author/meta, a = link).
+Use with {{story:SLUG}} tokens OR author manually. Best for 2–3 articles.
+
+**Using tokens (recommended):**
+{"block":"blog-card","rows":[
+  [[{"type":"token","value":"{{story:how-to-dial-in-espresso-in-under-10-minutes}}"}]],
+  [[{"type":"token","value":"{{story:why-your-grinder-matters-more-than-your-machine}}"}]]
+]}
+
+Use for: "You might also enjoy" sections when the query has an educational angle.
+
+---
+
+### article-excerpt
+Editorial preview cards for RAG-surfaced blog articles. Each row = one article.
+Shows the article's actual excerpt text — more informative than blog-card's image-only format.
+Structure per row: two cells — first cell = image (optional, use {{product-image:ID}} of related product), second cell = info.
+Info cell: em = category, h3 = title, p = excerpt text, p with strong = author/read-time meta, a = link.
+Use with {{story:SLUG}} tokens OR author manually. Best for 1–4 articles.
+
+**Using tokens (recommended):**
+{"block":"article-excerpt","rows":[
+  [[{"type":"token","value":"{{story:how-to-dial-in-espresso-in-under-10-minutes}}"}]],
+  [[{"type":"token","value":"{{story:calibrating-a-burr-grinder}}"}]]
+]}
+
+**Authoring manually:**
+{"block":"article-excerpt","rows":[
+  [
+    [{"type":"image","token":"{{product-image:macinino}}"}],
+    [{"type":"p","text":"How-To"},{"type":"h3","text":"How to Dial In Espresso in Under 10 Minutes"},{"type":"p","text":"With a structured approach and a willingness to taste honestly, you can land on a solid recipe in three to five shots — well under ten minutes."},{"type":"p","text":"Marcus Webb · 8 min read"},{"type":"link","text":"Read Article","href":"/stories/how-to-dial-in-espresso-in-under-10-minutes"}]
+  ]
+]}
+
+Use for: when RAG surfaces relevant articles for an educational query. Prefer this over blog-card when you want to show the actual excerpt text.
+
+---
+
 ## Block Selection Guidelines
 
 Vary structure based on what the query needs:
 
 - **Product comparisons** → hero + text (best pick) + comparison-table
 - **Product recommendations** → hero + columns (product spotlight) + comparison-table
-- **Direct question** → hero + text (answer) + (accordion for follow-up FAQs)
+- **Direct question** → hero + text (answer) + accordion (follow-up FAQs) + article-excerpt (related reading)
 - **Recipe/drink request** → hero + recipe-steps
-- **Maintenance/how-to request** → hero + text (answer) + recipe-steps (maintenance steps)
+- **Maintenance/how-to request** → hero + text (answer) + recipe-steps (maintenance steps) + article-excerpt (related guides)
 - **Feature showcase** → hero + columns (benefits grid) + cards (feature highlights) + columns (product spotlight)
-- **Grinder questions** → hero + columns (product spotlight with grinder) + comparison-table (grinders)
+- **Grinder questions** → hero + columns (product spotlight with grinder) + comparison-table (grinders) + article-excerpt (grinder guides)
 - **Budget questions** → hero + comparison-table sorted by price + text (verdict)
-- **Beginner/getting started** → hero + text (answer) + columns (key concepts) + columns (product spotlight)
+- **Beginner/getting started** → hero + text (answer) + columns (key concepts) + columns (product spotlight) + article-excerpt (beginner guides)
+- **Persona-matched query** → hero + columns (product spotlight) + comparison-table + experience-cta (matching journey)
 
 Only include product-related blocks when products are genuinely relevant. Prioritize content quality.
 Mix different block types and patterns for visual variety.
@@ -308,7 +388,7 @@ Suggestion types: "explore", "compare" — NOTHING ELSE.
 - Queries are natural follow-up sentences
 - Tailor to what you DON'T yet know about the user
 
-FINAL CHECK: Before outputting, verify every section has a "block" field from the allowed list (hero, text, cards, columns, accordion, table, comparison-table, product-list, testimonials), every section is valid JSON, and sections are separated by ===.
+FINAL CHECK: Before outputting, verify every section has a "block" field from the allowed list (hero, text, cards, columns, accordion, table, comparison-table, product-list, testimonials, quote, experience-cta, blog-card, article-excerpt, recipe-steps), every section is valid JSON, and sections are separated by ===.
 `;
 
 export default EDS_BLOCK_GUIDE;

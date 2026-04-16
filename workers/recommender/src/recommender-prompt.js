@@ -128,6 +128,10 @@ Focus on these blocks for recommender pages:
 - **product-list**: Product grid with images, pricing, and CTAs
 - **accordion**: FAQ-style Q&A about the recommended products
 - **recipe-steps**: Step-by-step instructions for recipes or maintenance procedures
+- **article-excerpt**: RAG-surfaced article previews with excerpt text — use {{story:SLUG}} tokens. Best for educational queries where you want to surface the actual article content (not just a title link). Use when Related Articles are available.
+- **blog-card**: Image-led editorial article cards — use {{story:SLUG}} tokens. Use for "further reading" sections with 2-3 related articles.
+- **experience-cta**: Curated experience journey teasers — use {{experience:SLUG}} tokens. Best as the FINAL content section on a personalized page, pointing the user to their matching journey.
+- **quote**: Full-width editorial pull quote. Use once per page for a trust-building customer or expert quote.
 
 ## Page Structure by Scenario
 
@@ -135,7 +139,8 @@ Focus on these blocks for recommender pages:
 1. hero — "Based on what you've been exploring..." personalized heading. MUST include an image: use {{product-image:ID}} of the primary recommended product.
 2. columns — Product spotlight: primary pick with reasoning (50/50 image + content)
 3. comparison-table — Top pick vs 1-2 alternatives
-4. cards — Recipes/guides matching their interests
+4. article-excerpt or blog-card — Related articles if any "Related Articles" appear in context data
+5. experience-cta — Matching experience journey if any "Related Experiences" appear in context data (omit if none)
 Suggestions: 3-5 information-gathering buttons
 
 ### Cold Start (no browsing history)
@@ -211,15 +216,17 @@ ${(recipes || []).map((r) => `- "${r.name}" (${r.id})`).join('\n') || '(none)'}
 
   if (guides?.length) {
     prompt += `
-### Guides (reference for educational content)
-${guides.map((g) => `- "${g.title}" | ${g.slug} | ${g.category || ''}`).join('\n')}
+### Related Articles (use {{story:SLUG}} tokens in article-excerpt or blog-card blocks)
+IMPORTANT: Only use slugs that appear exactly in this list. Story SLUGs are the last path segment (e.g. "how-to-dial-in-espresso-in-under-10-minutes").
+${guides.map((g) => `- "${g.title}" | slug: ${g.slug} | category: ${g.category || ''}`).join('\n')}
 `;
   }
 
   if (experiences?.length) {
     prompt += `
-### Experiences
-${experiences.map((e) => `- "${e.title}" | ${e.slug} | ${e.category || ''}`).join('\n')}
+### Related Experiences (use {{experience:SLUG}} tokens in experience-cta blocks)
+IMPORTANT: Only use slugs that appear exactly in this list.
+${experiences.map((e) => `- "${e.title}" | slug: ${e.slug} | archetype: ${e.experience_archetype || ''} | anchor: ${e.anchor_product || ''}`).join('\n')}
 `;
   }
 

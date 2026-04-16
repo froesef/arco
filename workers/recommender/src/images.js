@@ -7,6 +7,8 @@ import productsData from '../../../content/products/products.json';
 import recipesData from '../../../content/recipes/recipes.json';
 import reviewsData from '../../../content/metadata/reviews.json';
 import accessoriesData from '../../../content/accessories/accessories.json';
+import storiesData from '../../../content/stories-index.json';
+import experiencesData from '../../../content/experiences-index.json';
 /* eslint-enable import/extensions, import/no-relative-packages */
 
 /* eslint-disable import/extensions, import/no-relative-packages */
@@ -22,10 +24,14 @@ const products = productsData.data || [];
 const recipes = recipesData.data || [];
 const reviews = reviewsData.data || [];
 const accessories = accessoriesData.data || [];
+const stories = storiesData.data || [];
+const experiences = experiencesData.data || [];
 
 const productsMap = new Map(products.map((p) => [p.id, p]));
 const reviewsMap = new Map(reviews.map((r) => [r.id, r]));
 const accessoriesMap = new Map(accessories.map((a) => [a.id, a]));
+const storiesMap = new Map(stories.map((s) => [s.slug, s]));
+const experiencesMap = new Map(experiences.map((e) => [e.slug, e]));
 
 /**
  * Ensure an image URL is absolute.
@@ -194,6 +200,79 @@ function resolveAccessoryImageToken(accessoryId) {
 }
 
 /**
+ * Resolve a {{story:SLUG}} token to an article-excerpt row HTML.
+ * Produces a two-cell row: product image (from first related product) + article content.
+ * Falls back to a single-cell row if no related product image is available.
+ */
+function resolveStoryToken(slug) {
+  const story = storiesMap.get(slug.trim());
+  if (!story) return `<!-- unknown story: ${slug} -->`;
+
+  // Try to get an image from the first related product
+  const firstProduct = story.related_products?.[0];
+  const imageUrl = firstProduct ? getProductImage(firstProduct) : '';
+  const product = firstProduct ? productsMap.get(firstProduct) : null;
+
+  const categoryLabel = story.category
+    ? story.category.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+    : 'Article';
+  const readTime = story.read_time_minutes ? `${story.read_time_minutes} min read` : '';
+  const metaParts = [story.author, readTime].filter(Boolean);
+  const meta = metaParts.join(' · ');
+
+  const imageCell = imageUrl
+    ? `<div><picture><img src="${imageUrl}" alt="${product?.name || story.title}"></picture></div>`
+    : '';
+
+  const contentCell = `<div>
+      <p><em>${categoryLabel}</em></p>
+      <h3>${story.title}</h3>
+      <p>${story.intro || ''}</p>
+      ${meta ? `<p><strong>${meta}</strong></p>` : ''}
+      <p><a href="${story.url}">Read Article</a></p>
+    </div>`;
+
+  return `<div>
+    ${imageCell}
+    ${contentCell}
+  </div>`;
+}
+
+/**
+ * Resolve a {{experience:SLUG}} token to an experience-cta row HTML.
+ * Produces a two-cell row: anchor product image + experience info overlay.
+ * Falls back to text-only row if no anchor product image is available.
+ */
+function resolveExperienceToken(slug) {
+  const exp = experiencesMap.get(slug.trim());
+  if (!exp) return `<!-- unknown experience: ${slug} -->`;
+
+  // Use the anchor product image for the visual
+  const imageUrl = exp.anchor_product ? getProductImage(exp.anchor_product) : '';
+  const product = exp.anchor_product ? productsMap.get(exp.anchor_product) : null;
+
+  const archetype = exp.experience_archetype || exp.title;
+  const headline = exp.hero_headline || exp.title;
+  const hook = exp.hero_subtext || exp.editorial_intro || '';
+
+  const imageCell = imageUrl
+    ? `<div><picture><img src="${imageUrl}" alt="${product?.name || archetype}"></picture></div>`
+    : '';
+
+  const contentCell = `<div>
+      <p><em>${archetype}</em></p>
+      <h3>${headline}</h3>
+      <p>${hook}</p>
+      <p><a href="${exp.url}">Explore this journey</a></p>
+    </div>`;
+
+  return `<div>
+    ${imageCell}
+    ${contentCell}
+  </div>`;
+}
+
+/**
  * Pre-resolved hero image result for the current request.
  * Set by the pipeline before resolveTokens() runs.
  */
@@ -281,6 +360,30 @@ export function normalizeProductUrls(html) {
 }
 
 /**
+ * Get story index entries for use in the prompt (filtered by tags).
+ * @param {string[]} [tags] - optional tag filter
+ * @returns {object[]}
+ */
+export function getStoriesForPrompt(tags) {
+  if (!tags || !tags.length) return stories;
+  return stories.filter((s) => tags.some(
+    (t) => s.tags?.includes(t) || s.persona_tags?.includes(t) || s.intent_tags?.includes(t),
+  ));
+}
+
+/**
+ * Get experience index entries for use in the prompt (filtered by tags).
+ * @param {string[]} [tags] - optional tag filter
+ * @returns {object[]}
+ */
+export function getExperiencesForPrompt(tags) {
+  if (!tags || !tags.length) return experiences;
+  return experiences.filter(
+    (e) => tags.some((t) => e.persona_tags?.includes(t) || e.intent_tags?.includes(t)),
+  );
+}
+
+/**
  * Get product data for enrichment (used by llm-generate for suggestions).
  */
 export function getProductData(productId) {
@@ -309,6 +412,8 @@ export function resolveTokens(html) {
     .replace(/\{\{review:([^}]+)\}\}/g, (_, id) => resolveReviewToken(id.trim()))
     .replace(/\{\{accessory:([^}]+)\}\}/g, (_, id) => resolveAccessoryToken(id.trim()))
     .replace(/\{\{accessory-image:([^}]+)\}\}/g, (_, id) => resolveAccessoryImageToken(id.trim()))
+    .replace(/\{\{story:([^}]+)\}\}/g, (_, slug) => resolveStoryToken(slug.trim()))
+    .replace(/\{\{experience:([^}]+)\}\}/g, (_, slug) => resolveExperienceToken(slug.trim()))
     .replace(/\{\{hero-image:main\}\}/g, () => resolveHeroImageToken());
   resolved = stripUnknownImages(resolved);
   return resolved;

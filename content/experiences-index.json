@@ -1,0 +1,1206 @@
+{
+  "data": [
+    {
+      "id": "exp-core-003",
+      "slug": "craft-at-home",
+      "category": "core",
+      "title": "Craft at Home",
+      "experience_archetype": "Home Barista",
+      "hero_headline": "Your kitchen is the best cafe in town.",
+      "hero_subtext": "When making coffee at home becomes something closer to a practice than a habit.",
+      "editorial_intro": "There is a point where home coffee stops being a morning routine and becomes a craft. You weigh your doses. You track your extractions. You have opinions about water chemistry. This is not a phase \u2014 it is who you are now. And your equipment should re",
+      "anchor_product": "arco-studio",
+      "persona_tags": [
+        "home-barista",
+        "craft-focused",
+        "precision-driven"
+      ],
+      "intent_tags": [
+        "craft",
+        "precision",
+        "home-setup",
+        "advanced",
+        "flow-control"
+      ],
+      "url": "/experiences/craft-at-home"
+    },
+    {
+      "id": "exp-core-004",
+      "slug": "espresso-anywhere",
+      "category": "core",
+      "title": "Espresso Anywhere",
+      "experience_archetype": "Espresso Traveller",
+      "hero_headline": "Hotel coffee is not coffee. You solved that.",
+      "hero_subtext": "Because the worst part of travelling should never be the espresso.",
+      "editorial_intro": "You have stood in enough hotel rooms staring at a Nespresso machine with stale capsules to know that you cannot leave this to chance anymore. You travel for work, for pleasure, for life \u2014 and you refuse to spend a single morning drinking something th",
+      "anchor_product": "arco-viaggio",
+      "persona_tags": [
+        "travelling-purist",
+        "portable-coffee",
+        "espresso-first"
+      ],
+      "intent_tags": [
+        "travel",
+        "portable",
+        "compact",
+        "no-compromise",
+        "espresso"
+      ],
+      "url": "/experiences/espresso-anywhere"
+    },
+    {
+      "id": "exp-core-001",
+      "slug": "morning-minimalist",
+      "category": "core",
+      "title": "The Morning Minimalist",
+      "experience_archetype": "Morning Minimalist",
+      "hero_headline": "One cup. No compromise.",
+      "hero_subtext": "For the person who believes that fewer things, done well, is the whole point.",
+      "editorial_intro": "You don't need a shelf of gadgets or a complicated routine. You need one excellent cup, made quietly and precisely, before the rest of the day begins. The morning minimalist understands that quality isn't about accumulation \u2014 it's about distillation.",
+      "anchor_product": "arco-primo",
+      "persona_tags": [
+        "quality-minimalist",
+        "morning-ritual",
+        "espresso-purist"
+      ],
+      "intent_tags": [
+        "simplify",
+        "quality-over-quantity",
+        "morning-coffee",
+        "entry-level"
+      ],
+      "url": "/experiences/morning-minimalist"
+    },
+    {
+      "id": "exp-core-005",
+      "slug": "the-non-barista",
+      "category": "core",
+      "title": "The Non-Barista",
+      "experience_archetype": "Non-Barista",
+      "hero_headline": "Great coffee. Zero learning curve.",
+      "hero_subtext": "You want the result, not the hobby. That's perfectly valid.",
+      "editorial_intro": "Not everyone wants to weigh beans, time shots, and debate extraction theory. Some people want excellent coffee that appears when they press a button. You are one of those people, and there is absolutely nothing wrong with that. The Arco Automatico wa",
+      "anchor_product": "arco-automatico",
+      "persona_tags": [
+        "convenience-first",
+        "capsule-switcher",
+        "non-hobbyist"
+      ],
+      "intent_tags": [
+        "convenience",
+        "automatic",
+        "simple",
+        "capsule-alternative",
+        "low-maintenance"
+      ],
+      "url": "/experiences/the-non-barista"
+    },
+    {
+      "id": "exp-core-002",
+      "slug": "the-upgrade-path",
+      "category": "core",
+      "title": "The Upgrade Path",
+      "experience_archetype": "Upgrade Path",
+      "hero_headline": "You've outgrown your setup. You know it.",
+      "hero_subtext": "When the beans are better than the machine, it's time.",
+      "editorial_intro": "You have been drinking good coffee for years. You have tried the specialty roasters, dialled in your grind, watched the videos, read the forums. And every morning, you taste the gap between what your beans could be and what your current setup actuall",
+      "anchor_product": "arco-doppio",
+      "persona_tags": [
+        "frustrated-enthusiast",
+        "upgrader",
+        "research-driven"
+      ],
+      "intent_tags": [
+        "upgrade",
+        "investment",
+        "better-extraction",
+        "enthusiast"
+      ],
+      "url": "/experiences/the-upgrade-path"
+    },
+    {
+      "id": "exp-cu-001",
+      "slug": "italian-espresso-culture",
+      "category": "cultural",
+      "title": "Italian Espresso Culture",
+      "experience_archetype": "Italian Heritage",
+      "hero_headline": "Stand at the bar. Drink it in three sips. This is where it all began.",
+      "hero_subtext": "Arco was born in this tradition. Every machine we make carries it forward.",
+      "editorial_intro": "In Italy, espresso is not a drink you order and carry to a table. It is a civic ritual performed standing at a bar, completed in under ninety seconds, and repeated two or three times a day by virtually every adult in the country. It is the connective",
+      "anchor_product": "arco-primo",
+      "persona_tags": [
+        "tradition-keeper",
+        "italian-espresso",
+        "heritage"
+      ],
+      "intent_tags": [
+        "italian",
+        "tradition",
+        "heritage",
+        "ristretto",
+        "culture",
+        "market-it"
+      ],
+      "url": "/experiences/italian-espresso-culture"
+    },
+    {
+      "id": "exp-cu-004",
+      "slug": "precision-coffee-germany",
+      "category": "cultural",
+      "title": "Precision Coffee Germany",
+      "experience_archetype": "German Precision",
+      "hero_headline": "Measured. Calibrated. Repeatable. Coffee as an engineering discipline.",
+      "hero_subtext": "In Germany, the engineering mindset meets the brewing process \u2014 and the results are extraordinary.",
+      "editorial_intro": "Germany is a country that builds cars to tolerances measured in microns, that engineers bridges to last centuries, and that approaches every technical challenge with a rigour that the rest of the world admires and occasionally finds intimidating. It ",
+      "anchor_product": "arco-studio-pro",
+      "persona_tags": [
+        "engineering-mindset",
+        "data-driven",
+        "precision-focused"
+      ],
+      "intent_tags": [
+        "german",
+        "precision",
+        "engineering",
+        "data",
+        "advanced",
+        "culture",
+        "market-de"
+      ],
+      "url": "/experiences/precision-coffee-germany"
+    },
+    {
+      "id": "exp-cu-002",
+      "slug": "scandinavian-filter-tradition",
+      "category": "cultural",
+      "title": "Scandinavian Filter Tradition",
+      "experience_archetype": "Nordic Light Roast",
+      "hero_headline": "Light roasts. High extraction. The Nordic way of coffee.",
+      "hero_subtext": "In Scandinavia, coffee is brewed lighter, cleaner, and more intentionally than anywhere else in the world.",
+      "editorial_intro": "Scandinavian coffee culture is the inverse of Italian espresso tradition \u2014 where Italy goes dark, Nordic countries go light. Where Italy favours intensity and brevity, Scandinavia favours clarity and volume. The Nordic approach to coffee has quietly ",
+      "anchor_product": "arco-filtro",
+      "persona_tags": [
+        "nordic-filter",
+        "light-roast",
+        "filter-purist"
+      ],
+      "intent_tags": [
+        "scandinavian",
+        "filter",
+        "light-roast",
+        "nordic",
+        "culture",
+        "market-en-de"
+      ],
+      "url": "/experiences/scandinavian-filter-tradition"
+    },
+    {
+      "id": "exp-cu-003",
+      "slug": "third-wave-uk",
+      "category": "cultural",
+      "title": "Third Wave UK",
+      "experience_archetype": "UK Specialty Coffee",
+      "hero_headline": "London. Manchester. Edinburgh. The UK's specialty coffee revolution is here.",
+      "hero_subtext": "From flat whites to single-origin espressos, British coffee culture has transformed in a decade \u2014 and the home setup has kept pace.",
+      "editorial_intro": "Ten years ago, specialty coffee in the UK was a niche interest pursued by a small community of obsessives in east London warehouses. Today, every major British city has a thriving scene of independent roasters, specialty cafes, and a generation of dr",
+      "anchor_product": "arco-doppio",
+      "persona_tags": [
+        "specialty-enthusiast",
+        "third-wave",
+        "uk-market"
+      ],
+      "intent_tags": [
+        "uk",
+        "specialty",
+        "third-wave",
+        "flat-white",
+        "culture",
+        "market-en"
+      ],
+      "url": "/experiences/third-wave-uk"
+    },
+    {
+      "id": "exp-hs-002",
+      "slug": "dedicated-coffee-corner",
+      "category": "home-setups",
+      "title": "Dedicated Coffee Corner",
+      "experience_archetype": "Coffee Corner",
+      "hero_headline": "You built it a corner. It deserved one.",
+      "hero_subtext": "When the coffee setup stops sharing counter space and gets its own dedicated station.",
+      "editorial_intro": "It started with the machine on the main counter, squeezed between the toaster and the fruit bowl. Then the grinder arrived and needed its own spot. Then the accessories. At some point you looked at the kitchen and realised that coffee had colonised a",
+      "anchor_product": "arco-studio",
+      "persona_tags": [
+        "home-barista",
+        "design-conscious",
+        "dedicated-space"
+      ],
+      "intent_tags": [
+        "dedicated-setup",
+        "home-station",
+        "organisation",
+        "full-build",
+        "aesthetics"
+      ],
+      "url": "/experiences/dedicated-coffee-corner"
+    },
+    {
+      "id": "exp-hs-005",
+      "slug": "home-office-setup",
+      "category": "home-setups",
+      "title": "Home Office Setup",
+      "experience_archetype": "Home Office Station",
+      "hero_headline": "The cafe between your desk and your kitchen.",
+      "hero_subtext": "When home became the office, the commute became the walk to the coffee machine.",
+      "editorial_intro": "Your commute is fourteen steps. From the desk in the spare bedroom to the coffee station in the hallway, and back again. It is the shortest commute you have ever had, but it might be the most important, because those fourteen steps are the boundary b",
+      "anchor_product": "arco-doppio",
+      "persona_tags": [
+        "remote-professional",
+        "work-from-home",
+        "routine-builder"
+      ],
+      "intent_tags": [
+        "home-office",
+        "work-from-home",
+        "productivity",
+        "routine",
+        "dual-boiler"
+      ],
+      "url": "/experiences/home-office-setup"
+    },
+    {
+      "id": "exp-hs-003",
+      "slug": "open-plan-kitchen",
+      "category": "home-setups",
+      "title": "Open-Plan Kitchen",
+      "experience_archetype": "Open-Plan Living",
+      "hero_headline": "When the kitchen is the living room, everything has to look right and sound right.",
+      "hero_subtext": "Aesthetics and acoustics matter when there are no walls to hide behind.",
+      "editorial_intro": "In an open-plan home, the kitchen is not a separate room \u2014 it is the centre of everything. Cooking, eating, working, relaxing, all of it happens within earshot and line of sight. Your coffee equipment is not tucked away behind a door. It is part of t",
+      "anchor_product": "arco-doppio",
+      "persona_tags": [
+        "design-conscious",
+        "noise-sensitive",
+        "aesthetics-first"
+      ],
+      "intent_tags": [
+        "quiet",
+        "design",
+        "open-plan",
+        "aesthetics",
+        "rotary-pump"
+      ],
+      "url": "/experiences/open-plan-kitchen"
+    },
+    {
+      "id": "exp-hs-004",
+      "slug": "rented-apartment",
+      "category": "home-setups",
+      "title": "Rented Apartment",
+      "experience_archetype": "Rented Life",
+      "hero_headline": "No plumbing. No mods. No landlord negotiations.",
+      "hero_subtext": "A proper espresso setup that moves when you do.",
+      "editorial_intro": "You rent. This means the kitchen is not yours to modify, the plumbing is not yours to tap into, and any hole you drill in the wall will cost you a portion of the deposit. Your coffee setup needs to work within these constraints \u2014 self-contained, port",
+      "anchor_product": "arco-primo",
+      "persona_tags": [
+        "renter-practical",
+        "portable-setup",
+        "no-mods"
+      ],
+      "intent_tags": [
+        "rental",
+        "portable",
+        "no-plumbing",
+        "self-contained",
+        "compact"
+      ],
+      "url": "/experiences/rented-apartment"
+    },
+    {
+      "id": "exp-hs-001",
+      "slug": "small-kitchen-setup",
+      "category": "home-setups",
+      "title": "Small Kitchen Setup",
+      "experience_archetype": "Small Kitchen",
+      "hero_headline": "Under 40 centimetres. Every millimetre earns its place.",
+      "hero_subtext": "Great coffee in small spaces is an engineering problem. Here is the solution.",
+      "editorial_intro": "Your kitchen was not designed for a coffee setup. It was barely designed for cooking. The counter is shallow, the worktop is short, and every appliance competes for the same thirty-eight centimetres of depth. But you refuse to accept that limited spa",
+      "anchor_product": "arco-nano",
+      "persona_tags": [
+        "space-conscious",
+        "compact-setup",
+        "practical"
+      ],
+      "intent_tags": [
+        "small-kitchen",
+        "compact",
+        "space-saving",
+        "apartment",
+        "nano"
+      ],
+      "url": "/experiences/small-kitchen-setup"
+    },
+    {
+      "id": "exp-lm-005",
+      "slug": "back-from-naples",
+      "category": "life-moments",
+      "title": "Back From Naples",
+      "experience_archetype": "Post-Italy Awakening",
+      "hero_headline": "You stood at a bar in Naples. Now you cannot go back.",
+      "hero_subtext": "The holiday ended. The standard for coffee did not.",
+      "editorial_intro": "It was a Tuesday afternoon in the Quartieri Spagnoli. You walked into a bar with no name on the door, stood at the zinc counter with the locals, and a man in a white shirt placed a small cup in front of you without asking what you wanted. One sip, an",
+      "anchor_product": "arco-primo",
+      "persona_tags": [
+        "italy-inspired",
+        "traditional-espresso",
+        "culture-driven"
+      ],
+      "intent_tags": [
+        "italian",
+        "naples",
+        "dark-roast",
+        "traditional",
+        "post-travel"
+      ],
+      "url": "/experiences/back-from-naples"
+    },
+    {
+      "id": "exp-lm-001",
+      "slug": "first-apartment",
+      "category": "life-moments",
+      "title": "First Apartment",
+      "experience_archetype": "First Place",
+      "hero_headline": "Your first kitchen. Your first real coffee setup.",
+      "hero_subtext": "The machine that makes a new place feel like home before the furniture arrives.",
+      "editorial_intro": "The boxes are still stacked in the living room. The Wi-Fi is not set up yet. You ate dinner last night sitting on the floor with a fork and a takeaway container. But the coffee machine \u2014 that was the first thing unpacked. Because a place with good co",
+      "anchor_product": "arco-primo",
+      "persona_tags": [
+        "young-starter",
+        "first-setup",
+        "budget-conscious"
+      ],
+      "intent_tags": [
+        "first-machine",
+        "starter",
+        "apartment",
+        "learning",
+        "entry-level"
+      ],
+      "url": "/experiences/first-apartment"
+    },
+    {
+      "id": "exp-lm-006",
+      "slug": "gifting-for-a-coffee-lover",
+      "category": "life-moments",
+      "title": "Gifting for a Coffee Lover",
+      "experience_archetype": "The Gift",
+      "hero_headline": "They are impossible to buy for. Until now.",
+      "hero_subtext": "A guide to gifting for the person who already has opinions about water temperature.",
+      "editorial_intro": "You love someone who loves coffee. This should make gift-giving easy, but it does the opposite, because they already own a machine, already have a grinder, and already have strong, specific opinions about every piece of equipment they use. Buying the",
+      "anchor_product": "arco-tamper",
+      "persona_tags": [
+        "thoughtful-gifter",
+        "gift-buyer",
+        "non-expert"
+      ],
+      "intent_tags": [
+        "gift",
+        "accessories",
+        "bundles",
+        "subscription",
+        "holiday"
+      ],
+      "url": "/experiences/gifting-for-a-coffee-lover"
+    },
+    {
+      "id": "exp-lm-002",
+      "slug": "new-parent-upgrade",
+      "category": "life-moments",
+      "title": "New Parent Upgrade",
+      "experience_archetype": "New Parent",
+      "hero_headline": "Less sleep. Less time. The coffee has to be better, not harder.",
+      "hero_subtext": "Parenthood changed everything. Your coffee needs to keep up.",
+      "editorial_intro": "You used to have a morning routine. It involved leisurely grinding, careful tamping, a slow extraction watched with the attention of someone who had nowhere to be. Then the baby arrived, and that routine detonated. Now your mornings are dictated by a",
+      "anchor_product": "arco-nano",
+      "persona_tags": [
+        "time-poor-parent",
+        "convenience-needs",
+        "quality-conscious"
+      ],
+      "intent_tags": [
+        "new-parent",
+        "time-poor",
+        "fast",
+        "automatic",
+        "one-handed"
+      ],
+      "url": "/experiences/new-parent-upgrade"
+    },
+    {
+      "id": "exp-lm-004",
+      "slug": "remote-work-upgrade",
+      "category": "life-moments",
+      "title": "Remote Work Upgrade",
+      "experience_archetype": "Remote Transition",
+      "hero_headline": "The office closed. Your coffee upgrade began.",
+      "hero_subtext": "When 'working from home temporarily' became 'this is just how it works now.'",
+      "editorial_intro": "For the first few months, you told yourself it was temporary. The laptop on the kitchen table, the video calls from the sofa, the instant coffee because the office machine was no longer available. Then the email arrived confirming the permanent remot",
+      "anchor_product": "arco-doppio",
+      "persona_tags": [
+        "newly-remote",
+        "practical-upgrader",
+        "routine-builder"
+      ],
+      "intent_tags": [
+        "remote-work",
+        "upgrade",
+        "daily-use",
+        "savings",
+        "routine"
+      ],
+      "url": "/experiences/remote-work-upgrade"
+    },
+    {
+      "id": "exp-lm-003",
+      "slug": "retirement-time-to-learn",
+      "category": "life-moments",
+      "title": "Retirement: Time to Learn",
+      "experience_archetype": "Retirement Discovery",
+      "hero_headline": "Forty years of drinking coffee. Now, finally, time to understand it.",
+      "hero_subtext": "Retirement is not slowing down. It is finally having the time to do things properly.",
+      "editorial_intro": "For decades, coffee was functional. It appeared in your cup at the office, at restaurants, from machines in airport lounges. You drank it constantly and thought about it rarely. Now the working life is over, the diary is empty, and you have discovere",
+      "anchor_product": "arco-studio",
+      "persona_tags": [
+        "retired-learner",
+        "systematic",
+        "new-to-specialty"
+      ],
+      "intent_tags": [
+        "retirement",
+        "learning",
+        "new-hobby",
+        "methodical",
+        "advanced-setup"
+      ],
+      "url": "/experiences/retirement-time-to-learn"
+    },
+    {
+      "id": "exp-mr-005",
+      "slug": "commuter-one-cup",
+      "category": "morning-rituals",
+      "title": "Commuter One Cup",
+      "experience_archetype": "Commuter Cup",
+      "hero_headline": "One cup between the alarm and the 7:42.",
+      "hero_subtext": "The train will not wait. Your coffee should not make you late.",
+      "editorial_intro": "Your morning runs on a schedule that is not yours. The train leaves at 7:42. The walk to the station takes eleven minutes. Breakfast, shower, dressing \u2014 all of it is reverse-engineered from that departure time. The coffee has to fit inside the gaps, ",
+      "anchor_product": "arco-nano",
+      "persona_tags": [
+        "time-pressed-commuter",
+        "one-cup",
+        "efficiency-focused"
+      ],
+      "intent_tags": [
+        "commute",
+        "speed",
+        "compact",
+        "single-espresso",
+        "morning"
+      ],
+      "url": "/experiences/commuter-one-cup"
+    },
+    {
+      "id": "exp-mr-004",
+      "slug": "family-kitchen-morning",
+      "category": "morning-rituals",
+      "title": "Family Kitchen Morning",
+      "experience_archetype": "Family Morning",
+      "hero_headline": "Four people. Four preferences. One kitchen.",
+      "hero_subtext": "When the morning coffee run serves an espresso, a latte, a hot chocolate, and a long filter \u2014 all before 8am.",
+      "editorial_intro": "The family kitchen at 7:15am is a study in controlled chaos. Someone needs a packed lunch. Someone cannot find their shoes. And four different people want four different drinks. You have learned to navigate this with a system that looks effortless bu",
+      "anchor_product": "arco-studio",
+      "persona_tags": [
+        "family-host",
+        "multi-drink",
+        "morning-manager"
+      ],
+      "intent_tags": [
+        "family",
+        "multiple-preferences",
+        "volume",
+        "filter-and-espresso",
+        "morning-rush"
+      ],
+      "url": "/experiences/family-kitchen-morning"
+    },
+    {
+      "id": "exp-mr-001",
+      "slug": "pre-gym-espresso",
+      "category": "morning-rituals",
+      "title": "Pre-Gym Espresso",
+      "experience_archetype": "Pre-Gym Shot",
+      "hero_headline": "5:45am. One shot. Out the door.",
+      "hero_subtext": "The fastest good espresso you can make, for the morning that starts before the morning.",
+      "editorial_intro": "The alarm goes off in the dark. You do not snooze it. Your bag is packed from the night before, your clothes are laid out, and the only thing standing between you and the gym is one espresso. You need it fast, you need it strong, and you need it to b",
+      "anchor_product": "arco-nano",
+      "persona_tags": [
+        "active-minimalist",
+        "morning-ritual",
+        "efficiency-focused"
+      ],
+      "intent_tags": [
+        "speed",
+        "pre-workout",
+        "compact",
+        "morning",
+        "espresso"
+      ],
+      "url": "/experiences/pre-gym-espresso"
+    },
+    {
+      "id": "exp-mr-002",
+      "slug": "slow-weekend-morning",
+      "category": "morning-rituals",
+      "title": "Slow Weekend Morning",
+      "experience_archetype": "Weekend Slow Morning",
+      "hero_headline": "Saturday morning. No alarm. No rush.",
+      "hero_subtext": "The coffee you make when time is the only luxury that matters.",
+      "editorial_intro": "There is no alarm on Saturday. You wake when you wake, and the morning stretches ahead of you with nothing in it but potential. This is when coffee becomes something more than fuel. It becomes the centrepiece of the only hours in the week that belong",
+      "anchor_product": "arco-primo",
+      "persona_tags": [
+        "weekend-ritualist",
+        "slow-morning",
+        "flavour-explorer"
+      ],
+      "intent_tags": [
+        "weekend",
+        "slow",
+        "ritual",
+        "exploration",
+        "light-roast"
+      ],
+      "url": "/experiences/slow-weekend-morning"
+    },
+    {
+      "id": "exp-mr-003",
+      "slug": "work-from-home-morning",
+      "category": "morning-rituals",
+      "title": "Work From Home Morning",
+      "experience_archetype": "WFH Coffee Break",
+      "hero_headline": "The mid-morning cup that rescues the whole day.",
+      "hero_subtext": "Between meetings, between tasks, between the first coffee and lunch \u2014 this is the one that counts.",
+      "editorial_intro": "The first coffee of the day happened at 7am, mechanical and half-conscious. It did its job. But now it is 10:30, the morning meetings have blurred together, and you need something that is not just caffeine but a genuine interruption \u2014 a three-minute ",
+      "anchor_product": "arco-doppio",
+      "persona_tags": [
+        "remote-worker",
+        "routine-builder",
+        "cappuccino-drinker"
+      ],
+      "intent_tags": [
+        "work-from-home",
+        "mid-morning",
+        "productivity",
+        "milk-drinks",
+        "routine"
+      ],
+      "url": "/experiences/work-from-home-morning"
+    },
+    {
+      "id": "exp-seasonal-005",
+      "slug": "autumn-comfort-drinks",
+      "category": "seasonal",
+      "title": "Autumn Comfort Drinks",
+      "experience_archetype": "Autumn Comfort",
+      "hero_headline": "The season changes. Your coffee gets richer.",
+      "hero_subtext": "Autumn espresso is bolder, warmer, and more generous. Like the season itself.",
+      "editorial_intro": "There is a moment in early October when the air turns and everything shifts. The light goes golden. The mornings get that particular chill that is not yet cold but is no longer warm. And your coffee, as if responding to the same signal, starts wantin",
+      "anchor_product": "arco-doppio",
+      "persona_tags": [
+        "morning-minimalist",
+        "craft-barista",
+        "comfort-seeker",
+        "seasonal-drinker"
+      ],
+      "intent_tags": [
+        "autumn",
+        "seasonal",
+        "cappuccino",
+        "dark-roast",
+        "milk-drinks",
+        "comfort",
+        "blends"
+      ],
+      "url": "/experiences/autumn-comfort-drinks"
+    },
+    {
+      "id": "exp-se-005",
+      "slug": "autumn-slow-brew",
+      "category": "seasonal",
+      "title": "Autumn Slow Brew",
+      "experience_archetype": "Autumn Ritual",
+      "hero_headline": "The leaves turn. The roasts darken. The mornings slow down.",
+      "hero_subtext": "Autumn is the season that reminds you why you fell in love with coffee in the first place.",
+      "editorial_intro": "There is a week in October when something shifts. The light changes colour, the air has a bite, and the bright, fruity espressos of summer suddenly feel wrong. You reach for the darker roasts, the longer extractions, the richer cups. Autumn is coffee",
+      "anchor_product": "arco-studio",
+      "persona_tags": [
+        "seasonal-ritualist",
+        "dark-roast-lover",
+        "slow-morning"
+      ],
+      "intent_tags": [
+        "autumn",
+        "dark-roast",
+        "seasonal",
+        "slow-brew",
+        "ritual"
+      ],
+      "url": "/experiences/autumn-slow-brew"
+    },
+    {
+      "id": "exp-se-007",
+      "slug": "back-to-school-dorm-coffee",
+      "category": "seasonal",
+      "title": "Back to School: Dorm Coffee Done Right",
+      "experience_archetype": "Back to School",
+      "hero_headline": "Small room. Small budget. No compromises on the coffee.",
+      "hero_subtext": "The setup that fits on a dorm desk and outlasts your degree.",
+      "editorial_intro": "University coffee is a crisis that nobody talks about. The campus cafe charges four pounds for something that tastes like it was brewed during the previous administration. The instant coffee in the communal kitchen is an insult to the concept of beve",
+      "anchor_product": "arco-nano",
+      "persona_tags": [
+        "student-starter",
+        "budget-conscious",
+        "compact-setup"
+      ],
+      "intent_tags": [
+        "back-to-school",
+        "student",
+        "budget",
+        "compact",
+        "dorm",
+        "seasonal"
+      ],
+      "url": "/experiences/back-to-school-dorm-coffee"
+    },
+    {
+      "id": "exp-se-009",
+      "slug": "christmas-morning-coffee",
+      "category": "seasonal",
+      "title": "Christmas Morning Coffee",
+      "experience_archetype": "Christmas Morning",
+      "hero_headline": "Before the presents. Before the chaos. The coffee.",
+      "hero_subtext": "Christmas morning starts at the machine, and the whole family gathers around it.",
+      "editorial_intro": "Christmas morning is controlled chaos. The children are awake at an hour that should not exist. Wrapping paper is already on the floor. Someone needs batteries. The turkey has a schedule that nobody fully understands. And in the middle of all of it, ",
+      "anchor_product": "arco-studio",
+      "persona_tags": [
+        "family-host",
+        "christmas",
+        "entertainer"
+      ],
+      "intent_tags": [
+        "christmas",
+        "family",
+        "hosting",
+        "seasonal",
+        "holiday",
+        "crowd-serving"
+      ],
+      "url": "/experiences/christmas-morning-coffee"
+    },
+    {
+      "id": "exp-se-006",
+      "slug": "fathers-day-first-machine",
+      "category": "seasonal",
+      "title": "Father's Day: His First Real Machine",
+      "experience_archetype": "Father's Day Gift Guide",
+      "hero_headline": "He has been drinking bad coffee for thirty years. Time's up.",
+      "hero_subtext": "The Father's Day gift that changes his mornings for good.",
+      "editorial_intro": "Your father drinks coffee every day. He has done this for decades. And for decades, the coffee has been \u2014 at best \u2014 adequate. A drip machine that gurgles to life at six, producing a pot of brown liquid that he drinks out of habit rather than pleasure",
+      "anchor_product": "arco-primo",
+      "persona_tags": [
+        "thoughtful-gifter",
+        "fathers-day",
+        "entry-level"
+      ],
+      "intent_tags": [
+        "gift",
+        "fathers-day",
+        "beginner",
+        "entry-level",
+        "seasonal"
+      ],
+      "url": "/experiences/fathers-day-first-machine"
+    },
+    {
+      "id": "exp-seasonal-003",
+      "slug": "holiday-gift-guide-experience",
+      "category": "seasonal",
+      "title": "Holiday Gift Guide Experience",
+      "experience_archetype": "Holiday Gifting",
+      "hero_headline": "The gift that starts every morning right.",
+      "hero_subtext": "Whether you are giving or receiving, Arco makes the holidays taste better.",
+      "editorial_intro": "The holidays bring a particular kind of pressure. You want to give something meaningful, something that will not end up in a drawer by February. And if you are on the receiving end, you want the people who love you to understand that coffee is not ju",
+      "anchor_product": "arco-tamper",
+      "persona_tags": [
+        "non-barista",
+        "upgrader",
+        "gift-buyer",
+        "holiday-shopper"
+      ],
+      "intent_tags": [
+        "gift",
+        "holiday",
+        "seasonal",
+        "accessories",
+        "bundles",
+        "subscription"
+      ],
+      "url": "/experiences/holiday-gift-guide-experience"
+    },
+    {
+      "id": "exp-se-003",
+      "slug": "holiday-gift-guide",
+      "category": "seasonal",
+      "title": "Holiday Gift Guide",
+      "experience_archetype": "Holiday Gifting",
+      "hero_headline": "The gift that starts every morning right \u2014 matched to the person who matters.",
+      "hero_subtext": "Persona-matched Christmas gifts for every kind of coffee drinker in your life.",
+      "editorial_intro": "The holidays are approaching and you need gifts for people who love coffee. The problem is that they all love it differently. Your mother wants convenience. Your brother wants craft. Your best friend wants something beautiful on the counter. This is ",
+      "anchor_product": "arco-nano",
+      "persona_tags": [
+        "holiday-shopper",
+        "gift-buyer",
+        "seasonal"
+      ],
+      "intent_tags": [
+        "gift",
+        "holiday",
+        "christmas",
+        "all-products",
+        "persona-matched"
+      ],
+      "url": "/experiences/holiday-gift-guide"
+    },
+    {
+      "id": "exp-se-004",
+      "slug": "new-year-upgrade",
+      "category": "seasonal",
+      "title": "New Year Upgrade",
+      "experience_archetype": "January Resolution",
+      "hero_headline": "New year. New setup. The resolution that actually sticks.",
+      "hero_subtext": "January is for upgrading the things that matter most \u2014 starting with the first thing you do every morning.",
+      "editorial_intro": "January has a clarity that the rest of the year lacks. The holiday indulgence is over, the new calendar is blank, and there is a particular appetite for improvement that only the first week of the year provides. Most resolutions fail by February. Thi",
+      "anchor_product": "arco-primo",
+      "persona_tags": [
+        "resolution-maker",
+        "upgrader",
+        "entry-level"
+      ],
+      "intent_tags": [
+        "new-year",
+        "upgrade",
+        "entry-level",
+        "resolution",
+        "january"
+      ],
+      "url": "/experiences/new-year-upgrade"
+    },
+    {
+      "id": "exp-seasonal-004",
+      "slug": "spring-single-origins",
+      "category": "seasonal",
+      "title": "Spring Single Origins",
+      "experience_archetype": "Seasonal Explorer",
+      "hero_headline": "New harvest. New flavours. Your favourite time of year.",
+      "hero_subtext": "Spring means fresh crop arrivals, and the best single origins of the year are landing now.",
+      "editorial_intro": "Every spring, the coffee calendar resets. Fresh harvests arrive from East Africa, Central America, and beyond, and for a few weeks the specialty shelves are stocked with beans at their absolute peak \u2014 vibrant, complex, and unlike anything you tasted ",
+      "anchor_product": "arco-studio-pro",
+      "persona_tags": [
+        "craft-barista",
+        "upgrader",
+        "origin-explorer",
+        "seasonal-drinker"
+      ],
+      "intent_tags": [
+        "single-origin",
+        "spring",
+        "seasonal",
+        "light-roast",
+        "craft",
+        "exploration"
+      ],
+      "url": "/experiences/spring-single-origins"
+    },
+    {
+      "id": "exp-se-008",
+      "slug": "summer-garden-party-drinks",
+      "category": "seasonal",
+      "title": "Summer Garden Party Drinks",
+      "experience_archetype": "Summer Entertaining",
+      "hero_headline": "The garden party has a new signature serve.",
+      "hero_subtext": "Shakerato, Espresso Tonic, Iced Americano \u2014 summer entertaining, powered by espresso.",
+      "editorial_intro": "The summer garden party has a drinks problem. Wine is expected. Beer is easy. A gin and tonic is reliable. But the coffee option \u2014 if there is one \u2014 is usually an afterthought: a lukewarm pot of drip coffee sitting on the kitchen counter, ignored by ",
+      "anchor_product": "arco-doppio",
+      "persona_tags": [
+        "summer-host",
+        "entertainer",
+        "seasonal-adapter"
+      ],
+      "intent_tags": [
+        "summer",
+        "garden-party",
+        "entertaining",
+        "iced-drinks",
+        "shakerato",
+        "espresso-tonic",
+        "seasonal"
+      ],
+      "url": "/experiences/summer-garden-party-drinks"
+    },
+    {
+      "id": "exp-se-001",
+      "slug": "summer-iced-espresso",
+      "category": "seasonal",
+      "title": "Summer Iced Espresso",
+      "experience_archetype": "Summer Cold Brew",
+      "hero_headline": "When the heat arrives, the coffee adapts.",
+      "hero_subtext": "Cold brew, iced espresso, espresso tonic \u2014 summer has its own coffee vocabulary.",
+      "editorial_intro": "June arrives and the hot espresso that anchored your mornings for nine months starts to feel wrong. The kitchen is warm, the cup warms your hands when your hands do not need warming, and the first sip sits heavy in the heat. Summer demands a differen",
+      "anchor_product": "arco-filtro",
+      "persona_tags": [
+        "seasonal-adapter",
+        "cold-brew",
+        "summer-coffee"
+      ],
+      "intent_tags": [
+        "summer",
+        "cold-brew",
+        "iced",
+        "seasonal",
+        "refreshing"
+      ],
+      "url": "/experiences/summer-iced-espresso"
+    },
+    {
+      "id": "exp-se-005",
+      "slug": "valentines-espresso-for-two",
+      "category": "seasonal",
+      "title": "Valentine's Espresso for Two",
+      "experience_archetype": "Valentine's Day",
+      "hero_headline": "Love is a double shot, pulled for someone else.",
+      "hero_subtext": "The most romantic gesture is not a reservation. It is making something beautiful before they wake up.",
+      "editorial_intro": "Valentine's Day has been colonized by restaurants, florists, and greeting card companies. The grand gesture \u2014 the prix fixe dinner, the dozen roses, the overpriced champagne \u2014 is expected, performed, and forgotten by the following Tuesday. The small ",
+      "anchor_product": "arco-doppio",
+      "persona_tags": [
+        "romantic-ritualist",
+        "couple",
+        "gifter"
+      ],
+      "intent_tags": [
+        "valentines",
+        "romantic",
+        "couples",
+        "latte-art",
+        "seasonal"
+      ],
+      "url": "/experiences/valentines-espresso-for-two"
+    },
+    {
+      "id": "exp-se-002",
+      "slug": "winter-long-brews",
+      "category": "seasonal",
+      "title": "Winter Long Brews",
+      "experience_archetype": "Winter Slow Filter",
+      "hero_headline": "Short days. Long brews. The season that belongs to filter coffee.",
+      "hero_subtext": "When the mornings are dark and cold, the slow pour-over becomes a meditation.",
+      "editorial_intro": "Winter changes everything about how you drink coffee. The quick espresso that powers your summer mornings feels insufficient when the kitchen is cold and the sky is still dark at eight o'clock. You want something larger, something you can hold in bot",
+      "anchor_product": "arco-filtro",
+      "persona_tags": [
+        "winter-ritualist",
+        "filter-lover",
+        "slow-morning"
+      ],
+      "intent_tags": [
+        "winter",
+        "filter",
+        "slow-brew",
+        "seasonal",
+        "volume"
+      ],
+      "url": "/experiences/winter-long-brews"
+    },
+    {
+      "id": "exp-seasonal-002",
+      "slug": "winter-warmers",
+      "category": "seasonal",
+      "title": "Winter Warmers",
+      "experience_archetype": "Winter Ritual",
+      "hero_headline": "The cold outside makes the warmth inside matter more.",
+      "hero_subtext": "Winter coffee is slower, richer, and more deliberate. Lean into it.",
+      "editorial_intro": "Something changes about coffee in winter. Not the beans, not the machine \u2014 you. The days are short, the mornings are dark, and the cup in your hands becomes more than caffeine. It becomes warmth, ritual, a small act of comfort in a season that demand",
+      "anchor_product": "arco-automatico",
+      "persona_tags": [
+        "morning-minimalist",
+        "non-barista",
+        "comfort-seeker"
+      ],
+      "intent_tags": [
+        "winter",
+        "seasonal",
+        "warm-drinks",
+        "cortado",
+        "dark-roast",
+        "comfort"
+      ],
+      "url": "/experiences/winter-warmers"
+    },
+    {
+      "id": "exp-sc-003",
+      "slug": "clients-coming-to-home-office",
+      "category": "social-contexts",
+      "title": "Clients Coming to Home Office",
+      "experience_archetype": "Professional Home",
+      "hero_headline": "When clients visit, the coffee says as much as the portfolio.",
+      "hero_subtext": "A professional impression, made one cup at a time.",
+      "editorial_intro": "You work from home, and sometimes that means clients come to your home. The spare room is the studio, the dining table is the meeting space, and the impression you make in the first five minutes \u2014 including the coffee you serve \u2014 sets the tone for th",
+      "anchor_product": "arco-ufficio",
+      "persona_tags": [
+        "home-professional",
+        "client-facing",
+        "impression-conscious"
+      ],
+      "intent_tags": [
+        "professional",
+        "clients",
+        "home-office",
+        "hospitality",
+        "impression"
+      ],
+      "url": "/experiences/clients-coming-to-home-office"
+    },
+    {
+      "id": "exp-sc-008",
+      "slug": "coffee-and-conversation",
+      "category": "social-contexts",
+      "title": "Coffee and Conversation",
+      "experience_archetype": "Social Ritualist",
+      "hero_headline": "Two cups. One conversation. No rush.",
+      "hero_subtext": "The art of making coffee the reason people sit down and stay.",
+      "editorial_intro": "There is a version of hospitality that has nothing to do with dinner parties or elaborate entertaining. It is simpler than that. Someone comes to your door \u2014 a friend, a neighbour, a relative who was passing through \u2014 and you say, 'Let me make you a ",
+      "anchor_product": "arco-primo",
+      "persona_tags": [
+        "morning-minimalist",
+        "non-barista",
+        "social-coffee",
+        "hospitality"
+      ],
+      "intent_tags": [
+        "social",
+        "hospitality",
+        "conversation",
+        "simplicity",
+        "welcoming",
+        "guests"
+      ],
+      "url": "/experiences/coffee-and-conversation"
+    },
+    {
+      "id": "exp-sc-001",
+      "slug": "coffee-for-a-dinner-party",
+      "category": "social-contexts",
+      "title": "Coffee for a Dinner Party",
+      "experience_archetype": "Dinner Party Host",
+      "hero_headline": "Eight guests. Eight espressos. The finale the dinner deserves.",
+      "hero_subtext": "The course nobody lists on the menu but everyone remembers.",
+      "editorial_intro": "The meal is over. The conversation has reached that warm, expansive register that only emerges after three courses and two bottles of wine. Someone suggests moving to the sofa. Someone else mentions they should probably call a taxi. And then you say ",
+      "anchor_product": "arco-studio",
+      "persona_tags": [
+        "host-entertainer",
+        "dinner-party",
+        "social-coffee"
+      ],
+      "intent_tags": [
+        "entertaining",
+        "guests",
+        "volume",
+        "dinner-party",
+        "social"
+      ],
+      "url": "/experiences/coffee-for-a-dinner-party"
+    },
+    {
+      "id": "exp-sc-009",
+      "slug": "couples-morning-ritual",
+      "category": "social-contexts",
+      "title": "Couples Morning Ritual",
+      "experience_archetype": "Two-Person Morning",
+      "hero_headline": "Two people. Two preferences. One machine.",
+      "hero_subtext": "The morning ritual that works for both of you, without compromise.",
+      "editorial_intro": "You drink a straight double espresso, no sugar, no milk. Your partner wants a large oat milk latte with a little foam on top. These are not the same drink. They are barely the same category. And yet, every morning, the same machine makes both of you ",
+      "anchor_product": "arco-doppio",
+      "persona_tags": [
+        "morning-minimalist",
+        "upgrader",
+        "couples",
+        "morning-ritual"
+      ],
+      "intent_tags": [
+        "couples",
+        "morning-coffee",
+        "milk-drinks",
+        "dual-boiler",
+        "two-preferences",
+        "routine"
+      ],
+      "url": "/experiences/couples-morning-ritual"
+    },
+    {
+      "id": "exp-sc-006",
+      "slug": "dinner-party-espresso",
+      "category": "social-contexts",
+      "title": "Dinner Party Espresso",
+      "experience_archetype": "Dinner Party Performer",
+      "hero_headline": "The final course nobody forgets.",
+      "hero_subtext": "When the meal ends and the espresso begins, you own the room.",
+      "editorial_intro": "Dinner parties have acts. The first course sets the tone. The main builds momentum. Dessert draws applause. But the real finale \u2014 the one that keeps everyone at the table an extra hour \u2014 is espresso. Not coffee from a filter jug. Not a pod. Real espr",
+      "anchor_product": "arco-doppio",
+      "persona_tags": [
+        "craft-barista",
+        "non-barista",
+        "dinner-party",
+        "host-entertainer"
+      ],
+      "intent_tags": [
+        "entertaining",
+        "guests",
+        "dinner-party",
+        "social",
+        "volume",
+        "hosting"
+      ],
+      "url": "/experiences/dinner-party-espresso"
+    },
+    {
+      "id": "exp-sc-004",
+      "slug": "espresso-and-filter-couple",
+      "category": "social-contexts",
+      "title": "Espresso and Filter Couple",
+      "experience_archetype": "The Couple",
+      "hero_headline": "One loves espresso. One loves filter. Both are right.",
+      "hero_subtext": "The setup that keeps the peace and satisfies both palates.",
+      "editorial_intro": "You drink espresso \u2014 short, intense, concentrated. Your partner drinks filter \u2014 long, smooth, meditative. You have tried each other's preference and found it wanting. This is not a problem to be solved. It is a difference to be equipped for. Two mach",
+      "anchor_product": "arco-doppio",
+      "persona_tags": [
+        "coffee-couple",
+        "dual-method",
+        "relationship"
+      ],
+      "intent_tags": [
+        "couple",
+        "filter-and-espresso",
+        "dual-setup",
+        "shared-kitchen",
+        "parallel"
+      ],
+      "url": "/experiences/espresso-and-filter-couple"
+    },
+    {
+      "id": "exp-sc-002",
+      "slug": "flatmates-shared-machine",
+      "category": "social-contexts",
+      "title": "Flatmates Shared Machine",
+      "experience_archetype": "Shared House",
+      "hero_headline": "Three people. One machine. Zero drama.",
+      "hero_subtext": "The shared coffee setup that actually works, because someone finally chose the right equipment.",
+      "editorial_intro": "Living with other people means compromising on the thermostat, the bathroom schedule, and what counts as a clean kitchen. Coffee should not be another battleground. But when three adults with three different skill levels and three different ideas abo",
+      "anchor_product": "arco-ufficio",
+      "persona_tags": [
+        "shared-living",
+        "multi-user",
+        "practical"
+      ],
+      "intent_tags": [
+        "flatshare",
+        "shared",
+        "multi-user",
+        "profiles",
+        "budget"
+      ],
+      "url": "/experiences/flatmates-shared-machine"
+    },
+    {
+      "id": "exp-sc-005",
+      "slug": "home-coffee-tasting",
+      "category": "social-contexts",
+      "title": "Home Coffee Tasting",
+      "experience_archetype": "Home Cupping",
+      "hero_headline": "Six origins. Four friends. One afternoon that changes how everyone tastes coffee.",
+      "hero_subtext": "You do not need to be a professional to host a cupping. You just need good beans and curious people.",
+      "editorial_intro": "The idea started as a casual suggestion over dinner \u2014 'We should do a coffee tasting sometime.' Two weeks later, you have six single-origin beans, a set of cupping bowls, a freshly printed tasting wheel, and four friends arriving at three o'clock. Yo",
+      "anchor_product": "arco-filtro",
+      "persona_tags": [
+        "coffee-explorer",
+        "social-coffee",
+        "education-focused"
+      ],
+      "intent_tags": [
+        "cupping",
+        "tasting",
+        "social",
+        "education",
+        "single-origin"
+      ],
+      "url": "/experiences/home-coffee-tasting"
+    },
+    {
+      "id": "exp-sc-010",
+      "slug": "impressing-the-in-laws",
+      "category": "social-contexts",
+      "title": "Impressing the In-Laws",
+      "experience_archetype": "High-Stakes Host",
+      "hero_headline": "Great espresso when the stakes feel high.",
+      "hero_subtext": "They are judging the coffee. You know it. The machine does not care.",
+      "editorial_intro": "Your partner's parents are coming for lunch. They are Italian, or they lived in Melbourne for a decade, or they simply have opinions about coffee that they express with the directness of people who have been drinking espresso since before you were bo",
+      "anchor_product": "arco-automatico",
+      "persona_tags": [
+        "non-barista",
+        "upgrader",
+        "high-stakes",
+        "family-hosting"
+      ],
+      "intent_tags": [
+        "impressing",
+        "family",
+        "automatic",
+        "simple",
+        "reliability",
+        "hosting",
+        "in-laws"
+      ],
+      "url": "/experiences/impressing-the-in-laws"
+    },
+    {
+      "id": "exp-sc-007",
+      "slug": "the-home-cafe",
+      "category": "social-contexts",
+      "title": "The Home Cafe",
+      "experience_archetype": "Home Cafe Host",
+      "hero_headline": "The best cafe in the neighbourhood is your kitchen.",
+      "hero_subtext": "When friends stop suggesting going out for coffee and start suggesting coming to yours.",
+      "editorial_intro": "There was no sign. No grand opening. Nobody applied for a licence or designed a logo. It just happened gradually \u2014 friends started coming over for coffee instead of meeting at the cafe down the road. Your kitchen became the place. The coffee was bett",
+      "anchor_product": "arco-studio",
+      "persona_tags": [
+        "craft-barista",
+        "morning-minimalist",
+        "home-cafe",
+        "social-coffee"
+      ],
+      "intent_tags": [
+        "social",
+        "hosting",
+        "friends",
+        "weekend",
+        "home-setup",
+        "milk-drinks"
+      ],
+      "url": "/experiences/the-home-cafe"
+    }
+  ]
+}
