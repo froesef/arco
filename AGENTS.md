@@ -195,6 +195,29 @@ On `GET /generate`, the server checks `DAClient.exists(path)` before starting th
 
 Key files for caching: `scripts/scripts.js` (deterministic `generateSlug`, `cache-hit` handler), `workers/recommender/src/index.js` (cache check in `/api/generate`).
 
+### LLM Providers & Model Switching
+
+The recommender's one LLM call (`llm-generate` step) is vendor-agnostic. Three providers ship today:
+
+| Provider | Binding / Secret | Access |
+|----------|------------------|--------|
+| `cerebras`   | `CEREBRAS_API_KEY` secret   | `@cerebras/cerebras_cloud_sdk` |
+| `cloudflare` | `AI` binding (Workers AI)   | `env.AI.run(model, { messages, stream: true, ... })` |
+| `sambanova`  | `SAMBANOVA_API_KEY` secret  | OpenAI-compatible REST to `api.sambanova.ai` |
+
+Each implements the same async-iterable contract in `workers/recommender/src/providers/*.js` — yielding `{ type: 'delta', text }` chunks and a terminal `{ type: 'usage', usage }` frame. The selectable `{provider, model}` pairs are a hardcoded catalog in `workers/recommender/src/providers/index.js` (`MODEL_CATALOG`). Add a model by adding a row and redeploying.
+
+**Active selection** is stored in the `CACHE` KV under `llm-config:active` (`{provider, model, temperature, maxTokens, updatedAt}`). Read via `getActiveLlmConfig(env)` from `workers/recommender/src/llm-config.js`; KV wins over the per-flow defaults in `flows.js`. If the stored entry drops out of the catalog, the worker warns and falls back to the catalog default.
+
+**Switching models at runtime** — open `/admin` (backed by `blocks/admin/admin.js`) → *Model Settings*. Pick a provider/model, adjust temperature and max tokens, save. The next `/api/generate` call picks up the change. D1 records `llm_provider` / `llm_model` on every run (`migrations/0003_llm_vendor.sql`) so per-model comparisons via `wrangler d1 execute` are one query away.
+
+Admin API:
+- `GET /api/admin/catalog` → `{ catalog: [{ provider, model, label, available }], limits }`
+- `GET /api/admin/llm-config` → `{ active: {provider, model, temperature, maxTokens, updatedAt} | null }`
+- `PUT /api/admin/llm-config` → validates against the catalog and clamps `temperature` to `[0, 2]`, `maxTokens` to `[256, 16384]`.
+
+There is **no** automatic provider fallback — errors from the selected vendor surface as usual (401 → "AI authentication failed", 429 → "rate limit reached", 5xx → "temporarily overloaded"). This keeps experiments honest.
+
 ### Article Cards & Modal Fragments
 
 When the recommender surfaces a `{{story:SLUG}}` or `{{experience:SLUG}}` token, it renders a card whose CTA opens the authored page as a **modal fragment** instead of navigating away. This keeps the user in the query flow; the modal footer still carries an "Open full article ↗" link to the canonical page for sharing / SEO.

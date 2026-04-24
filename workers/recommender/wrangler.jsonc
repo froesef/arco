@@ -53,8 +53,10 @@
   ],
 
   // Environment variables (set secrets via `wrangler secret put`)
-  // Required secrets: CEREBRAS_API_KEY, CF_API_TOKEN (Analytics Engine read permission)
+  // LLM provider secrets: CEREBRAS_API_KEY, SAMBANOVA_API_KEY (Cloudflare AI uses the AI binding above)
+  // Analytics: CF_API_TOKEN (Analytics Engine read permission)
   // DA secrets: DA_CLIENT_ID, DA_CLIENT_SECRET, DA_SERVICE_TOKEN (or DA_TOKEN as fallback)
+  // Admin: ADMIN_TOKEN (Basic Auth password for /admin + /api/admin/*)
   "vars": {
     "ENVIRONMENT": "production",
     "DA_ORG": "froesef",

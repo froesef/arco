@@ -902,3 +902,112 @@
   font-size: 0.78rem;
   color: var(--text-color);
 }
+
+/* ── Header nav (top-level routes) ─────────────────────────── */
+
+.admin .admin-header-nav {
+  display: flex;
+  gap: 0.75rem;
+  flex: 1;
+  justify-content: center;
+}
+
+/* stylelint-disable-next-line no-descending-specificity */
+.admin .admin-header-nav a {
+  font-size: 0.82rem;
+  text-decoration: none;
+  color: rgb(255 255 255 / 60%);
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  transition: background var(--transition), color var(--transition);
+}
+
+.admin .admin-header-nav a:hover {
+  color: var(--background-color);
+  background: rgb(255 255 255 / 8%);
+}
+
+.admin .admin-header-nav a.is-active {
+  color: var(--background-color);
+  background: rgb(255 255 255 / 14%);
+}
+
+/* ── LLM config form ─────────────────────────────────────── */
+
+.admin .admin-llm-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+@media (width >= 700px) {
+  .admin .admin-llm-form {
+    grid-template-columns: 2fr 1fr 1fr;
+    align-items: end;
+  }
+
+  .admin .admin-llm-form .admin-llm-actions {
+    grid-column: 1 / -1;
+  }
+}
+
+.admin .admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.admin .admin-field > span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted-color);
+  font-weight: 600;
+}
+
+.admin .admin-field input,
+.admin .admin-field select {
+  font: inherit;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--light-color);
+  color: var(--text-color);
+  font-size: 0.85rem;
+}
+
+.admin .admin-field select {
+  min-width: 240px;
+}
+
+.admin .admin-llm-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.admin .admin-btn-primary {
+  background: var(--accent-color);
+  color: var(--light-color);
+}
+
+.admin .admin-llm-status {
+  font-size: 0.8rem;
+}
+
+.admin .admin-llm-status.is-error {
+  color: #b00020;
+}
+
+.admin .admin-llm-status.is-ok {
+  color: #15803d;
+}
+
+.admin .admin-llm-current {
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border-color);
+}

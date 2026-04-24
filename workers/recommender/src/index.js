@@ -18,6 +18,9 @@ import {
   handleAdminPageGroup,
   handleAdminRun,
   handleAdminUI,
+  handleAdminCatalog,
+  handleAdminLlmConfigGet,
+  handleAdminLlmConfigPut,
 } from './admin.js';
 import {
   handleVectorizeStats,
@@ -385,6 +388,17 @@ export default {
     const runMatch = url.pathname.match(/^\/api\/admin\/runs\/([^/]+)$/);
     if (runMatch && request.method === 'GET') {
       return handleAdminRun(request, env, runMatch[1]);
+    }
+
+    // Admin routes — LLM configuration
+    if (url.pathname === '/api/admin/catalog' && request.method === 'GET') {
+      return handleAdminCatalog(request, env);
+    }
+    if (url.pathname === '/api/admin/llm-config' && request.method === 'GET') {
+      return handleAdminLlmConfigGet(request, env);
+    }
+    if (url.pathname === '/api/admin/llm-config' && request.method === 'PUT') {
+      return handleAdminLlmConfigPut(request, env);
     }
 
     // Admin routes — vectorize browser

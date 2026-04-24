@@ -16,6 +16,8 @@
 
 import { CORS_HEADERS } from './pipeline/context.js';
 import { rowToRunDto } from './storage.js';
+import { MODEL_CATALOG } from './providers/index.js';
+import { getActiveLlmConfig, putActiveLlmConfig, LLM_CONFIG_LIMITS } from './llm-config.js';
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 
@@ -227,6 +229,58 @@ export async function handleAdminRun(request, env, runId) {
   const payload = await env.SESSION_STORE.get(`page:${runId}`, 'json');
 
   return new Response(JSON.stringify({ run, payload }), {
+    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+  });
+}
+
+/**
+ * Catalog of selectable provider/model pairs. Static — driven by source.
+ */
+export async function handleAdminCatalog(request, env) {
+  if (!await checkCookieAuth(request, env) && !checkBasicAuth(request, env)) return unauthorized();
+  const haveKey = {
+    cerebras: !!env.CEREBRAS_API_KEY,
+    cloudflare: !!env.AI,
+    sambanova: !!env.SAMBANOVA_API_KEY,
+  };
+  const catalog = MODEL_CATALOG.map((e) => ({ ...e, available: !!haveKey[e.provider] }));
+  return new Response(JSON.stringify({ catalog, limits: LLM_CONFIG_LIMITS }), {
+    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+  });
+}
+
+/**
+ * Read currently active LLM config from KV. Returns null config on first boot.
+ */
+export async function handleAdminLlmConfigGet(request, env) {
+  if (!await checkCookieAuth(request, env) && !checkBasicAuth(request, env)) return unauthorized();
+  const active = await getActiveLlmConfig(env);
+  return new Response(JSON.stringify({ active }), {
+    headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+  });
+}
+
+/**
+ * Update the active LLM config. Validates against the catalog and clamps
+ * numeric params to safe ranges.
+ */
+export async function handleAdminLlmConfigPut(request, env) {
+  if (!await checkCookieAuth(request, env) && !checkBasicAuth(request, env)) return unauthorized();
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: 'Invalid JSON body' }), {
+      status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    });
+  }
+  const result = await putActiveLlmConfig(env, body);
+  if (result.error) {
+    return new Response(JSON.stringify({ error: result.error }), {
+      status: 400, headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    });
+  }
+  return new Response(JSON.stringify({ active: result.value }), {
     headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
   });
 }
