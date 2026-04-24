@@ -829,6 +829,11 @@ async function renderLlmConfig(root) {
   const currentKey = `${selected.provider}::${selected.model}`;
   const temperature = active?.temperature ?? 0.6;
   const maxTokens = active?.maxTokens ?? 4096;
+  const currentEntry = catalog.find(
+    (e) => `${e.provider}::${e.model}` === currentKey,
+  );
+  const currentMissing = currentEntry?.available === false
+    ? (currentEntry.missing || []) : [];
 
   root.innerHTML = `
     <nav class="admin-crumbs"><a href="#/">← Sessions</a></nav>
@@ -851,10 +856,14 @@ async function renderLlmConfig(root) {
             ${catalog.map((e) => {
     const key = `${e.provider}::${e.model}`;
     const disabled = e.available === false ? ' disabled' : '';
-    const tag = e.available === false ? ' (no API key)' : '';
-    return `<option value="${esc(key)}"${currentKey === key ? ' selected' : ''}${disabled}>${esc(e.label)}${tag}</option>`;
+    const missing = (e.missing || []).join(', ');
+    const tag = e.available === false ? ` — needs ${missing}` : '';
+    return `<option value="${esc(key)}"${currentKey === key ? ' selected' : ''}${disabled} title="${esc(e.available === false ? `Missing: ${missing}` : '')}">${esc(e.label)}${esc(tag)}</option>`;
   }).join('')}
           </select>
+          ${currentMissing.length
+    ? `<small class="admin-llm-warn">Active selection cannot run — missing: ${esc(currentMissing.join(', '))}. Set the secret(s) with <code>wrangler secret put &lt;NAME&gt;</code> and redeploy, or choose a different model.</small>`
+    : ''}
         </label>
         <label class="admin-field">
           <span>Temperature <small class="admin-muted">(${limits.temperature.min} – ${limits.temperature.max})</small></span>

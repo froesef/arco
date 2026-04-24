@@ -16,7 +16,7 @@
 
 import { CORS_HEADERS } from './pipeline/context.js';
 import { rowToRunDto } from './storage.js';
-import { MODEL_CATALOG } from './providers/index.js';
+import { MODEL_CATALOG, catalogAvailability } from './providers/index.js';
 import { getActiveLlmConfig, putActiveLlmConfig, LLM_CONFIG_LIMITS } from './llm-config.js';
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
@@ -238,12 +238,10 @@ export async function handleAdminRun(request, env, runId) {
  */
 export async function handleAdminCatalog(request, env) {
   if (!await checkCookieAuth(request, env) && !checkBasicAuth(request, env)) return unauthorized();
-  const haveKey = {
-    cerebras: !!env.CEREBRAS_API_KEY,
-    cloudflare: !!env.AI,
-    sambanova: !!env.SAMBANOVA_API_KEY,
-  };
-  const catalog = MODEL_CATALOG.map((e) => ({ ...e, available: !!haveKey[e.provider] }));
+  const catalog = MODEL_CATALOG.map((e) => {
+    const { available, missing } = catalogAvailability(e, env);
+    return { ...e, available, missing };
+  });
   return new Response(JSON.stringify({ catalog, limits: LLM_CONFIG_LIMITS }), {
     headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
   });

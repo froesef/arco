@@ -4,7 +4,7 @@
  * Token resolution and sanitization happen per-section inside this step.
  */
 
-import { getProvider } from '../../providers/index.js';
+import { getProvider, findCatalogEntry, catalogAvailability } from '../../providers/index.js';
 import { getActiveLlmConfig, resolveLlmConfig } from '../../llm-config.js';
 import { writeEvent } from '../../analytics.js';
 import { sectionToHtml, sanitizeBlockContent } from '../../json-to-eds.js';
@@ -340,6 +340,18 @@ export async function llmGenerate(ctx, config, env) {
   // Resolve active provider + model from KV, with per-flow config as fallback.
   const active = await getActiveLlmConfig(env);
   const resolved = resolveLlmConfig(active, config);
+
+  // Preflight: make sure all env vars the chosen model needs are present.
+  // Fall through with a clear error instead of letting the vendor call fail.
+  const entry = findCatalogEntry(resolved.provider, resolved.model)
+    || { provider: resolved.provider, model: resolved.model };
+  const { available, missing } = catalogAvailability(entry, env);
+  if (!available) {
+    const err = new Error(`Missing configuration for ${resolved.provider}/${resolved.model}: ${missing.join(', ')}. Set the required secrets or pick a different model in Admin → Model Settings.`);
+    err.status = 400;
+    throw err;
+  }
+
   const provider = getProvider(resolved.provider);
   ctx.llm.model = resolved.model;
   ctx.llm.provider = resolved.provider;

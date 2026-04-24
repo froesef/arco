@@ -1011,3 +1011,28 @@
   padding-top: 0.75rem;
   border-top: 1px dashed var(--border-color);
 }
+
+.admin .admin-llm-warn {
+  display: block;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgb(234 179 8 / 14%);
+  border: 1px solid rgb(234 179 8 / 40%);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: #8c6d00;
+  line-height: 1.45;
+}
+
+.admin .admin-llm-warn code {
+  background: rgb(234 179 8 / 20%);
+  padding: 0.05rem 0.35rem;
+  border-radius: 3px;
+  font-family: ui-monospace, 'SF Mono', Menlo, monospace;
+  font-size: 0.72rem;
+}
+
+.admin .admin-field select option:disabled {
+  color: var(--muted-color);
+  font-style: italic;
+}
