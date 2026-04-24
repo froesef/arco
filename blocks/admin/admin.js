@@ -1,19 +1,28 @@
 /**
- * Admin Block — session & page browser for the Arco recommender demo.
+ * Admin Block — Audience of One Admin.
+ *
+ * Unified admin for the Arco recommender demo, covering:
+ *   1. Sessions / pages / runs — browse recorded sessions and reconstruct pages
+ *   2. Model settings — runtime provider/model/temperature/maxTokens switch
+ *   3. Vectorize — inspect the `arco-content` index, run similarity searches
  *
  * Authenticates against the recommender worker's /api/admin/* endpoints
  * using HTTP Basic Auth (username: admin, password: ADMIN_TOKEN). The token
  * is prompted once and cached in localStorage.
  *
- * Model:
+ * Hierarchy (sessions section):
  *   session (one browser tab)
  *     └─ page (one ?q= URL visit)
  *         └─ run (one /api/generate call — initial or a follow-up click)
  *
- * Views (hash routing within the block):
- *   #/                    Sessions list
- *   #/sessions/:id        Session detail + pages list
- *   #/pages/:id           Page detail — overview / reconstruction / timeline / debug
+ * Hash routes:
+ *   #/                         Sessions list (default)
+ *   #/sessions/:id             Session detail + pages list
+ *   #/pages/:id[/:tab]         Page detail — overview / reconstruction / timeline / debug
+ *   #/llm-config               Model settings
+ *   #/vectorize                Vectorize overview (index stats + sampled histogram)
+ *   #/vectorize/search[?...]   Vectorize similarity search
+ *   #/vectorize/items/:id      Vectorize item detail
  */
 
 import {
@@ -21,7 +30,7 @@ import {
 } from '../../scripts/aem.js';
 import { ARCO_RECOMMENDER_URL } from '../../scripts/api-config.js';
 import { BLOCK_ALIASES } from '../../scripts/block-aliases.js';
-import { formatTimestamp as ts, formatDuration } from '../../scripts/formatting.js';
+import { formatTimestamp as ts, formatDuration, formatInt as fmtInt } from '../../scripts/formatting.js';
 import { processSectionMetadata } from '../../scripts/section-metadata.js';
 
 const TOKEN_STORAGE_KEY = 'arco-admin-token';
@@ -34,10 +43,18 @@ function esc(s) {
 }
 
 const dur = (ms) => formatDuration(ms);
+const vecDur = (ms) => formatDuration(ms, 2);
 
 function badge(label, tone = 'neutral') {
   if (!label && label !== 0) return '<span class="admin-badge admin-badge-muted">—</span>';
   return `<span class="admin-badge admin-badge-${tone}">${esc(label)}</span>`;
+}
+
+function vecBadge(label, tone = 'muted') {
+  if (label === null || label === undefined || label === '') {
+    return '<span class="vec-badge vec-badge-muted">—</span>';
+  }
+  return `<span class="vec-badge vec-badge-${tone}">${esc(label)}</span>`;
 }
 
 function kv(label, value) {
@@ -56,6 +73,22 @@ function intentTone(intent) {
     support: 'muted',
   };
   return map[intent] || 'accent';
+}
+
+function typeTone(type) {
+  const map = {
+    guide: 'ok',
+    experience: 'purple',
+    comparison: 'warn',
+    product: 'accent',
+    recipe: 'ok',
+    'hero-image': 'purple',
+    maintenance: 'warn',
+    diagnostic: 'warn',
+    pairing: 'accent',
+    calculator: 'muted',
+  };
+  return map[type] || 'accent';
 }
 
 // ── Auth ────────────────────────────────────────────────────────────────────
@@ -101,12 +134,21 @@ async function api(path, options = {}) {
 
 function parseRoute() {
   const hash = window.location.hash.replace(/^#/, '') || '/';
-  if (hash === '/') return { view: 'sessions' };
+  if (hash === '/' || hash === '/sessions') return { view: 'sessions' };
   if (hash === '/llm-config') return { view: 'llm-config' };
+
   const sessionMatch = hash.match(/^\/sessions\/([^/]+)$/);
   if (sessionMatch) return { view: 'session', id: sessionMatch[1] };
+
   const pageMatch = hash.match(/^\/pages\/([^/]+)(?:\/(\w+))?$/);
   if (pageMatch) return { view: 'page', id: pageMatch[1], tab: pageMatch[2] || 'overview' };
+
+  if (hash === '/vectorize' || hash === '/vectorize/overview') return { view: 'vec-overview' };
+  if (hash === '/vectorize/search' || hash.startsWith('/vectorize/search?')) return { view: 'vec-search' };
+
+  const itemMatch = hash.match(/^\/vectorize\/items\/(.+)$/);
+  if (itemMatch) return { view: 'vec-item', id: decodeURIComponent(itemMatch[1]) };
+
   return { view: 'sessions' };
 }
 
@@ -919,15 +961,366 @@ async function renderLlmConfig(root) {
   });
 }
 
+// ── Vectorize: sub-nav ──────────────────────────────────────────────────────
+
+function renderVectorizeSubNav(active) {
+  return `
+    <nav class="admin-subnav">
+      <a href="#/vectorize" data-subnav="overview" class="${active === 'overview' ? 'is-active' : ''}">Overview</a>
+      <a href="#/vectorize/search" data-subnav="search" class="${active === 'search' ? 'is-active' : ''}">Search</a>
+    </nav>
+  `;
+}
+
+// ── Vectorize: overview ─────────────────────────────────────────────────────
+
+function renderHistogramBars(title, dist) {
+  const entries = Object.entries(dist || {}).sort((a, b) => b[1] - a[1]);
+  if (!entries.length) {
+    return `<div class="vec-hist"><h4>${esc(title)}</h4><p class="vec-muted">No values in sample.</p></div>`;
+  }
+  const max = entries[0][1];
+  return `<div class="vec-hist">
+    <h4>${esc(title)}</h4>
+    <ul class="vec-hist-list">
+      ${entries.map(([k, v]) => {
+    const pct = max > 0 ? (v / max) * 100 : 0;
+    return `<li class="vec-hist-row">
+          <span class="vec-hist-label">${esc(k)}</span>
+          <span class="vec-hist-bar"><span style="width:${pct.toFixed(1)}%"></span></span>
+          <span class="vec-hist-count">${v}</span>
+        </li>`;
+  }).join('')}
+    </ul>
+  </div>`;
+}
+
+async function renderVectorizeOverview(root) {
+  root.innerHTML = `${renderVectorizeSubNav('overview')}<p class="vec-loading">Loading index stats…</p>`;
+  let data;
+  try {
+    data = await api('/api/admin/vectorize/stats?sampleTopK=50');
+  } catch (err) {
+    root.innerHTML = `${renderVectorizeSubNav('overview')}<p class="vec-error">${esc(err.message)}</p>`;
+    return;
+  }
+
+  const d = data.describe || {};
+  const s = data.sample || {};
+  const totalVectors = data.totalVectors ?? d.vectorCount ?? d.vectorsCount ?? null;
+  const scoreStats = s.scoreStats || null;
+  const lastMutation = d.processedUpToDatetime
+    ? new Date(d.processedUpToDatetime).toLocaleString('en-US', {
+      month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false,
+    })
+    : '—';
+
+  const metric = d.metric ? String(d.metric) : '—';
+
+  root.innerHTML = `
+    ${renderVectorizeSubNav('overview')}
+    <div class="vec-stats-strip">
+      <span class="vec-stat"><span class="vec-stat-value">${fmtInt(totalVectors)}</span><span class="vec-stat-label">vectors (describe)</span></span>
+      <span class="vec-stat"><span class="vec-stat-value">${fmtInt(d.dimensions)}</span><span class="vec-stat-label">dimensions</span></span>
+      <span class="vec-stat"><span class="vec-stat-value" style="font-size:0.95rem">${esc(metric)}</span><span class="vec-stat-label">metric</span></span>
+      <span class="vec-stat"><span class="vec-stat-value" style="font-size:0.95rem">${esc((data.index?.embeddingModel || '').replace(/^@cf\//, ''))}</span><span class="vec-stat-label">model</span></span>
+    </div>
+
+    <section class="vec-card">
+      <h3>Index metadata</h3>
+      <dl class="vec-kvs vec-kvs-two">
+        <div class="vec-kv"><dt>Name</dt><dd>${esc(data.index?.name)}</dd></div>
+        <div class="vec-kv"><dt>Binding</dt><dd><code>${esc(data.index?.binding)}</code></dd></div>
+        <div class="vec-kv"><dt>Embedding model</dt><dd><code>${esc(data.index?.embeddingModel)}</code></dd></div>
+        <div class="vec-kv"><dt>Dimensions</dt><dd>${fmtInt(d.dimensions)}</dd></div>
+        <div class="vec-kv"><dt>Metric</dt><dd>${esc(metric)}</dd></div>
+        <div class="vec-kv"><dt>Total vectors</dt><dd>${fmtInt(totalVectors)}</dd></div>
+        <div class="vec-kv"><dt>Processed up to</dt><dd>${esc(lastMutation)}</dd></div>
+        <div class="vec-kv"><dt>Last mutation id</dt><dd class="vec-mono">${esc(d.processedUpToMutation || '—')}</dd></div>
+      </dl>
+      <p class="vec-muted vec-hint">
+        Vectorize V2 has no list-all-vectors API, so the breakdown below is sampled from the top
+        ${esc(s.topK || 50)} similarity results for a broad seed query
+        (<em>${esc(s.seed || '')}</em>). It is a snapshot of the neighbourhood, not a census.
+        Max topK is 50 when <code>returnMetadata=all</code> (Vectorize V2 limit).
+      </p>
+    </section>
+
+    ${s.error ? `<div class="vec-card vec-error-card"><p class="vec-error">Sample failed: ${esc(s.error)}</p></div>` : `
+    <section class="vec-card">
+      <h3>Sampled type distribution (top ${esc(s.topK || 100)})</h3>
+      ${scoreStats ? `<p class="vec-muted vec-hint">
+        Score range in sample: ${scoreStats.min.toFixed(3)} – ${scoreStats.max.toFixed(3)}
+        · mean ${scoreStats.mean.toFixed(3)} · n=${scoreStats.count}
+      </p>` : ''}
+      <div class="vec-hist-grid">
+        ${renderHistogramBars('type', s.histogram?.type)}
+        ${renderHistogramBars('category', s.histogram?.category)}
+        ${renderHistogramBars('personaTags', s.histogram?.personaTags)}
+        ${renderHistogramBars('difficulty', s.histogram?.difficulty)}
+      </div>
+    </section>`}
+
+    <section class="vec-card">
+      <h3>Next</h3>
+      <p>Use <a href="#/vectorize/search">Search</a> to embed a query and retrieve the top-K nearest vectors, or click any item id below to inspect it directly.</p>
+    </section>
+  `;
+}
+
+// ── Vectorize: search ───────────────────────────────────────────────────────
+
+const TYPE_OPTIONS = [
+  '', 'guide', 'experience', 'comparison', 'product', 'recipe',
+  'hero-image', 'maintenance', 'diagnostic', 'pairing', 'calculator',
+];
+
+function readSearchParamsFromHash() {
+  const raw = window.location.hash.replace(/^#/, '');
+  const [, query = ''] = raw.match(/^\/vectorize\/search\?(.*)$/) || [];
+  const p = new URLSearchParams(query);
+  return {
+    q: p.get('q') || '',
+    topK: parseInt(p.get('topK') || '20', 10) || 20,
+    type: p.get('type') || '',
+    values: p.get('values') === '1',
+  };
+}
+
+function writeSearchParamsToHash({
+  q, topK, type, values,
+}) {
+  const p = new URLSearchParams();
+  if (q) p.set('q', q);
+  if (topK && topK !== 20) p.set('topK', String(topK));
+  if (type) p.set('type', type);
+  if (values) p.set('values', '1');
+  const str = p.toString();
+  window.location.hash = `/vectorize/search${str ? `?${str}` : ''}`;
+}
+
+function renderSearchForm(params) {
+  return `
+    <section class="vec-card">
+      <h3>Query</h3>
+      <form class="vec-form" id="vec-search-form">
+        <label class="vec-field vec-field-wide">
+          <span>Query text</span>
+          <input type="text" name="q" value="${esc(params.q)}" placeholder="e.g. quiet espresso machine for a small kitchen" autocomplete="off">
+        </label>
+        <label class="vec-field">
+          <span>top K (1–50)</span>
+          <input type="number" name="topK" min="1" max="50" value="${esc(params.topK)}">
+        </label>
+        <label class="vec-field">
+          <span>type filter</span>
+          <select name="type">
+            ${TYPE_OPTIONS.map((t) => `<option value="${esc(t)}"${t === params.type ? ' selected' : ''}>${t ? esc(t) : '(any)'}</option>`).join('')}
+          </select>
+        </label>
+        <label class="vec-field vec-field-check">
+          <input type="checkbox" name="values"${params.values ? ' checked' : ''}>
+          <span>include raw vector values</span>
+        </label>
+        <div class="vec-field vec-field-actions">
+          <button type="submit" class="vec-btn vec-btn-accent">Search</button>
+        </div>
+      </form>
+    </section>
+  `;
+}
+
+function renderMatchRow(match) {
+  const md = match.metadata || {};
+  const type = md.type || '—';
+  const id = match.id || '';
+  const scoreFmt = typeof match.score === 'number' ? match.score.toFixed(4) : '—';
+  const title = md.title || md.alt || md.sectionHeading || md.name || '';
+  const badges = [
+    ['type', type],
+    ['category', md.category],
+    ['difficulty', md.difficulty],
+  ].filter(([, v]) => v).map(([k, v]) => `<span class="vec-kvtag"><b>${esc(k)}</b> ${esc(v)}</span>`).join(' ');
+  const personaTags = md.personaTags
+    ? String(md.personaTags).split(',').filter(Boolean)
+      .map((t) => `<span class="vec-kvtag vec-kvtag-soft">persona · ${esc(t.trim())}</span>`)
+      .join(' ')
+    : '';
+  const valuesPreview = (() => {
+    if (!Array.isArray(match.values)) return '';
+    const head = match.values.slice(0, 8)
+      .map((v) => (typeof v === 'number' ? v.toFixed(3) : String(v)))
+      .join(', ');
+    const more = match.values.length > 8 ? ', …' : '';
+    return `[${head}${more}] <span class="vec-muted">(dims=${match.values.length})</span>`;
+  })();
+
+  return `
+    <li class="vec-result">
+      <div class="vec-result-head">
+        <span class="vec-score">${esc(scoreFmt)}</span>
+        <span class="vec-type-chip vec-type-${esc(type)}">${vecBadge(type, typeTone(type))}</span>
+        <a class="vec-result-id vec-mono" href="#/vectorize/items/${encodeURIComponent(id)}">${esc(id)}</a>
+      </div>
+      ${title ? `<div class="vec-result-title">${esc(title)}</div>` : ''}
+      <div class="vec-result-tags">${badges}${personaTags}</div>
+      ${valuesPreview ? `<div class="vec-muted vec-result-values">${valuesPreview}</div>` : ''}
+      <details class="vec-result-json">
+        <summary>metadata JSON</summary>
+        <pre>${esc(JSON.stringify(md, null, 2))}</pre>
+      </details>
+    </li>
+  `;
+}
+
+async function renderVectorizeSearch(root) {
+  const params = readSearchParamsFromHash();
+  root.innerHTML = `
+    ${renderVectorizeSubNav('search')}
+    <div class="vec-search-shell">
+      <div class="vec-search-form" id="vec-form-slot">${renderSearchForm(params)}</div>
+      <div class="vec-search-results" id="vec-results-slot"></div>
+    </div>
+  `;
+
+  const form = root.querySelector('#vec-search-form');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    writeSearchParamsToHash({
+      q: fd.get('q') || '',
+      topK: parseInt(fd.get('topK') || '20', 10),
+      type: fd.get('type') || '',
+      values: fd.get('values') === 'on',
+    });
+  });
+
+  const resultsSlot = root.querySelector('#vec-results-slot');
+
+  if (!params.q) {
+    resultsSlot.innerHTML = `
+      <section class="vec-card vec-placeholder">
+        <h3>Run a search</h3>
+        <p class="vec-muted">Enter a query to embed it via <code>@cf/baai/bge-small-en-v1.5</code> and retrieve the top-K nearest vectors from <code>arco-content</code>.</p>
+      </section>
+    `;
+    return;
+  }
+
+  resultsSlot.innerHTML = '<p class="vec-loading">Embedding &amp; searching…</p>';
+
+  const qs = new URLSearchParams({ q: params.q, topK: String(params.topK) });
+  if (params.type) qs.set('type', params.type);
+  if (params.values) qs.set('values', '1');
+
+  let data;
+  try {
+    data = await api(`/api/admin/vectorize/search?${qs.toString()}`);
+  } catch (err) {
+    resultsSlot.innerHTML = `<p class="vec-error">${esc(err.message)}</p>`;
+    return;
+  }
+
+  const t = data.timings || {};
+  const preview = (data.embedding?.preview || []).map((v) => (typeof v === 'number' ? v.toFixed(3) : String(v))).join(', ');
+
+  resultsSlot.innerHTML = `
+    <section class="vec-card">
+      <div class="vec-result-toolbar">
+        <div class="vec-result-count">
+          <strong>${data.count}</strong> match${data.count === 1 ? '' : 'es'}
+          ${params.type ? `<span class="vec-muted">after client-side <code>type=${esc(params.type)}</code> filter (raw topK=${esc(data.totalReturned)})</span>` : ''}
+        </div>
+        <div class="vec-result-timings vec-muted">
+          embed ${vecDur(t.embedMs)} · query ${vecDur(t.queryMs)} · total ${vecDur(t.totalMs)}
+          · dims ${esc(data.embedding?.dims || '—')}
+        </div>
+      </div>
+      <details class="vec-result-embed">
+        <summary>embedding preview (first 8 dims)</summary>
+        <pre>[${esc(preview)}${data.embedding?.dims > 8 ? ', …' : ''}]</pre>
+      </details>
+      ${data.count === 0
+    ? '<p class="vec-empty">No matches for this query.</p>'
+    : `<ul class="vec-results">${data.matches.map(renderMatchRow).join('')}</ul>`}
+    </section>
+  `;
+}
+
+// ── Vectorize: item detail ─────────────────────────────────────────────────
+
+async function renderVectorizeItem(root, id) {
+  root.innerHTML = `
+    <nav class="vec-crumbs"><a href="#/vectorize">← Overview</a> <span>·</span> <a href="#/vectorize/search">Search</a></nav>
+    <p class="vec-loading">Loading item <code>${esc(id)}</code>…</p>
+  `;
+
+  let data;
+  try {
+    data = await api(`/api/admin/vectorize/items/${encodeURIComponent(id)}?values=1`);
+  } catch (err) {
+    root.innerHTML = `
+      <nav class="vec-crumbs"><a href="#/vectorize">← Overview</a> <span>·</span> <a href="#/vectorize/search">Search</a></nav>
+      <p class="vec-error">${esc(err.message)}</p>
+    `;
+    return;
+  }
+
+  const md = data.metadata || {};
+  const valuesPreview = Array.isArray(data.values)
+    ? data.values.slice(0, 16).map((v) => (typeof v === 'number' ? v.toFixed(4) : String(v))).join(', ')
+    : null;
+
+  root.innerHTML = `
+    <nav class="vec-crumbs"><a href="#/vectorize">← Overview</a> <span>·</span> <a href="#/vectorize/search">Search</a></nav>
+    <div class="vec-toolbar">
+      <h2 class="vec-mono">${esc(data.id)}</h2>
+      <div class="vec-badges">
+        ${vecBadge(md.type || 'unknown', typeTone(md.type))}
+        ${data.dims ? vecBadge(`${data.dims}d`, 'muted') : ''}
+      </div>
+    </div>
+
+    <section class="vec-card">
+      <h3>Metadata</h3>
+      <dl class="vec-kvs vec-kvs-two">
+        ${Object.entries(md).map(([k, v]) => `<div class="vec-kv"><dt>${esc(k)}</dt><dd>${esc(String(v))}</dd></div>`).join('') || '<p class="vec-muted">No metadata.</p>'}
+      </dl>
+    </section>
+
+    ${md.url ? `
+    <section class="vec-card">
+      <h3>Preview</h3>
+      <div class="vec-preview-media">
+        <a href="${esc(md.url)}" target="_blank" rel="noopener">
+          <img src="${esc(md.url)}" alt="${esc(md.alt || '')}" loading="lazy">
+        </a>
+        ${md.alt ? `<p class="vec-muted">${esc(md.alt)}</p>` : ''}
+      </div>
+    </section>` : ''}
+
+    ${valuesPreview ? `
+    <section class="vec-card">
+      <h3>Vector values</h3>
+      <p class="vec-muted">First 16 of ${esc(data.dims || data.values.length)} dimensions.</p>
+      <pre class="vec-pre">[${esc(valuesPreview)}, …]</pre>
+    </section>` : ''}
+  `;
+}
+
 // ── Entry ───────────────────────────────────────────────────────────────────
 
 function syncHeaderNav(route) {
   const nav = document.querySelector('.admin-header-nav');
   if (!nav) return;
+  const isVec = route.view?.startsWith('vec-');
+  const isLlm = route.view === 'llm-config';
   nav.querySelectorAll('a[data-nav]').forEach((a) => {
     const key = a.dataset.nav;
-    const active = (key === 'llm-config' && route.view === 'llm-config')
-      || (key === 'sessions' && route.view !== 'llm-config');
+    let active = false;
+    if (key === 'vectorize') active = isVec;
+    else if (key === 'llm-config') active = isLlm;
+    else if (key === 'sessions') active = !isVec && !isLlm;
     a.classList.toggle('is-active', active);
   });
 }
@@ -941,6 +1334,12 @@ async function render(root) {
     await renderPage(root, route.id, route.tab);
   } else if (route.view === 'llm-config') {
     await renderLlmConfig(root);
+  } else if (route.view === 'vec-overview') {
+    await renderVectorizeOverview(root);
+  } else if (route.view === 'vec-search') {
+    await renderVectorizeSearch(root);
+  } else if (route.view === 'vec-item') {
+    await renderVectorizeItem(root, route.id);
   } else {
     await renderSessions(root);
   }
@@ -958,6 +1357,7 @@ export default async function decorate(block) {
     <nav class="admin-header-nav">
       <a href="#/" data-nav="sessions">Sessions</a>
       <a href="#/llm-config" data-nav="llm-config">Model Settings</a>
+      <a href="#/vectorize" data-nav="vectorize">Vectorize</a>
     </nav>
     <div class="admin-header-actions">
       <button type="button" class="admin-btn admin-btn-ghost" data-action="reload">Reload</button>
