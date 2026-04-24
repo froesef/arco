@@ -355,6 +355,8 @@ export async function llmGenerate(ctx, config, env) {
   const provider = getProvider(resolved.provider);
   ctx.llm.model = resolved.model;
   ctx.llm.provider = resolved.provider;
+  ctx.llm.temperature = resolved.temperature;
+  ctx.llm.maxTokens = resolved.maxTokens;
 
   // Heartbeat to keep the connection alive while waiting for LLM
   const heartbeatInterval = setInterval(async () => {

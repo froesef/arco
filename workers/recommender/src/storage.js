@@ -200,6 +200,8 @@ function buildDebugSnapshot(ctx) {
     llm: {
       provider: ctx.llm?.provider || null,
       model: ctx.llm?.model || null,
+      temperature: ctx.llm?.temperature ?? null,
+      maxTokens: ctx.llm?.maxTokens ?? null,
       inputTokens: ctx.llm?.usage?.prompt_tokens || null,
       outputTokens: ctx.llm?.usage?.completion_tokens || null,
       rawOutput: ctx.llm?.fullText || '',

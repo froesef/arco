@@ -63,9 +63,14 @@ function renderOverview(d) {
   const el = document.createElement('div');
   el.className = 'debug-overview';
 
+  const providerModel = d.llm?.provider
+    ? `${escapeHtml(d.llm.provider)} / ${escapeHtml(d.llm?.model || '—')}`
+    : escapeHtml(d.llm?.model);
   const rows = [
     ['Total Time', `<span class="debug-badge ${timingClass(d.timings?.total)}">${formatMs(d.timings?.total)}</span>`],
-    ['Model', escapeHtml(d.llm?.model)],
+    ['Provider / Model', providerModel],
+    ['Temperature', d.llm?.temperature != null ? escapeHtml(String(d.llm.temperature)) : '—'],
+    ['Max Tokens', d.llm?.maxTokens != null ? escapeHtml(String(d.llm.maxTokens)) : '—'],
     ['Flow', escapeHtml(d.pipeline?.flowName || d.pipeline?.flow)],
     ['Intent', d.intent ? `${escapeHtml(d.intent.type)} <span class="debug-dim">(${Math.round((d.intent.confidence || 0) * 100)}% conf)</span>` : '—'],
     ['Journey Stage', escapeHtml(d.intent?.journeyStage)],

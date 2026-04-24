@@ -494,11 +494,18 @@ function renderOverviewSection(dbg, run) {
   const totalMs = dbg.timings?.total;
   const llmMs = dbg.timings?.llm;
   const totalTokens = (dbg.llm?.inputTokens || 0) + (dbg.llm?.outputTokens || 0);
+  const providerModel = dbg.llm?.provider
+    ? `<span class="admin-mono">${esc(dbg.llm.provider)}</span> / ${esc(dbg.llm?.model || '—')}`
+    : (dbg.llm?.model || '—');
+  const tempStr = dbg.llm?.temperature != null ? String(dbg.llm.temperature) : '—';
+  const maxStr = dbg.llm?.maxTokens != null ? String(dbg.llm.maxTokens) : '—';
   const rows = [
     ['Total time', `<span class="admin-badge admin-badge-${timingTone(totalMs)}">${fmtMs(totalMs)}</span>`],
     ['LLM time', `<span class="admin-badge admin-badge-${timingTone(llmMs)}">${fmtMs(llmMs)}</span>`],
     ['First token', fmtMs(dbg.timings?.llmFirstToken)],
-    ['Model', dbg.llm?.model || '—'],
+    ['Provider / model', providerModel],
+    ['Temperature', tempStr],
+    ['Max tokens', maxStr],
     ['Flow', run.flow_id || '—'],
     ['Intent', intent],
     ['Journey stage', run.journey_stage || '—'],
