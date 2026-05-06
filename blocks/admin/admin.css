@@ -2236,4 +2236,55 @@
   font-weight: 400;
   margin-left: 0.4rem;
 }
+
+.admin .admin-eval-cell-flags {
+  font-size: 0.68rem;
+  font-weight: 500;
+}
+
+.admin .admin-eval-cell-blocker {
+  display: inline-block;
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  background: rgb(239 68 68 / 12%);
+  color: rgb(176 26 26);
+  font-weight: 600;
+  font-size: 0.7rem;
+  cursor: help;
+}
+
+.admin .admin-eval-cell-warn {
+  display: inline-block;
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  background: rgb(245 158 11 / 12%);
+  color: rgb(146 73 7);
+  font-weight: 500;
+  font-size: 0.7rem;
+  cursor: help;
+}
+
+.admin .admin-eval-cell-blocker-cell {
+  background: rgb(239 68 68 / 4%);
+}
+
+.admin .admin-eval-cell-raw {
+  font-size: 0.65rem;
+  color: var(--secondary-color, #888);
+  margin-left: 0.25rem;
+}
+
+.admin .admin-eval-ci,
+.admin .admin-eval-n {
+  font-size: 0.7rem;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  margin-left: 0.2rem;
+}
+
+.admin .admin-eval-significance {
+  font-size: 0.78rem;
+  margin: 0.2rem 0 0.6rem;
+  line-height: 1.5;
+}
 /* stylelint-enable no-descending-specificity */

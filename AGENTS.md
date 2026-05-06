@@ -363,7 +363,26 @@ Per-variant full NDJSON payloads (blocks, suggestions, debug snapshot, prompt, r
 - *specificity* — concrete coffee details (grams, ratios, temps, grind sizes, named techniques) instead of vague generalities
 - *visualAssetUsage* — hero image present, story / experience / product image tokens placed where they aid the reader, no missing assets
 
-The composite score (mean of the seven) lives in `experiment_variants.evaluator_score`. Per-dimension reasoning, judge model, and judge token counts live as JSON in `experiment_variants.evaluator_notes`.
+The composite score (mean of the seven) lives in `experiment_variants.evaluator_score`. Per-dimension reasoning, judge model, judge token counts, **deterministic-assertion results**, and **blocker-gate metadata** live as JSON in `experiment_variants.evaluator_notes`.
+
+**Deterministic assertions** (`workers/recommender/src/evaluations/assertions.js`) run on every variant alongside the judge. They are cheap, reliable, and catch what the LLM judge often misses:
+
+- *broken-token* — `<!-- unknown story:slug -->` / `<!-- unpublished experience:slug -->` markers left by `images.js` when token resolution fails (always **blocker**)
+- *unbalanced-html* — opening / closing tag mismatch on `<div>`, `<p>`, `<a>`, `<picture>`, list, table tags (always **blocker**)
+- *block-count* — pages with <3 blocks are blockers; >25 blocks is a warn
+- *gold-must-mention-any* — at least one of the per-query `gold.mustMentionAny` substrings must appear (warn)
+- *gold-must-not-mention* — none of `gold.mustNotMention` may appear (blocker — protects against hallucinated SKUs like `Arco MoonRover 9000`)
+- *gold-min-products* / *gold-min-recipes* — minimum count of resolved product/recipe cards (warn)
+- *expected-decline* — for queries tagged `expectedBehavior: "decline"` (off-topic), the page must include decline phrasing AND ≤2 product cards (blocker)
+
+**Blocker gate** — composite score is **capped at 2.50** when any of:
+- `faithfulness` dimension < 3
+- `structure` dimension < 3
+- any deterministic assertion has severity `blocker`
+
+The raw judge score is preserved in `evaluator_notes.raw_score` and shown in the admin matrix in parentheses. Blocker rate is reported per model in the summary table — a high quality average with a 30% blocker rate is worse in production than a slightly lower quality with 0% blockers.
+
+**Statistical reporting** — the per-model summary now includes 95% confidence intervals (`qualityCi95`, `ttftCi95`, `durationCi95`) and a sample count (`qualityN`). The admin UI surfaces them as `4.10 ± 0.18` and adds a pairwise hint flagging model pairs whose CIs overlap so a 0.1-point gap on n=15 isn't mistaken for a real difference.
 
 **Run-level data** (migration `0006_evaluations.sql`):
 
@@ -375,7 +394,24 @@ The composite score (mean of the seven) lives in `experiment_variants.evaluator_
 
 The eval reuses the entire experiment storage path so the admin's variant viewer (`renderExperimentVariantPreview`) re-renders any cell's generated page without new code.
 
-**Adding a query suite:** drop a JSON file in `eval/suites/` (see `coffee-default.json` for shape) and import it from `workers/recommender/src/evaluations/suites.js`. Suites are bundled into the worker — no D1 round-trip — and identified by `id` so renaming is a breaking change for historical runs.
+**Available suites:**
+- `coffee-extended` (default, 60 queries) — stratified on size × intent (3 sizes × 4 intents × 3 each = 36), plus 12 adversarial cases (off-topic / vague / contradictory / hallucination-bait) and 12 deep-specific cases (recipes, troubleshooting, named products, FAQs). Each query carries optional `gold` fields used by the assertion engine.
+- `coffee-default` (15 queries) — original smoke-test suite. Kept so historical runs stay interpretable; not recommended for new comparisons.
+- `coffee-dev` (3 queries) — minimal smoke suite for verifying the eval flow end-to-end without burning budget.
+
+**Adding a query suite:** drop a JSON file in `eval/suites/` (see `coffee-extended.json` for shape, including the `gold` field schema) and import it from `workers/recommender/src/evaluations/suites.js`. Suites are bundled into the worker — no D1 round-trip — and identified by `id` so renaming is a breaking change for historical runs.
+
+**`gold` field schema** (per query, all optional):
+```jsonc
+{
+  "mustMentionAny":   ["grind", "ratio"],   // warn if none of these appear
+  "mustNotMention":   ["MoonRover 9000"],   // blocker if any of these appear
+  "minProductCount":  1,                    // warn if fewer product cards
+  "minRecipeCount":   0,                    // warn if fewer recipe links
+  // top-level on the query (not under gold):
+  // "expectedBehavior": "decline"          // off-topic — page must decline + show ≤2 products
+}
+```
 
 **Authentication:** the judge calls Anthropic Claude **via AWS Bedrock**, reusing the existing `AWS_BEARER_TOKEN_BEDROCK` secret. No additional setup is needed — if the rest of the recommender's Bedrock models work, the judge works.
 

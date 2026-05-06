@@ -10,8 +10,10 @@
 import coffeeDefault from '../../../../eval/suites/coffee-default.json';
 // eslint-disable-next-line import/no-relative-packages, import/extensions
 import coffeeDev from '../../../../eval/suites/coffee-dev.json';
+// eslint-disable-next-line import/no-relative-packages, import/extensions
+import coffeeExtended from '../../../../eval/suites/coffee-extended.json';
 
-const SUITE_REGISTRY = [coffeeDefault, coffeeDev];
+const SUITE_REGISTRY = [coffeeExtended, coffeeDefault, coffeeDev];
 
 const SUITES_BY_ID = new Map(SUITE_REGISTRY.map((s) => [s.id, s]));
 

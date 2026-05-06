@@ -1,0 +1,483 @@
+{
+  "id": "coffee-extended",
+  "name": "Coffee — extended (60 queries, stratified)",
+  "description": "Decision-grade benchmark suite. 36 stratified core queries (3 sizes × 4 intents × 3 each), 12 adversarial cases (off-topic, vague, contradictory, no-RAG), and 12 deep-specific cases (recipes, troubleshooting, named products, FAQs). Each query carries optional `gold` fields used by deterministic assertions.",
+  "version": 1,
+  "queries": [
+    {
+      "id": "s-disc-001",
+      "size": "short",
+      "expectedIntent": "discovery",
+      "query": "what is a flat white",
+      "gold": { "mustMentionAny": ["flat white", "milk"], "minProductCount": 0 }
+    },
+    {
+      "id": "s-disc-002",
+      "size": "short",
+      "expectedIntent": "discovery",
+      "query": "burr grinder for beginners",
+      "gold": { "mustMentionAny": ["burr"], "minProductCount": 0 }
+    },
+    {
+      "id": "s-disc-003",
+      "size": "short",
+      "expectedIntent": "discovery",
+      "query": "how does a moka pot work",
+      "gold": { "mustMentionAny": ["moka", "pressure"], "minProductCount": 0 }
+    },
+    {
+      "id": "s-comp-001",
+      "size": "short",
+      "expectedIntent": "comparison",
+      "query": "best espresso machine under $1000",
+      "gold": { "mustMentionAny": ["espresso"], "minProductCount": 1 }
+    },
+    {
+      "id": "s-comp-002",
+      "size": "short",
+      "expectedIntent": "comparison",
+      "query": "moka pot vs french press",
+      "gold": { "mustMentionAny": ["moka", "french press"], "minProductCount": 0 }
+    },
+    {
+      "id": "s-comp-003",
+      "size": "short",
+      "expectedIntent": "comparison",
+      "query": "single boiler vs dual boiler espresso",
+      "gold": { "mustMentionAny": ["dual boiler", "single boiler"], "minProductCount": 0 }
+    },
+    {
+      "id": "s-pd-001",
+      "size": "short",
+      "expectedIntent": "product-detail",
+      "query": "best beans for cold brew",
+      "gold": { "mustMentionAny": ["cold brew"], "minProductCount": 0 }
+    },
+    {
+      "id": "s-pd-002",
+      "size": "short",
+      "expectedIntent": "product-detail",
+      "query": "tamper for 58mm portafilter",
+      "gold": { "mustMentionAny": ["58mm", "tamper"], "minProductCount": 0 }
+    },
+    {
+      "id": "s-pd-003",
+      "size": "short",
+      "expectedIntent": "product-detail",
+      "query": "milk frothing pitcher size",
+      "gold": { "mustMentionAny": ["pitcher", "milk"], "minProductCount": 0 }
+    },
+    {
+      "id": "s-dg-001",
+      "size": "short",
+      "expectedIntent": "deep-guidance",
+      "query": "how to clean group head",
+      "gold": { "mustMentionAny": ["backflush", "clean"], "minProductCount": 0 }
+    },
+    {
+      "id": "s-dg-002",
+      "size": "short",
+      "expectedIntent": "deep-guidance",
+      "query": "fix sour pour over",
+      "gold": { "mustMentionAny": ["grind", "extraction"], "minProductCount": 0 }
+    },
+    {
+      "id": "s-dg-003",
+      "size": "short",
+      "expectedIntent": "deep-guidance",
+      "query": "how to season a new portafilter",
+      "gold": { "mustMentionAny": ["portafilter"], "minProductCount": 0 }
+    },
+    {
+      "id": "m-disc-001",
+      "size": "medium",
+      "expectedIntent": "discovery",
+      "query": "I'm new to coffee — what equipment should I get to make better coffee than my drip machine?",
+      "gold": { "mustMentionAny": ["grinder", "espresso"], "minProductCount": 1 }
+    },
+    {
+      "id": "m-disc-002",
+      "size": "medium",
+      "expectedIntent": "discovery",
+      "query": "I want to learn latte art at home — what tools and beans do I need to start?",
+      "gold": { "mustMentionAny": ["pitcher", "milk"], "minProductCount": 1 }
+    },
+    {
+      "id": "m-disc-003",
+      "size": "medium",
+      "expectedIntent": "discovery",
+      "query": "I drink mostly americanos — is buying an espresso machine worth it over a moka pot?",
+      "gold": { "mustMentionAny": ["espresso", "moka"], "minProductCount": 0 }
+    },
+    {
+      "id": "m-comp-001",
+      "size": "medium",
+      "expectedIntent": "comparison",
+      "query": "Which espresso machine would work best for a busy household with two coffee drinkers?",
+      "gold": { "mustMentionAny": ["dual boiler", "boiler"], "minProductCount": 1 }
+    },
+    {
+      "id": "m-comp-002",
+      "size": "medium",
+      "expectedIntent": "comparison",
+      "query": "Should I get a Primo or a Nano if my counter space is tight but I want real espresso?",
+      "gold": { "mustMentionAny": ["Primo", "Nano"], "minProductCount": 1 }
+    },
+    {
+      "id": "m-comp-003",
+      "size": "medium",
+      "expectedIntent": "comparison",
+      "query": "What's the difference between a single-boiler PID machine and a heat exchanger setup?",
+      "gold": { "mustMentionAny": ["PID", "boiler"], "minProductCount": 0 }
+    },
+    {
+      "id": "m-pd-001",
+      "size": "medium",
+      "expectedIntent": "product-detail",
+      "query": "Decaf espresso that actually tastes like coffee — what should I look at?",
+      "gold": { "mustMentionAny": ["decaf"], "minProductCount": 0 }
+    },
+    {
+      "id": "m-pd-002",
+      "size": "medium",
+      "expectedIntent": "product-detail",
+      "query": "Looking for a chocolate-forward bean that pairs well with milk drinks",
+      "gold": { "mustMentionAny": ["chocolate", "milk"], "minProductCount": 0 }
+    },
+    {
+      "id": "m-pd-003",
+      "size": "medium",
+      "expectedIntent": "product-detail",
+      "query": "What kind of grinder pairs well with the Doppio for espresso work?",
+      "gold": { "mustMentionAny": ["Doppio", "grinder"], "minProductCount": 0 }
+    },
+    {
+      "id": "m-dg-001",
+      "size": "medium",
+      "expectedIntent": "deep-guidance",
+      "query": "How do I dial in a new bag of espresso beans without wasting half of them?",
+      "gold": { "mustMentionAny": ["dose", "grind", "yield"], "minProductCount": 0 }
+    },
+    {
+      "id": "m-dg-002",
+      "size": "medium",
+      "expectedIntent": "deep-guidance",
+      "query": "My espresso pulls in 18 seconds and tastes harsh — what do I change first?",
+      "gold": { "mustMentionAny": ["grind"], "minProductCount": 0 }
+    },
+    {
+      "id": "m-dg-003",
+      "size": "medium",
+      "expectedIntent": "deep-guidance",
+      "query": "What's a good morning routine for someone learning to make espresso at home?",
+      "gold": { "mustMentionAny": ["espresso"], "minProductCount": 0 }
+    },
+    {
+      "id": "l-disc-001",
+      "size": "long",
+      "expectedIntent": "discovery",
+      "query": "I just inherited my grandfather's old Italian espresso setup but I have no idea what I'm doing. He had a moka pot, a manual lever machine that looks ancient, and bags of beans I don't recognize. Where should I even start to learn?",
+      "gold": { "mustMentionAny": ["moka", "lever"], "minProductCount": 0 }
+    },
+    {
+      "id": "l-disc-002",
+      "size": "long",
+      "expectedIntent": "discovery",
+      "query": "I'm a tea drinker who's getting into coffee because everyone in my new office is a coffee snob. I don't want to spend a fortune but I want to actually understand what I'm tasting. What should I try first to develop my palate?",
+      "gold": { "mustMentionAny": ["origin", "tasting"], "minProductCount": 0 }
+    },
+    {
+      "id": "l-disc-003",
+      "size": "long",
+      "expectedIntent": "discovery",
+      "query": "We just moved into a new place and want to set up a small coffee bar. Our budget is around $2000 total and we drink mostly espresso drinks but occasionally pour-over on weekends. What machine, grinder, and accessories should we look at?",
+      "gold": { "mustMentionAny": ["grinder", "espresso"], "minProductCount": 1 }
+    },
+    {
+      "id": "l-comp-001",
+      "size": "long",
+      "expectedIntent": "comparison",
+      "query": "Looking for a coffee setup for our small office of about 10 people. We need something easy for everyone to use, makes consistent espresso drinks, and doesn't require a barista. Budget is flexible if it saves time.",
+      "gold": { "mustMentionAny": ["espresso"], "minProductCount": 1 }
+    },
+    {
+      "id": "l-comp-002",
+      "size": "long",
+      "expectedIntent": "comparison",
+      "query": "I'm choosing between buying a high-end manual espresso machine plus separate grinder, or a fully automatic super-auto. I make 3-4 drinks a day, mostly cappuccinos, and I'd rather spend 5 minutes total than 5 minutes per drink. Which path makes sense?",
+      "gold": { "mustMentionAny": ["super-auto", "automatic"], "minProductCount": 0 }
+    },
+    {
+      "id": "l-comp-003",
+      "size": "long",
+      "expectedIntent": "comparison",
+      "query": "We're deciding between a Breville Dual Boiler, a Lelit Mara X, and a Profitec Pro 500 in the $1500-2500 range. We mostly do milk drinks, occasional black espresso, and want it to last 10+ years. Which would you put your money on and why?",
+      "gold": { "mustMentionAny": ["dual boiler"], "minProductCount": 0 }
+    },
+    {
+      "id": "l-pd-001",
+      "size": "long",
+      "expectedIntent": "product-detail",
+      "query": "I've been pulling shots on my Breville for two years and I'm wondering if I'm missing something with single-origin beans. Can you walk me through how the same recipe tastes different across origins, and recommend a few starter beans to try?",
+      "gold": { "mustMentionAny": ["single origin", "Ethiopia"], "minProductCount": 0 }
+    },
+    {
+      "id": "l-pd-002",
+      "size": "long",
+      "expectedIntent": "product-detail",
+      "query": "My partner only drinks decaf but I want them to enjoy real espresso. Most decaf I've had tastes flat — are there decaf options that hold up in a double shot, and does the brewing technique need to change at all?",
+      "gold": { "mustMentionAny": ["decaf"], "minProductCount": 0 }
+    },
+    {
+      "id": "l-pd-003",
+      "size": "long",
+      "expectedIntent": "product-detail",
+      "query": "I want to gift a complete pour-over kit to my brother who's just getting into specialty coffee. He has nothing but a kettle. Looking at $300 budget — what brewer, grinder, scale, and a starter bean would you put together?",
+      "gold": { "mustMentionAny": ["grinder", "scale"], "minProductCount": 1 }
+    },
+    {
+      "id": "l-dg-001",
+      "size": "long",
+      "expectedIntent": "deep-guidance",
+      "query": "I make pour-over every morning but my coffee always tastes either too bitter or too sour. I'm using a V60 with medium-fine grind and 1:16 ratio. What variables should I be adjusting and in what order?",
+      "gold": { "mustMentionAny": ["grind", "ratio", "extraction"], "minProductCount": 0 }
+    },
+    {
+      "id": "l-dg-002",
+      "size": "long",
+      "expectedIntent": "deep-guidance",
+      "query": "My espresso looks beautiful — perfect crema, golden stream, runs in 28 seconds — but tastes weak and watery. I'm at 18g in, 36g out. What's actually happening and how do I diagnose?",
+      "gold": { "mustMentionAny": ["dose", "grind"], "minProductCount": 0 }
+    },
+    {
+      "id": "l-dg-003",
+      "size": "long",
+      "expectedIntent": "deep-guidance",
+      "query": "I want to start tracking my espresso shots more rigorously. What variables actually matter, what should I write down, and how do I avoid getting lost in numbers and forgetting that the shot should taste good?",
+      "gold": { "mustMentionAny": ["dose", "yield"], "minProductCount": 0 }
+    },
+    {
+      "id": "adv-offtopic-001",
+      "size": "short",
+      "expectedIntent": "off-topic",
+      "expectedBehavior": "decline",
+      "query": "best recipe for chicken curry",
+      "gold": {
+        "mustMentionAny": ["coffee"],
+        "mustNotMention": ["curry recipe", "chicken thigh"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "adv-offtopic-002",
+      "size": "short",
+      "expectedIntent": "off-topic",
+      "expectedBehavior": "decline",
+      "query": "how to fix my JavaScript build error",
+      "gold": {
+        "mustMentionAny": ["coffee"],
+        "mustNotMention": ["webpack", "npm install"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "adv-offtopic-003",
+      "size": "medium",
+      "expectedIntent": "off-topic",
+      "expectedBehavior": "decline",
+      "query": "I'm planning a wedding for 200 people next summer in Tuscany — any vendor recommendations?",
+      "gold": {
+        "mustMentionAny": ["coffee"],
+        "mustNotMention": ["wedding planner", "venue"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "adv-vague-001",
+      "size": "short",
+      "expectedIntent": "discovery",
+      "query": "coffee stuff",
+      "gold": { "mustMentionAny": ["coffee"], "minProductCount": 0 }
+    },
+    {
+      "id": "adv-vague-002",
+      "size": "short",
+      "expectedIntent": "discovery",
+      "query": "tell me about coffee",
+      "gold": { "mustMentionAny": ["coffee"], "minProductCount": 0 }
+    },
+    {
+      "id": "adv-vague-003",
+      "size": "short",
+      "expectedIntent": "discovery",
+      "query": "good",
+      "gold": { "mustMentionAny": ["coffee"], "minProductCount": 0 }
+    },
+    {
+      "id": "adv-conflict-001",
+      "size": "short",
+      "expectedIntent": "comparison",
+      "query": "cheapest super-automatic espresso machine under $50",
+      "gold": {
+        "mustMentionAny": ["super-auto", "budget", "realistic"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "adv-conflict-002",
+      "size": "medium",
+      "expectedIntent": "comparison",
+      "query": "I want a fully-manual lever machine that's also fully automatic and dishwasher safe",
+      "gold": {
+        "mustMentionAny": ["manual", "lever"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "adv-conflict-003",
+      "size": "medium",
+      "expectedIntent": "deep-guidance",
+      "query": "How do I make ristretto-strength espresso using a drip coffee maker?",
+      "gold": {
+        "mustMentionAny": ["espresso", "drip"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "adv-norag-001",
+      "size": "short",
+      "expectedIntent": "product-detail",
+      "query": "best zebra-themed espresso machine 2026",
+      "gold": {
+        "mustMentionAny": ["espresso"],
+        "mustNotMention": ["zebra-pattern", "zebra-print"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "adv-norag-002",
+      "size": "short",
+      "expectedIntent": "product-detail",
+      "query": "Arco MoonRover 9000 review",
+      "gold": {
+        "mustMentionAny": ["Arco"],
+        "mustNotMention": ["MoonRover 9000 has", "MoonRover features"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "adv-norag-003",
+      "size": "medium",
+      "expectedIntent": "comparison",
+      "query": "How does Arco's quantum-pressure profiling compare to traditional pressure profiling?",
+      "gold": {
+        "mustMentionAny": ["pressure"],
+        "mustNotMention": ["quantum-pressure", "quantum pressure profiling"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "spec-recipe-001",
+      "size": "medium",
+      "expectedIntent": "deep-guidance",
+      "query": "Give me a starting espresso recipe for a medium-roast Brazilian bean on a single-boiler machine",
+      "gold": {
+        "mustMentionAny": ["18g", "ratio", "Brazil"],
+        "minProductCount": 0,
+        "minRecipeCount": 0
+      }
+    },
+    {
+      "id": "spec-recipe-002",
+      "size": "medium",
+      "expectedIntent": "deep-guidance",
+      "query": "What's a good V60 recipe for a light-roast Ethiopian — grind, ratio, water temp, pour pattern?",
+      "gold": {
+        "mustMentionAny": ["V60", "Ethiopia", "1:"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "spec-recipe-003",
+      "size": "medium",
+      "expectedIntent": "deep-guidance",
+      "query": "How do I make a flat white at home that actually has microfoam, not big bubbles?",
+      "gold": {
+        "mustMentionAny": ["microfoam", "steam"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "spec-trouble-001",
+      "size": "medium",
+      "expectedIntent": "deep-guidance",
+      "query": "Espresso is channeling on every shot — perfect distribution and tamp, still channels. What's the actual cause?",
+      "gold": {
+        "mustMentionAny": ["channel", "distribution"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "spec-trouble-002",
+      "size": "medium",
+      "expectedIntent": "deep-guidance",
+      "query": "My grinder is producing way more fines than usual on the same setting — burrs are 6 months old. Replace or clean?",
+      "gold": {
+        "mustMentionAny": ["burr"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "spec-trouble-003",
+      "size": "medium",
+      "expectedIntent": "deep-guidance",
+      "query": "Steam wand spits water at the start before steam comes through — what's wrong with my machine?",
+      "gold": {
+        "mustMentionAny": ["steam"],
+        "minProductCount": 0
+      }
+    },
+    {
+      "id": "spec-prod-001",
+      "size": "short",
+      "expectedIntent": "product-detail",
+      "query": "tell me about the Arco Doppio",
+      "gold": { "mustMentionAny": ["Doppio", "dual"], "minProductCount": 1 }
+    },
+    {
+      "id": "spec-prod-002",
+      "size": "short",
+      "expectedIntent": "product-detail",
+      "query": "is the Primo good for milk drinks",
+      "gold": { "mustMentionAny": ["Primo", "milk"], "minProductCount": 1 }
+    },
+    {
+      "id": "spec-prod-003",
+      "size": "short",
+      "expectedIntent": "product-detail",
+      "query": "what colors does the Nano come in",
+      "gold": { "mustMentionAny": ["Nano"], "minProductCount": 1 }
+    },
+    {
+      "id": "spec-faq-001",
+      "size": "short",
+      "expectedIntent": "discovery",
+      "query": "how often should I descale my espresso machine",
+      "gold": { "mustMentionAny": ["descale"], "minProductCount": 0 }
+    },
+    {
+      "id": "spec-faq-002",
+      "size": "short",
+      "expectedIntent": "discovery",
+      "query": "should coffee beans be stored in the freezer",
+      "gold": { "mustMentionAny": ["bean", "stor"], "minProductCount": 0 }
+    },
+    {
+      "id": "spec-faq-003",
+      "size": "short",
+      "expectedIntent": "discovery",
+      "query": "how long do espresso beans stay fresh after roast",
+      "gold": { "mustMentionAny": ["roast", "fresh"], "minProductCount": 0 }
+    }
+  ]
+}

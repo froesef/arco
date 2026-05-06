@@ -2009,6 +2009,31 @@ const QUALITY_TONE = (score) => {
   return 'muted';
 };
 
+// Pairwise significance hint — flags model pairs whose 95% CIs overlap so the
+// reader doesn't over-interpret a tiny composite-score gap. Sorts by quality
+// descending; reports any pair where |meanA - meanB| <= ci95A + ci95B.
+function renderSignificanceHint(perModel) {
+  const ranked = perModel
+    .filter((m) => m.avgQuality != null && m.qualityCi95 != null && m.qualityN >= 2)
+    .slice()
+    .sort((a, b) => b.avgQuality - a.avgQuality);
+  if (ranked.length < 2) return '';
+  const overlaps = [];
+  for (let i = 0; i < ranked.length - 1; i += 1) {
+    const a = ranked[i];
+    const b = ranked[i + 1];
+    const delta = Math.abs(a.avgQuality - b.avgQuality);
+    const margin = (a.qualityCi95 || 0) + (b.qualityCi95 || 0);
+    if (delta <= margin) {
+      overlaps.push(`${esc(a.label)} vs ${esc(b.label)}: Δ=${delta.toFixed(2)}, CIs overlap (±${margin.toFixed(2)})`);
+    }
+  }
+  if (!overlaps.length) {
+    return '<p class="admin-muted admin-eval-significance">All pairwise composite gaps exceed the combined 95% CIs — rankings are statistically distinguishable.</p>';
+  }
+  return `<p class="admin-muted admin-eval-significance"><strong>Within noise:</strong> ${overlaps.join(' · ')}. Treat these as ties — increase suite size or judge passes per cell to separate them.</p>`;
+}
+
 const QUALITY_RUBRIC_HTML = `
   <details class="admin-eval-rubric">
     <summary>How is quality scored?</summary>
@@ -2034,6 +2059,13 @@ const QUALITY_RUBRIC_HTML = `
       <p class="admin-muted">
         The compact <code>4·5·3·4·5·3·4</code> notation under each cell shows the raw per-dimension scores
         in order: structure · intent · faithfulness · helpfulness · brand voice · specificity · visual.
+      </p>
+      <p class="admin-muted">
+        <strong>Blocker gate:</strong> a cell whose <em>faithfulness</em> or <em>structure</em> dimension scores
+        below 3, or whose deterministic assertions (broken tokens, unbalanced HTML, off-topic decline expected)
+        fail, has its composite capped at 2.50 and is tagged <span class="admin-eval-cell-blocker">⚠ blocker</span>.
+        The raw judge score is shown in parens for reference. The per-model summary reports a <em>Blocker rate</em>
+        — a high-quality cell average means little if 30% of generations are unshippable.
       </p>
     </div>
   </details>
@@ -2637,7 +2669,10 @@ async function renderEvaluation(root, evalRunId) {
       const dims = notes
         ? `<span class="admin-eval-cell-dims" title="structure / intent / faithfulness / helpfulness / brand voice / specificity / visual">${notes.structure?.score || '—'}·${notes.intent?.score || '—'}·${notes.faithfulness?.score || '—'}·${notes.helpfulness?.score || '—'}·${notes.brandVoice?.score || '—'}·${notes.specificity?.score || '—'}·${notes.visualAssetUsage?.score || '—'}</span>`
         : '';
-      return `<span class="admin-badge admin-badge-${tone}">${score.toFixed(2)}</span>${dims}`;
+      const raw = notes?.raw_score != null && notes.raw_score !== score
+        ? `<span class="admin-eval-cell-raw" title="raw judge score before blocker cap">(raw ${notes.raw_score.toFixed(2)})</span>`
+        : '';
+      return `<span class="admin-badge admin-badge-${tone}">${score.toFixed(2)}</span>${dims}${raw}`;
     }
     if (judgeError) {
       return `<span class="admin-error-text" title="${esc(judgeError)}">judge err</span>`;
@@ -2646,6 +2681,27 @@ async function renderEvaluation(root, evalRunId) {
       return '<span class="admin-error-text">gen err</span>';
     }
     return '<span class="admin-muted">…</span>';
+  };
+
+  const renderBlockerRow = (notes) => {
+    if (!notes) return '';
+    const isBlocker = notes.blocker === true;
+    const reasons = Array.isArray(notes.blocker_reasons) ? notes.blocker_reasons : [];
+    const violations = Array.isArray(notes.assertions?.violations)
+      ? notes.assertions.violations : [];
+    const blockerViolations = violations.filter((v) => v.severity === 'blocker');
+    const warnViolations = violations.filter((v) => v.severity === 'warn');
+    if (!isBlocker && !blockerViolations.length && !warnViolations.length) return '';
+    const tip = [...reasons, ...violations.map((v) => `${v.severity}: ${v.category} — ${v.message}`)]
+      .filter(Boolean).join(' · ');
+    if (isBlocker || blockerViolations.length) {
+      const blockerBadge = `<span class="admin-eval-cell-blocker" title="${esc(tip)}">⚠ blocker${blockerViolations.length ? ` (${blockerViolations.length})` : ''}</span>`;
+      return `<div class="admin-eval-cell-row admin-eval-cell-flags">${blockerBadge}</div>`;
+    }
+    if (warnViolations.length) {
+      return `<div class="admin-eval-cell-row admin-eval-cell-flags"><span class="admin-eval-cell-warn" title="${esc(tip)}">${warnViolations.length} warn</span></div>`;
+    }
+    return '';
   };
 
   const cellHtml = (cell, exp) => {
@@ -2660,7 +2716,10 @@ async function renderEvaluation(root, evalRunId) {
     const ttftLabel = cell.time_to_first_token_ms != null
       ? `TTFT ${dur(cell.time_to_first_token_ms)}`
       : 'TTFT —';
-    return `<td class="admin-eval-cell admin-eval-cell-${status}" data-experiment-id="${esc(exp.id)}" data-variant-id="${esc(cell.id)}">
+    const isBlocker = notes?.blocker === true;
+    const cellClasses = ['admin-eval-cell', `admin-eval-cell-${status}`];
+    if (isBlocker) cellClasses.push('admin-eval-cell-blocker-cell');
+    return `<td class="${cellClasses.join(' ')}" data-experiment-id="${esc(exp.id)}" data-variant-id="${esc(cell.id)}">
       <div class="admin-eval-cell-row admin-eval-cell-speed">
         <span class="admin-eval-cell-ttft">${ttftLabel}</span>
         <span class="admin-eval-cell-duration">${dur(cell.duration_ms)}</span>
@@ -2669,6 +2728,7 @@ async function renderEvaluation(root, evalRunId) {
       <div class="admin-eval-cell-row admin-eval-cell-quality">
         ${renderQualityCell(notes, score, tone, judgeError, status)}
       </div>
+      ${renderBlockerRow(notes)}
     </td>`;
   };
 
@@ -2701,17 +2761,32 @@ async function renderEvaluation(root, evalRunId) {
 
     ${summary?.perModel?.length
     ? `<section class="admin-card">
-        <h3>Per-model averages <span class="admin-muted admin-eval-score-hint">· quality scale 1.00 (worst) – 5.00 (best)</span></h3>
+        <h3>Per-model averages <span class="admin-muted admin-eval-score-hint">· quality scale 1.00 (worst) – 5.00 (best) · ± value is 95% CI half-width</span></h3>
+        ${renderSignificanceHint(summary.perModel)}
         <div class="admin-table-wrap"><table class="admin-table admin-eval-summary-table">
           <thead><tr>
             <th>Model</th><th>Quality</th>
             <th>Structure</th><th>Intent</th><th>Faithfulness</th><th>Helpfulness</th>
             <th>Brand voice</th><th>Specificity</th><th>Visual</th>
-            <th>Avg TTFT</th><th>Avg duration</th><th>Tok in</th><th>Tok out</th><th>Errors</th>
+            <th>Blockers</th><th>Avg TTFT</th><th>Avg duration</th>
+            <th>Tok in</th><th>Tok out</th><th>Errors</th>
           </tr></thead>
-          <tbody>${summary.perModel.map((m) => `<tr>
+          <tbody>${summary.perModel.map((m) => {
+    const qualityCell = m.avgQuality != null
+      ? `<span class="admin-badge admin-badge-${QUALITY_TONE(m.avgQuality)}">${m.avgQuality.toFixed(2)}</span>${m.qualityCi95 != null ? ` <span class="admin-muted admin-eval-ci">± ${m.qualityCi95.toFixed(2)}</span>` : ''}${m.qualityN ? ` <span class="admin-muted admin-eval-n">n=${m.qualityN}</span>` : ''}`
+      : '—';
+    const blockerCell = m.blockerCount > 0
+      ? `<span class="admin-eval-cell-blocker">${m.blockerCount} (${Math.round((m.blockerRate || 0) * 100)}%)</span>`
+      : '<span class="admin-muted">0</span>';
+    const ttftCell = m.avgTtftMs != null
+      ? `${dur(m.avgTtftMs)}${m.ttftCi95 != null ? ` <span class="admin-muted admin-eval-ci">± ${dur(m.ttftCi95)}</span>` : ''}`
+      : '—';
+    const durationCell = m.avgDurationMs != null
+      ? `${dur(m.avgDurationMs)}${m.durationCi95 != null ? ` <span class="admin-muted admin-eval-ci">± ${dur(m.durationCi95)}</span>` : ''}`
+      : '—';
+    return `<tr>
             <td><strong>${esc(m.label)}</strong><br><span class="admin-muted admin-mono">${esc(m.provider)} · ${esc(m.model)}</span></td>
-            <td>${m.avgQuality != null ? `<span class="admin-badge admin-badge-${QUALITY_TONE(m.avgQuality)}">${m.avgQuality.toFixed(2)}</span>` : '—'}</td>
+            <td>${qualityCell}</td>
             <td>${m.avgStructure != null ? m.avgStructure.toFixed(2) : '—'}</td>
             <td>${m.avgIntent != null ? m.avgIntent.toFixed(2) : '—'}</td>
             <td>${m.avgFaithfulness != null ? m.avgFaithfulness.toFixed(2) : '—'}</td>
@@ -2719,12 +2794,14 @@ async function renderEvaluation(root, evalRunId) {
             <td>${m.avgBrandVoice != null ? m.avgBrandVoice.toFixed(2) : '—'}</td>
             <td>${m.avgSpecificity != null ? m.avgSpecificity.toFixed(2) : '—'}</td>
             <td>${m.avgVisualAssetUsage != null ? m.avgVisualAssetUsage.toFixed(2) : '—'}</td>
-            <td>${m.avgTtftMs != null ? dur(m.avgTtftMs) : '—'}</td>
-            <td>${m.avgDurationMs != null ? dur(m.avgDurationMs) : '—'}</td>
+            <td>${blockerCell}</td>
+            <td>${ttftCell}</td>
+            <td>${durationCell}</td>
             <td>${fmtInt(m.inputTokens || 0)}</td>
             <td>${fmtInt(m.outputTokens || 0)}</td>
             <td>${m.errors > 0 ? `<span class="admin-error-text">${m.errors}</span>` : '0'}</td>
-          </tr>`).join('')}</tbody>
+          </tr>`;
+  }).join('')}</tbody>
         </table></div>
       </section>`
     : ''}

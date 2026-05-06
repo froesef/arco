@@ -27,6 +27,25 @@ import { getSuite } from './suites.js';
 import {
   judgeVariant, isValidJudgeModel, getJudgeRates, JUDGE_MODELS,
 } from './judge.js';
+import { runAssertions } from './assertions.js';
+
+const BLOCKER_COMPOSITE_CAP = 2.5;
+const FAITHFULNESS_GATE = 3;
+const STRUCTURE_GATE = 3;
+
+function applyBlockerGate(rawScore, dims, assertions) {
+  const reasons = [];
+  if (assertions && !assertions.passed) reasons.push('assertions-failed');
+  if ((dims?.faithfulness?.score || 0) > 0 && dims.faithfulness.score < FAITHFULNESS_GATE) {
+    reasons.push(`faithfulness<${FAITHFULNESS_GATE}`);
+  }
+  if ((dims?.structure?.score || 0) > 0 && dims.structure.score < STRUCTURE_GATE) {
+    reasons.push(`structure<${STRUCTURE_GATE}`);
+  }
+  if (!reasons.length) return { gatedScore: rawScore, blocker: false, reasons: [] };
+  const gatedScore = Math.min(rawScore, BLOCKER_COMPOSITE_CAP);
+  return { gatedScore, blocker: true, reasons };
+}
 
 const VARIANT_KV_TTL = 60 * 60 * 24 * 90; // 90 days
 const JUDGE_CONCURRENCY = 4;
@@ -211,13 +230,13 @@ async function finalizeExperimentRow(db, expId, status, sharedDurationMs) {
   `).bind(status, Date.now(), sharedDurationMs, expId).run();
 }
 
-async function writeVariantJudgeResult(db, variantId, judgement) {
+async function writeVariantJudgeResult(db, variantId, judgement, assertions, blockerInfo) {
   await db.prepare(`
     UPDATE experiment_variants
     SET evaluator_score = ?1, evaluator_notes = ?2
     WHERE id = ?3
   `).bind(
-    judgement.score ?? null,
+    blockerInfo.gatedScore ?? judgement.score ?? null,
     JSON.stringify({
       judge_model: judgement.judgeModel,
       judge_input_tokens: judgement.inputTokens,
@@ -230,6 +249,27 @@ async function writeVariantJudgeResult(db, variantId, judgement) {
       brandVoice: judgement.dims.brandVoice,
       specificity: judgement.dims.specificity,
       visualAssetUsage: judgement.dims.visualAssetUsage,
+      raw_score: judgement.score,
+      blocker: blockerInfo.blocker,
+      blocker_reasons: blockerInfo.reasons,
+      assertions: assertions || null,
+    }),
+    variantId,
+  ).run();
+}
+
+async function writeVariantAssertionsOnly(db, variantId, assertions, blockerInfo) {
+  // For variants where the judge couldn't run (gen error etc.), still persist
+  // assertion results so the matrix can show structural problems.
+  await db.prepare(`
+    UPDATE experiment_variants
+    SET evaluator_notes = ?1
+    WHERE id = ?2
+  `).bind(
+    JSON.stringify({
+      assertions,
+      blocker: blockerInfo.blocker,
+      blocker_reasons: blockerInfo.reasons,
     }),
     variantId,
   ).run();
@@ -525,14 +565,40 @@ async function runOneQuery({
     }));
   }
 
+  // Deterministic assertions — run on every completed variant before the judge.
+  // Cheap, perfectly reliable, no token cost. Catches structural defects the
+  // judge often misses (broken {{story:slug}} tokens, unbalanced HTML, etc.).
+  const assertionsByVariant = new Map();
+  await Promise.all(variants.map(async (v) => {
+    if (v.status !== 'complete' || !v.state.sections.length) return;
+    const blocks = v.state.sections.map((html, i) => ({
+      index: i,
+      blockType: v.state.rawJsonSections?.[i]?.block || 'unknown',
+      html,
+    }));
+    const assertions = runAssertions(blocks, queryDef);
+    assertionsByVariant.set(v.id, assertions);
+    await writeLine({
+      type: 'assertions-done',
+      queryId: queryDef.id,
+      experimentId,
+      variantId: v.id,
+      passed: assertions.passed,
+      counts: assertions.counts,
+      violations: assertions.violations,
+    });
+  }));
+
   // Judge — concurrency-limited, only completed variants.
   const judgeable = variants.filter((v) => v.status === 'complete' && v.state.sections.length > 0);
   const judgements = await runWithConcurrency(judgeable, JUDGE_CONCURRENCY, async (v) => {
+    const assertions = assertionsByVariant.get(v.id) || null;
     try {
       const result = await judgeVariant(env, {
         judgeModel,
         query,
         expectedIntent: queryDef.expectedIntent || null,
+        expectedBehavior: queryDef.expectedBehavior || null,
         classifiedIntent: intentType,
         journeyStage,
         rag: ctx.rag || {},
@@ -542,15 +608,19 @@ async function runOneQuery({
           html,
         })),
       });
+      const blockerInfo = applyBlockerGate(result.score, result.dims, assertions);
       if (env.SESSIONS_DB) {
-        await writeVariantJudgeResult(env.SESSIONS_DB, v.id, result);
+        await writeVariantJudgeResult(env.SESSIONS_DB, v.id, result, assertions, blockerInfo);
       }
       await writeLine({
         type: 'judge-done',
         queryId: queryDef.id,
         experimentId,
         variantId: v.id,
-        score: result.score,
+        score: blockerInfo.gatedScore,
+        rawScore: result.score,
+        blocker: blockerInfo.blocker,
+        blockerReasons: blockerInfo.reasons,
         summary: result.summary,
         dims: result.dims,
         judgeModel: result.judgeModel,
@@ -558,12 +628,23 @@ async function runOneQuery({
         judgeOutputTokens: result.outputTokens,
         judgeDurationMs: result.durationMs,
       });
-      return result;
+      return { ...result, gatedScore: blockerInfo.gatedScore, blocker: blockerInfo.blocker };
     } catch (err) {
       const message = err.message || 'judge failed';
       console.error(`[Eval] judge failed (${v.id}):`, message);
       if (env.SESSIONS_DB) {
         try { await writeVariantJudgeError(env.SESSIONS_DB, v.id, message); } catch { /* ignore */ }
+      }
+      // Still persist assertion findings so the cell can show structural blockers
+      // even when the judge couldn't grade.
+      if (assertions && env.SESSIONS_DB) {
+        const blockerInfo = {
+          blocker: !assertions.passed,
+          reasons: assertions.passed ? [] : ['assertions-failed'],
+        };
+        try {
+          await writeVariantAssertionsOnly(env.SESSIONS_DB, v.id, assertions, blockerInfo);
+        } catch { /* ignore */ }
       }
       await writeLine({
         type: 'judge-error',
@@ -769,6 +850,36 @@ function parseEvalNotes(notesJson) {
   try { return JSON.parse(notesJson); } catch { return null; }
 }
 
+function round2(n) {
+  return Math.round(n * 100) / 100;
+}
+
+// Standard error of the mean and 95% confidence half-width using a normal
+// approximation (z=1.96). Adequate for n≥30; for smaller n we still report it
+// — it widens with small samples, which is the desired signal.
+function meanCi(values) {
+  const n = values.length;
+  if (n === 0) {
+    return {
+      mean: null, sem: null, ci95: null, n: 0,
+    };
+  }
+  const mean = values.reduce((a, b) => a + b, 0) / n;
+  if (n < 2) {
+    return {
+      mean: round2(mean), sem: null, ci95: null, n,
+    };
+  }
+  const variance = values.reduce((acc, v) => acc + (v - mean) ** 2, 0) / (n - 1);
+  const sem = Math.sqrt(variance / n);
+  return {
+    mean: round2(mean),
+    sem: round2(sem),
+    ci95: round2(1.96 * sem),
+    n,
+  };
+}
+
 function buildSummaryFromD1(models, experiments, variants) {
   const expById = new Map(experiments.map((e) => [e.id, e]));
   const perModel = new Map();
@@ -779,21 +890,21 @@ function buildSummaryFromD1(models, experiments, variants) {
       model: m.model,
       label: m.label,
       generations: 0,
-      ttftSum: 0,
-      ttftCount: 0,
-      durationSum: 0,
-      durationCount: 0,
+      qualityValues: [],
+      structureValues: [],
+      intentValues: [],
+      faithfulnessValues: [],
+      helpfulnessValues: [],
+      brandVoiceValues: [],
+      specificityValues: [],
+      visualAssetUsageValues: [],
+      ttftValues: [],
+      durationValues: [],
       inputTokenSum: 0,
       outputTokenSum: 0,
-      qualitySum: 0,
-      qualityCount: 0,
-      structureSum: 0,
-      intentSum: 0,
-      faithfulnessSum: 0,
-      helpfulnessSum: 0,
-      brandVoiceSum: 0,
-      specificitySum: 0,
-      visualAssetUsageSum: 0,
+      blockerCount: 0,
+      assertionFailCount: 0,
+      assertionGradedCount: 0,
       errors: 0,
     });
   });
@@ -813,59 +924,69 @@ function buildSummaryFromD1(models, experiments, variants) {
       bucket.errors += 1;
       return;
     }
-    if (v.time_to_first_token_ms != null) {
-      bucket.ttftSum += v.time_to_first_token_ms;
-      bucket.ttftCount += 1;
-    }
-    if (v.duration_ms != null) {
-      bucket.durationSum += v.duration_ms;
-      bucket.durationCount += 1;
-    }
+    if (v.time_to_first_token_ms != null) bucket.ttftValues.push(v.time_to_first_token_ms);
+    if (v.duration_ms != null) bucket.durationValues.push(v.duration_ms);
     bucket.inputTokenSum += v.input_tokens || 0;
     bucket.outputTokenSum += v.output_tokens || 0;
     totalInputTokens += v.input_tokens || 0;
     totalOutputTokens += v.output_tokens || 0;
 
     const notes = parseEvalNotes(v.evaluator_notes);
+    if (notes?.assertions) {
+      bucket.assertionGradedCount += 1;
+      if (notes.assertions.passed === false) bucket.assertionFailCount += 1;
+    }
+    if (notes?.blocker) bucket.blockerCount += 1;
     if (notes && !notes.judge_error && v.evaluator_score != null) {
-      bucket.qualitySum += v.evaluator_score;
-      bucket.qualityCount += 1;
-      bucket.structureSum += notes.structure?.score || 0;
-      bucket.intentSum += notes.intent?.score || 0;
-      bucket.faithfulnessSum += notes.faithfulness?.score || 0;
-      bucket.helpfulnessSum += notes.helpfulness?.score || 0;
-      bucket.brandVoiceSum += notes.brandVoice?.score || 0;
-      bucket.specificitySum += notes.specificity?.score || 0;
-      bucket.visualAssetUsageSum += notes.visualAssetUsage?.score || 0;
+      bucket.qualityValues.push(v.evaluator_score);
+      if (notes.structure?.score) bucket.structureValues.push(notes.structure.score);
+      if (notes.intent?.score) bucket.intentValues.push(notes.intent.score);
+      if (notes.faithfulness?.score) bucket.faithfulnessValues.push(notes.faithfulness.score);
+      if (notes.helpfulness?.score) bucket.helpfulnessValues.push(notes.helpfulness.score);
+      if (notes.brandVoice?.score) bucket.brandVoiceValues.push(notes.brandVoice.score);
+      if (notes.specificity?.score) bucket.specificityValues.push(notes.specificity.score);
+      if (notes.visualAssetUsage?.score) {
+        bucket.visualAssetUsageValues.push(notes.visualAssetUsage.score);
+      }
       judgeInputTokens += notes.judge_input_tokens || 0;
       judgeOutputTokens += notes.judge_output_tokens || 0;
     }
   });
 
-  const summary = [...perModel.values()].map((b) => ({
-    provider: b.provider,
-    model: b.model,
-    label: b.label,
-    generations: b.generations,
-    errors: b.errors,
-    avgTtftMs: b.ttftCount ? Math.round(b.ttftSum / b.ttftCount) : null,
-    avgDurationMs: b.durationCount ? Math.round(b.durationSum / b.durationCount) : null,
-    inputTokens: b.inputTokenSum,
-    outputTokens: b.outputTokenSum,
-    avgQuality: b.qualityCount ? Math.round((b.qualitySum / b.qualityCount) * 100) / 100 : null,
-    avgStructure: b.qualityCount ? Math.round((b.structureSum / b.qualityCount) * 100) / 100 : null,
-    avgIntent: b.qualityCount ? Math.round((b.intentSum / b.qualityCount) * 100) / 100 : null,
-    avgFaithfulness: b.qualityCount
-      ? Math.round((b.faithfulnessSum / b.qualityCount) * 100) / 100 : null,
-    avgHelpfulness: b.qualityCount
-      ? Math.round((b.helpfulnessSum / b.qualityCount) * 100) / 100 : null,
-    avgBrandVoice: b.qualityCount
-      ? Math.round((b.brandVoiceSum / b.qualityCount) * 100) / 100 : null,
-    avgSpecificity: b.qualityCount
-      ? Math.round((b.specificitySum / b.qualityCount) * 100) / 100 : null,
-    avgVisualAssetUsage: b.qualityCount
-      ? Math.round((b.visualAssetUsageSum / b.qualityCount) * 100) / 100 : null,
-  }));
+  const summary = [...perModel.values()].map((b) => {
+    const quality = meanCi(b.qualityValues);
+    const ttft = meanCi(b.ttftValues);
+    const duration = meanCi(b.durationValues);
+    const blockerRate = b.generations
+      ? round2((b.blockerCount / b.generations) * 100) / 100 : null;
+    return {
+      provider: b.provider,
+      model: b.model,
+      label: b.label,
+      generations: b.generations,
+      errors: b.errors,
+      avgTtftMs: ttft.mean != null ? Math.round(ttft.mean) : null,
+      ttftCi95: ttft.ci95 != null ? Math.round(ttft.ci95) : null,
+      avgDurationMs: duration.mean != null ? Math.round(duration.mean) : null,
+      durationCi95: duration.ci95 != null ? Math.round(duration.ci95) : null,
+      inputTokens: b.inputTokenSum,
+      outputTokens: b.outputTokenSum,
+      avgQuality: quality.mean,
+      qualityCi95: quality.ci95,
+      qualityN: quality.n,
+      avgStructure: meanCi(b.structureValues).mean,
+      avgIntent: meanCi(b.intentValues).mean,
+      avgFaithfulness: meanCi(b.faithfulnessValues).mean,
+      avgHelpfulness: meanCi(b.helpfulnessValues).mean,
+      avgBrandVoice: meanCi(b.brandVoiceValues).mean,
+      avgSpecificity: meanCi(b.specificityValues).mean,
+      avgVisualAssetUsage: meanCi(b.visualAssetUsageValues).mean,
+      blockerCount: b.blockerCount,
+      blockerRate,
+      assertionFailCount: b.assertionFailCount,
+      assertionGradedCount: b.assertionGradedCount,
+    };
+  });
 
   return {
     perModel: summary,

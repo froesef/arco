@@ -55,6 +55,8 @@ export function getJudgeRates(id) {
 }
 
 const MAX_BLOCK_CHARS = 24_000; // ~6k tokens of generated HTML; truncates long pages.
+// ~1.5k tokens of RAG context — enough for prices+specs without crowding blocks.
+const MAX_RAG_CHARS = 6_000;
 const MAX_RETRIES = 3;
 const RETRY_BASE_MS = 800;
 
@@ -71,20 +73,60 @@ const RUBRIC = `Score on each dimension 1-5 (1=poor, 5=excellent) with one short
 Respond with JSON only, no preamble. Schema:
 {"structure":{"score":N,"reasoning":"..."},"intent":{"score":N,"reasoning":"..."},"faithfulness":{"score":N,"reasoning":"..."},"helpfulness":{"score":N,"reasoning":"..."},"brandVoice":{"score":N,"reasoning":"..."},"specificity":{"score":N,"reasoning":"..."},"visualAssetUsage":{"score":N,"reasoning":"..."}}`;
 
+function topSpecLines(specs) {
+  if (!specs || typeof specs !== 'object') return [];
+  // Pick the human-meaningful ones the judge actually needs to verify against.
+  const preferred = ['boilers', 'pumpType', 'groupHead', 'pidControl', 'heatUpTime', 'waterSource'];
+  return preferred
+    .filter((key) => specs[key] !== undefined && specs[key] !== null && specs[key] !== '')
+    .slice(0, 4)
+    .map((key) => `${key}=${specs[key]}`);
+}
+
 function summarizeRagContext(ctx) {
   const products = (ctx?.rag?.products || []).slice(0, 12).map((p) => {
-    const price = p.price != null ? ` $${p.price}` : '';
-    return `${p.id || p.sku || ''} ${p.name || ''}${price}`.trim();
+    const id = p.id || p.sku || '';
+    const name = p.name || '';
+    const price = p.price != null ? `$${p.price}` : '';
+    const url = p.url || '';
+    const tagline = p.tagline ? ` — ${p.tagline}` : '';
+    const specLines = topSpecLines(p.specs);
+    const specSuffix = specLines.length ? ` [${specLines.join(', ')}]` : '';
+    return `${id} · ${name} ${price}${tagline}${specSuffix} ${url ? `(${url})` : ''}`.trim();
   });
-  const features = (ctx?.rag?.features || []).slice(0, 10).map((f) => f.name).filter(Boolean);
-  const recipes = (ctx?.rag?.recipes || []).slice(0, 8).map((r) => r.name).filter(Boolean);
+  const features = (ctx?.rag?.features || []).slice(0, 10).map((f) => {
+    const name = f.name || f.title || '';
+    const desc = f.description || f.summary || '';
+    const trimmed = desc ? ` — ${String(desc).slice(0, 120)}` : '';
+    return `${name}${trimmed}`.trim();
+  }).filter(Boolean);
+  const recipes = (ctx?.rag?.recipes || []).slice(0, 8).map((r) => {
+    const name = r.name || '';
+    const url = r.url || (r.id ? `/recipes/${r.id}` : '');
+    return url ? `${name} (${url})` : name;
+  }).filter(Boolean);
   const faqs = (ctx?.rag?.faqs || []).slice(0, 6).map((f) => f.question || f.q).filter(Boolean);
+  const stories = (ctx?.rag?.stories || []).slice(0, 6).map((s) => {
+    const slug = s.slug || s.id || '';
+    return slug ? `{{story:${slug}}}` : '';
+  }).filter(Boolean);
+  const experiences = (ctx?.rag?.experiences || []).slice(0, 6).map((e) => {
+    const slug = e.slug || e.id || '';
+    return slug ? `{{experience:${slug}}}` : '';
+  }).filter(Boolean);
   return {
     products: products.length ? products : ['(none)'],
     features: features.length ? features : ['(none)'],
     recipes: recipes.length ? recipes : ['(none)'],
     faqs: faqs.length ? faqs : ['(none)'],
+    stories: stories.length ? stories : ['(none)'],
+    experiences: experiences.length ? experiences : ['(none)'],
   };
+}
+
+function clipContextString(text, max) {
+  if (text.length <= max) return text;
+  return `${text.slice(0, max)}\n…[RAG context truncated at ${max} chars]`;
 }
 
 function clipBlocks(blocks) {
@@ -101,6 +143,7 @@ function clipBlocks(blocks) {
 function buildJudgePrompt({
   query,
   expectedIntent,
+  expectedBehavior,
   classifiedIntent,
   journeyStage,
   rag,
@@ -111,19 +154,31 @@ function buildJudgePrompt({
   const intentLine = expectedIntent
     ? `Expected intent: ${expectedIntent}\nClassified intent: ${classifiedIntent || '(none)'}`
     : `Classified intent: ${classifiedIntent || '(none)'}`;
+  const behaviorLine = expectedBehavior === 'decline'
+    ? '\nExpected behavior: DECLINE — query is off-topic for a specialty-coffee assistant. The page should explain that the assistant is focused on coffee and not surface unrelated product recommendations. A page that confidently force-fits the off-topic query MUST score low on intent and faithfulness.'
+    : '';
 
-  return `You are evaluating an AI-generated coffee-discovery webpage produced by a recommender system. Score the page on four dimensions, each 1-5.
+  const ragBlock = clipContextString(
+    [
+      `- Products (id · name · price · tagline · key specs · url): ${ctxSummary.products.join(' || ')}`,
+      `- Features: ${ctxSummary.features.join(' || ')}`,
+      `- Recipes: ${ctxSummary.recipes.join('; ')}`,
+      `- FAQs: ${ctxSummary.faqs.join(' || ')}`,
+      `- Story tokens available: ${ctxSummary.stories.join(', ')}`,
+      `- Experience tokens available: ${ctxSummary.experiences.join(', ')}`,
+    ].join('\n'),
+    MAX_RAG_CHARS,
+  );
+
+  return `You are evaluating an AI-generated coffee-discovery webpage produced by a recommender system. Score the page on seven dimensions, each 1-5.
 
 INPUT
 User query: "${query}"
-${intentLine}
+${intentLine}${behaviorLine}
 Journey stage: ${journeyStage || '(none)'}
 
-RAG CONTEXT (the only sources of truth available at generation time):
-- Products: ${ctxSummary.products.join('; ')}
-- Features: ${ctxSummary.features.join('; ')}
-- Recipes: ${ctxSummary.recipes.join('; ')}
-- FAQs: ${ctxSummary.faqs.join('; ')}
+RAG CONTEXT (the ONLY sources of truth available at generation time — any product, price, spec, story slug, or experience slug NOT in this list is hallucinated and must be penalized on faithfulness):
+${ragBlock}
 
 GENERATED PAGE BLOCKS${truncated ? ' (truncated)' : ''}:
 ${blocksText}
@@ -218,6 +273,8 @@ async function callWithRetry(args) {
  *   - judgeModel: string (id from JUDGE_MODELS)
  *   - query: string
  *   - expectedIntent: string|null
+ *   - expectedBehavior: 'decline'|null — when set to 'decline', the judge is told
+ *     the query is off-topic and must score force-fit pages low.
  *   - classifiedIntent: string|null
  *   - journeyStage: string|null
  *   - rag: object
