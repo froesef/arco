@@ -354,13 +354,16 @@ Per-variant full NDJSON payloads (blocks, suggestions, debug snapshot, prompt, r
 
 **Speed metrics** (per cell, no extra cost) — TTFT, total duration, tokens/sec. Captured during the existing streaming generation; surfaced from `experiment_variants.time_to_first_token_ms` and `duration_ms`.
 
-**Quality metrics** (per cell, costs Anthropic tokens) — Claude scores the generated page on four dimensions, each 1–5:
+**Quality metrics** (per cell, costs Anthropic tokens) — Claude scores the generated page on seven dimensions, each 1–5:
 - *structure* — well-formed EDS blocks, required sections present
 - *intent* — does the page actually answer the query?
 - *faithfulness* — products / prices / specs grounded in the RAG context (no hallucinated SKUs)
 - *helpfulness* — editorial polish, tone, useful next steps
+- *brandVoice* — sounds like a knowledgeable, approachable specialty-coffee brand; penalizes generic AI filler and clichés
+- *specificity* — concrete coffee details (grams, ratios, temps, grind sizes, named techniques) instead of vague generalities
+- *visualAssetUsage* — hero image present, story / experience / product image tokens placed where they aid the reader, no missing assets
 
-The composite score (mean of the four) lives in `experiment_variants.evaluator_score`. Per-dimension reasoning, judge model, and judge token counts live as JSON in `experiment_variants.evaluator_notes`.
+The composite score (mean of the seven) lives in `experiment_variants.evaluator_score`. Per-dimension reasoning, judge model, and judge token counts live as JSON in `experiment_variants.evaluator_notes`.
 
 **Run-level data** (migration `0006_evaluations.sql`):
 

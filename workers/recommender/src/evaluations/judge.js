@@ -64,9 +64,12 @@ const RUBRIC = `Score on each dimension 1-5 (1=poor, 5=excellent) with one short
 2. intent: Does the page actually answer the user's query? Does the focus match the expected intent?
 3. faithfulness: Are products, prices, specs, and claims grounded in the RAG context provided? Penalize hallucinated SKUs, prices, links, or specs that aren't in the context.
 4. helpfulness: Editorial quality - tone, hierarchy, prose flow, useful next steps. Would a real shopper find this trustworthy and useful?
+5. brandVoice: Does the prose sound like a knowledgeable, approachable specialty-coffee brand (Arco)? Penalize generic AI-sounding filler, clichés ("In today's fast-paced world…"), overly salesy hype, or stiff/academic tone.
+6. specificity: Does it use concrete coffee details — grams, ratios, temperatures, grind sizes, named techniques, named beans/origins — instead of vague generalities like "use a good amount" or "the right grind"? Score on the density and accuracy of useful specifics for the query type.
+7. visualAssetUsage: Are images and visual assets used well? Hero image present and on-topic; product image tokens / story / experience tokens (e.g. {{story:slug}}, {{experience:slug}}) placed where they aid the reader; no missing or obviously broken assets.
 
 Respond with JSON only, no preamble. Schema:
-{"structure":{"score":N,"reasoning":"..."},"intent":{"score":N,"reasoning":"..."},"faithfulness":{"score":N,"reasoning":"..."},"helpfulness":{"score":N,"reasoning":"..."}}`;
+{"structure":{"score":N,"reasoning":"..."},"intent":{"score":N,"reasoning":"..."},"faithfulness":{"score":N,"reasoning":"..."},"helpfulness":{"score":N,"reasoning":"..."},"brandVoice":{"score":N,"reasoning":"..."},"specificity":{"score":N,"reasoning":"..."},"visualAssetUsage":{"score":N,"reasoning":"..."}}`;
 
 function summarizeRagContext(ctx) {
   const products = (ctx?.rag?.products || []).slice(0, 12).map((p) => {
@@ -146,8 +149,18 @@ function clampDim(dim) {
   return { score, reasoning };
 }
 
+const DIMENSION_KEYS = [
+  'structure',
+  'intent',
+  'faithfulness',
+  'helpfulness',
+  'brandVoice',
+  'specificity',
+  'visualAssetUsage',
+];
+
 function compositeScore(dims) {
-  const scores = ['structure', 'intent', 'faithfulness', 'helpfulness']
+  const scores = DIMENSION_KEYS
     .map((k) => dims[k]?.score)
     .filter((s) => typeof s === 'number' && s > 0);
   if (!scores.length) return 0;
@@ -239,9 +252,12 @@ export async function judgeVariant(env, args) {
     intent: clampDim(parsed.intent),
     faithfulness: clampDim(parsed.faithfulness),
     helpfulness: clampDim(parsed.helpfulness),
+    brandVoice: clampDim(parsed.brandVoice),
+    specificity: clampDim(parsed.specificity),
+    visualAssetUsage: clampDim(parsed.visualAssetUsage),
   };
   const score = compositeScore(dims);
-  const summary = `${dims.structure.score}·${dims.intent.score}·${dims.faithfulness.score}·${dims.helpfulness.score}`;
+  const summary = DIMENSION_KEYS.map((k) => dims[k].score || '—').join('·');
 
   return {
     dims,

@@ -227,6 +227,9 @@ async function writeVariantJudgeResult(db, variantId, judgement) {
       intent: judgement.dims.intent,
       faithfulness: judgement.dims.faithfulness,
       helpfulness: judgement.dims.helpfulness,
+      brandVoice: judgement.dims.brandVoice,
+      specificity: judgement.dims.specificity,
+      visualAssetUsage: judgement.dims.visualAssetUsage,
     }),
     variantId,
   ).run();
@@ -788,6 +791,9 @@ function buildSummaryFromD1(models, experiments, variants) {
       intentSum: 0,
       faithfulnessSum: 0,
       helpfulnessSum: 0,
+      brandVoiceSum: 0,
+      specificitySum: 0,
+      visualAssetUsageSum: 0,
       errors: 0,
     });
   });
@@ -828,6 +834,9 @@ function buildSummaryFromD1(models, experiments, variants) {
       bucket.intentSum += notes.intent?.score || 0;
       bucket.faithfulnessSum += notes.faithfulness?.score || 0;
       bucket.helpfulnessSum += notes.helpfulness?.score || 0;
+      bucket.brandVoiceSum += notes.brandVoice?.score || 0;
+      bucket.specificitySum += notes.specificity?.score || 0;
+      bucket.visualAssetUsageSum += notes.visualAssetUsage?.score || 0;
       judgeInputTokens += notes.judge_input_tokens || 0;
       judgeOutputTokens += notes.judge_output_tokens || 0;
     }
@@ -850,6 +859,12 @@ function buildSummaryFromD1(models, experiments, variants) {
       ? Math.round((b.faithfulnessSum / b.qualityCount) * 100) / 100 : null,
     avgHelpfulness: b.qualityCount
       ? Math.round((b.helpfulnessSum / b.qualityCount) * 100) / 100 : null,
+    avgBrandVoice: b.qualityCount
+      ? Math.round((b.brandVoiceSum / b.qualityCount) * 100) / 100 : null,
+    avgSpecificity: b.qualityCount
+      ? Math.round((b.specificitySum / b.qualityCount) * 100) / 100 : null,
+    avgVisualAssetUsage: b.qualityCount
+      ? Math.round((b.visualAssetUsageSum / b.qualityCount) * 100) / 100 : null,
   }));
 
   return {

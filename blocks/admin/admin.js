@@ -2013,7 +2013,7 @@ const QUALITY_RUBRIC_HTML = `
   <details class="admin-eval-rubric">
     <summary>How is quality scored?</summary>
     <div class="admin-eval-rubric-body">
-      <p>Claude grades each generation on four dimensions, each <strong>1–5</strong>
+      <p>Claude grades each generation on seven dimensions, each <strong>1–5</strong>
         (1 = poor, 5 = excellent). The cell score is the unweighted mean — so the
         composite ranges from <strong>1.00 (worst)</strong> to <strong>5.00 (best)</strong>.</p>
       <ul class="admin-eval-rubric-list">
@@ -2021,6 +2021,9 @@ const QUALITY_RUBRIC_HTML = `
         <li><strong>Intent</strong> — does the page actually answer the query and match the classified intent?</li>
         <li><strong>Faithfulness</strong> — products, prices, and specs grounded in the RAG context (no hallucinated SKUs or prices).</li>
         <li><strong>Helpfulness</strong> — editorial polish, tone, hierarchy, useful next steps.</li>
+        <li><strong>Brand voice</strong> — sounds like a knowledgeable, approachable specialty-coffee brand. Penalizes generic AI filler and clichés.</li>
+        <li><strong>Specificity</strong> — concrete coffee details (grams, ratios, temps, grind sizes, named techniques) instead of vague generalities.</li>
+        <li><strong>Visual / asset usage</strong> — hero present, product / story / experience tokens placed where they aid the reader, no missing assets.</li>
       </ul>
       <p class="admin-eval-rubric-legend">
         Color guide:
@@ -2029,8 +2032,8 @@ const QUALITY_RUBRIC_HTML = `
         <span class="admin-badge admin-badge-muted">&lt; 3.00 weak</span>
       </p>
       <p class="admin-muted">
-        The compact <code>4·5·3·4</code> notation under each cell shows the raw per-dimension scores
-        in order: structure · intent · faithfulness · helpfulness.
+        The compact <code>4·5·3·4·5·3·4</code> notation under each cell shows the raw per-dimension scores
+        in order: structure · intent · faithfulness · helpfulness · brand voice · specificity · visual.
       </p>
     </div>
   </details>
@@ -2215,8 +2218,9 @@ async function renderEvaluationsList(root) {
     </div>
     <p class="admin-muted admin-experiments-hint">
       Run a fixed coffee query suite across multiple LLMs and let Claude score each
-      generation on structure, intent alignment, RAG faithfulness, and helpfulness.
-      Speed metrics (TTFT, total duration, tokens/sec) come for free from each run.
+      generation on seven dimensions: structure, intent alignment, RAG faithfulness,
+      helpfulness, brand voice, specificity, and visual / asset usage. Speed metrics
+      (TTFT, total duration, tokens/sec) come for free from each run.
     </p>
     <div class="admin-stats">
       <span class="admin-stat"><span class="admin-stat-value">${total}</span><span class="admin-stat-label">runs</span></span>
@@ -2368,7 +2372,7 @@ async function renderEvaluationCreateForm(root) {
         </div>
 
         <h3>3. Judge</h3>
-        <p class="admin-muted">Claude scores each generation 1–5 on four dimensions; the cell score is the mean (range 1.00–5.00). Cost depends on the model and the suite size.</p>
+        <p class="admin-muted">Claude scores each generation 1–5 on seven dimensions (structure, intent, faithfulness, helpfulness, brand voice, specificity, visual/asset usage); the cell score is the mean (range 1.00–5.00). Cost depends on the model and the suite size.</p>
         <label class="admin-field">
           <span>Judge model</span>
           <select name="judgeModel" required>
@@ -2631,7 +2635,7 @@ async function renderEvaluation(root, evalRunId) {
   const renderQualityCell = (notes, score, tone, judgeError, status) => {
     if (score != null) {
       const dims = notes
-        ? `<span class="admin-eval-cell-dims" title="structure / intent / faithfulness / helpfulness">${notes.structure?.score || '—'}·${notes.intent?.score || '—'}·${notes.faithfulness?.score || '—'}·${notes.helpfulness?.score || '—'}</span>`
+        ? `<span class="admin-eval-cell-dims" title="structure / intent / faithfulness / helpfulness / brand voice / specificity / visual">${notes.structure?.score || '—'}·${notes.intent?.score || '—'}·${notes.faithfulness?.score || '—'}·${notes.helpfulness?.score || '—'}·${notes.brandVoice?.score || '—'}·${notes.specificity?.score || '—'}·${notes.visualAssetUsage?.score || '—'}</span>`
         : '';
       return `<span class="admin-badge admin-badge-${tone}">${score.toFixed(2)}</span>${dims}`;
     }
@@ -2702,6 +2706,7 @@ async function renderEvaluation(root, evalRunId) {
           <thead><tr>
             <th>Model</th><th>Quality</th>
             <th>Structure</th><th>Intent</th><th>Faithfulness</th><th>Helpfulness</th>
+            <th>Brand voice</th><th>Specificity</th><th>Visual</th>
             <th>Avg TTFT</th><th>Avg duration</th><th>Tok in</th><th>Tok out</th><th>Errors</th>
           </tr></thead>
           <tbody>${summary.perModel.map((m) => `<tr>
@@ -2711,6 +2716,9 @@ async function renderEvaluation(root, evalRunId) {
             <td>${m.avgIntent != null ? m.avgIntent.toFixed(2) : '—'}</td>
             <td>${m.avgFaithfulness != null ? m.avgFaithfulness.toFixed(2) : '—'}</td>
             <td>${m.avgHelpfulness != null ? m.avgHelpfulness.toFixed(2) : '—'}</td>
+            <td>${m.avgBrandVoice != null ? m.avgBrandVoice.toFixed(2) : '—'}</td>
+            <td>${m.avgSpecificity != null ? m.avgSpecificity.toFixed(2) : '—'}</td>
+            <td>${m.avgVisualAssetUsage != null ? m.avgVisualAssetUsage.toFixed(2) : '—'}</td>
             <td>${m.avgTtftMs != null ? dur(m.avgTtftMs) : '—'}</td>
             <td>${m.avgDurationMs != null ? dur(m.avgDurationMs) : '—'}</td>
             <td>${fmtInt(m.inputTokens || 0)}</td>

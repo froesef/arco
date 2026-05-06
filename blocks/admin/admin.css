@@ -2156,6 +2156,7 @@
 }
 
 .admin .admin-eval-cell-quality {
+  flex-wrap: wrap;
   font-weight: 600;
 }
 
@@ -2164,6 +2165,7 @@
   font-weight: 400;
   color: var(--secondary-color, #777);
   font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 
 .admin .admin-eval-preview-meta {
