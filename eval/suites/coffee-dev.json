@@ -1,0 +1,26 @@
+{
+  "id": "coffee-dev",
+  "name": "Coffee — dev smoke (3 queries)",
+  "description": "Tiny dev-only suite: one short, one medium, one long query. Use for quickly verifying the eval flow end-to-end without burning the full default suite's budget.",
+  "version": 1,
+  "queries": [
+    {
+      "id": "short-001",
+      "size": "short",
+      "expectedIntent": "comparison",
+      "query": "best espresso machine under $1000"
+    },
+    {
+      "id": "med-001",
+      "size": "medium",
+      "expectedIntent": "discovery",
+      "query": "I'm new to coffee — what equipment should I get to make better coffee than my drip machine?"
+    },
+    {
+      "id": "long-001",
+      "size": "long",
+      "expectedIntent": "deep-guidance",
+      "query": "We just moved into a new place and want to set up a small coffee bar. Our budget is around $2000 total and we drink mostly espresso drinks but occasionally pour-over on weekends. What machine, grinder, and accessories should we look at?"
+    }
+  ]
+}
