@@ -2264,16 +2264,6 @@
   cursor: help;
 }
 
-.admin .admin-eval-cell-blocker-cell {
-  background: rgb(239 68 68 / 4%);
-}
-
-.admin .admin-eval-cell-raw {
-  font-size: 0.65rem;
-  color: var(--secondary-color, #888);
-  margin-left: 0.25rem;
-}
-
 .admin .admin-eval-ci,
 .admin .admin-eval-n {
   font-size: 0.7rem;

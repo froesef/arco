@@ -2061,11 +2061,11 @@ const QUALITY_RUBRIC_HTML = `
         in order: structure · intent · faithfulness · helpfulness · brand voice · specificity · visual.
       </p>
       <p class="admin-muted">
-        <strong>Blocker gate:</strong> a cell whose <em>faithfulness</em> or <em>structure</em> dimension scores
-        below 3, or whose deterministic assertions (broken tokens, unbalanced HTML, off-topic decline expected)
-        fail, has its composite capped at 2.50 and is tagged <span class="admin-eval-cell-blocker">⚠ blocker</span>.
-        The raw judge score is shown in parens for reference. The per-model summary reports a <em>Blocker rate</em>
-        — a high-quality cell average means little if 30% of generations are unshippable.
+        <strong>Blocker tag:</strong> cells whose <em>faithfulness</em> or <em>structure</em> scores below 3,
+        or whose deterministic assertions fail (broken tokens, unbalanced HTML, off-topic decline expected),
+        get a <span class="admin-eval-cell-blocker">⚠ blocker</span> badge. The score itself is the raw judge
+        composite — the badge is a quality flag, not a score modifier. The per-model summary reports a
+        <em>Blocker rate</em> so a high cell average doesn't mask a high rate of unshippable generations.
       </p>
     </div>
   </details>
@@ -2669,10 +2669,7 @@ async function renderEvaluation(root, evalRunId) {
       const dims = notes
         ? `<span class="admin-eval-cell-dims" title="structure / intent / faithfulness / helpfulness / brand voice / specificity / visual">${notes.structure?.score || '—'}·${notes.intent?.score || '—'}·${notes.faithfulness?.score || '—'}·${notes.helpfulness?.score || '—'}·${notes.brandVoice?.score || '—'}·${notes.specificity?.score || '—'}·${notes.visualAssetUsage?.score || '—'}</span>`
         : '';
-      const raw = notes?.raw_score != null && notes.raw_score !== score
-        ? `<span class="admin-eval-cell-raw" title="raw judge score before blocker cap">(raw ${notes.raw_score.toFixed(2)})</span>`
-        : '';
-      return `<span class="admin-badge admin-badge-${tone}">${score.toFixed(2)}</span>${dims}${raw}`;
+      return `<span class="admin-badge admin-badge-${tone}">${score.toFixed(2)}</span>${dims}`;
     }
     if (judgeError) {
       return `<span class="admin-error-text" title="${esc(judgeError)}">judge err</span>`;
@@ -2716,10 +2713,7 @@ async function renderEvaluation(root, evalRunId) {
     const ttftLabel = cell.time_to_first_token_ms != null
       ? `TTFT ${dur(cell.time_to_first_token_ms)}`
       : 'TTFT —';
-    const isBlocker = notes?.blocker === true;
-    const cellClasses = ['admin-eval-cell', `admin-eval-cell-${status}`];
-    if (isBlocker) cellClasses.push('admin-eval-cell-blocker-cell');
-    return `<td class="${cellClasses.join(' ')}" data-experiment-id="${esc(exp.id)}" data-variant-id="${esc(cell.id)}">
+    return `<td class="admin-eval-cell admin-eval-cell-${status}" data-experiment-id="${esc(exp.id)}" data-variant-id="${esc(cell.id)}">
       <div class="admin-eval-cell-row admin-eval-cell-speed">
         <span class="admin-eval-cell-ttft">${ttftLabel}</span>
         <span class="admin-eval-cell-duration">${dur(cell.duration_ms)}</span>

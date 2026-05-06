@@ -375,12 +375,12 @@ The composite score (mean of the seven) lives in `experiment_variants.evaluator_
 - *gold-min-products* / *gold-min-recipes* — minimum count of resolved product/recipe cards (warn)
 - *expected-decline* — for queries tagged `expectedBehavior: "decline"` (off-topic), the page must include decline phrasing AND ≤2 product cards (blocker)
 
-**Blocker gate** — composite score is **capped at 2.50** when any of:
+**Blocker tag** — cells are flagged with a `⚠ blocker` badge when any of:
 - `faithfulness` dimension < 3
 - `structure` dimension < 3
 - any deterministic assertion has severity `blocker`
 
-The raw judge score is preserved in `evaluator_notes.raw_score` and shown in the admin matrix in parentheses. Blocker rate is reported per model in the summary table — a high quality average with a 30% blocker rate is worse in production than a slightly lower quality with 0% blockers.
+The badge is informational — the cell still shows the raw judge composite as its score so trends and rankings remain visible. Blocker rate is reported per model in the summary table — a high quality average with a 30% blocker rate is worse in production than a slightly lower quality with 0% blockers.
 
 **Statistical reporting** — the per-model summary now includes 95% confidence intervals (`qualityCi95`, `ttftCi95`, `durationCi95`) and a sample count (`qualityN`). The admin UI surfaces them as `4.10 ± 0.18` and adds a pairwise hint flagging model pairs whose CIs overlap so a 0.1-point gap on n=15 isn't mistaken for a real difference.
 

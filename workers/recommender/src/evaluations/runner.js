@@ -29,11 +29,14 @@ import {
 } from './judge.js';
 import { runAssertions } from './assertions.js';
 
-const BLOCKER_COMPOSITE_CAP = 2.5;
+// Soft thresholds. We flag a cell as a "blocker" when faithfulness or structure
+// score below 3 OR any deterministic assertion fails — but we no longer cap the
+// composite score. The badge is purely informational; the cell shows the raw
+// judge score so trends and ranking stay visible.
 const FAITHFULNESS_GATE = 3;
 const STRUCTURE_GATE = 3;
 
-function applyBlockerGate(rawScore, dims, assertions) {
+function detectBlocker(dims, assertions) {
   const reasons = [];
   if (assertions && !assertions.passed) reasons.push('assertions-failed');
   if ((dims?.faithfulness?.score || 0) > 0 && dims.faithfulness.score < FAITHFULNESS_GATE) {
@@ -42,9 +45,7 @@ function applyBlockerGate(rawScore, dims, assertions) {
   if ((dims?.structure?.score || 0) > 0 && dims.structure.score < STRUCTURE_GATE) {
     reasons.push(`structure<${STRUCTURE_GATE}`);
   }
-  if (!reasons.length) return { gatedScore: rawScore, blocker: false, reasons: [] };
-  const gatedScore = Math.min(rawScore, BLOCKER_COMPOSITE_CAP);
-  return { gatedScore, blocker: true, reasons };
+  return { blocker: reasons.length > 0, reasons };
 }
 
 const VARIANT_KV_TTL = 60 * 60 * 24 * 90; // 90 days
@@ -236,7 +237,7 @@ async function writeVariantJudgeResult(db, variantId, judgement, assertions, blo
     SET evaluator_score = ?1, evaluator_notes = ?2
     WHERE id = ?3
   `).bind(
-    blockerInfo.gatedScore ?? judgement.score ?? null,
+    judgement.score ?? null,
     JSON.stringify({
       judge_model: judgement.judgeModel,
       judge_input_tokens: judgement.inputTokens,
@@ -249,7 +250,6 @@ async function writeVariantJudgeResult(db, variantId, judgement, assertions, blo
       brandVoice: judgement.dims.brandVoice,
       specificity: judgement.dims.specificity,
       visualAssetUsage: judgement.dims.visualAssetUsage,
-      raw_score: judgement.score,
       blocker: blockerInfo.blocker,
       blocker_reasons: blockerInfo.reasons,
       assertions: assertions || null,
@@ -608,7 +608,7 @@ async function runOneQuery({
           html,
         })),
       });
-      const blockerInfo = applyBlockerGate(result.score, result.dims, assertions);
+      const blockerInfo = detectBlocker(result.dims, assertions);
       if (env.SESSIONS_DB) {
         await writeVariantJudgeResult(env.SESSIONS_DB, v.id, result, assertions, blockerInfo);
       }
@@ -617,8 +617,7 @@ async function runOneQuery({
         queryId: queryDef.id,
         experimentId,
         variantId: v.id,
-        score: blockerInfo.gatedScore,
-        rawScore: result.score,
+        score: result.score,
         blocker: blockerInfo.blocker,
         blockerReasons: blockerInfo.reasons,
         summary: result.summary,
@@ -628,7 +627,7 @@ async function runOneQuery({
         judgeOutputTokens: result.outputTokens,
         judgeDurationMs: result.durationMs,
       });
-      return { ...result, gatedScore: blockerInfo.gatedScore, blocker: blockerInfo.blocker };
+      return { ...result, blocker: blockerInfo.blocker };
     } catch (err) {
       const message = err.message || 'judge failed';
       console.error(`[Eval] judge failed (${v.id}):`, message);
