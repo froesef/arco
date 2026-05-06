@@ -2009,6 +2009,33 @@ const QUALITY_TONE = (score) => {
   return 'muted';
 };
 
+const QUALITY_RUBRIC_HTML = `
+  <details class="admin-eval-rubric">
+    <summary>How is quality scored?</summary>
+    <div class="admin-eval-rubric-body">
+      <p>Claude grades each generation on four dimensions, each <strong>1–5</strong>
+        (1 = poor, 5 = excellent). The cell score is the unweighted mean — so the
+        composite ranges from <strong>1.00 (worst)</strong> to <strong>5.00 (best)</strong>.</p>
+      <ul class="admin-eval-rubric-list">
+        <li><strong>Structure</strong> — well-formed EDS blocks, required sections present, no malformed HTML.</li>
+        <li><strong>Intent</strong> — does the page actually answer the query and match the classified intent?</li>
+        <li><strong>Faithfulness</strong> — products, prices, and specs grounded in the RAG context (no hallucinated SKUs or prices).</li>
+        <li><strong>Helpfulness</strong> — editorial polish, tone, hierarchy, useful next steps.</li>
+      </ul>
+      <p class="admin-eval-rubric-legend">
+        Color guide:
+        <span class="admin-badge admin-badge-ok">≥ 4.00 strong</span>
+        <span class="admin-badge admin-badge-warn">3.00 – 3.99 mixed</span>
+        <span class="admin-badge admin-badge-muted">&lt; 3.00 weak</span>
+      </p>
+      <p class="admin-muted">
+        The compact <code>4·5·3·4</code> notation under each cell shows the raw per-dimension scores
+        in order: structure · intent · faithfulness · helpfulness.
+      </p>
+    </div>
+  </details>
+`;
+
 async function streamEvalRun(body, onEvent, signal) {
   const token = getAdminToken();
   if (!token) throw new Error('Admin token required');
@@ -2230,12 +2257,20 @@ async function renderEvaluationCreateForm(root) {
         </div>
 
         <h3>3. Judge</h3>
-        <p class="admin-muted">Claude scores each generation on four dimensions (1–5 each). Cost depends on the model and the suite size.</p>
+        <p class="admin-muted">Claude scores each generation 1–5 on four dimensions; the cell score is the mean (range 1.00–5.00). Cost depends on the model and the suite size.</p>
         <label class="admin-field">
           <span>Judge model</span>
           <select name="judgeModel" required>
             ${judgeModels.map((m) => `<option value="${esc(m.id)}"${m.id === defaultJudge?.id ? ' selected' : ''}>${esc(m.label)}</option>`).join('')}
           </select>
+        </label>
+        ${QUALITY_RUBRIC_HTML}
+
+        <h3>4. Parallelism</h3>
+        <p class="admin-muted">How many queries to run in parallel. Higher = faster wall time, but more pressure on the upstream LLM and Vectorize. Within each query, all models still run in parallel.</p>
+        <label class="admin-field">
+          <span>Queries in parallel</span>
+          <input type="number" name="queryConcurrency" min="1" max="6" step="1" value="3" required>
         </label>
 
         <div class="admin-experiment-actions">
@@ -2350,6 +2385,9 @@ async function renderEvaluationCreateForm(root) {
     e.preventDefault();
     const suiteId = suiteSelect.value;
     const judgeModel = form.querySelector('select[name="judgeModel"]').value;
+    const queryConcurrencyRaw = parseInt(form.querySelector('input[name="queryConcurrency"]').value, 10);
+    const queryConcurrency = Number.isNaN(queryConcurrencyRaw)
+      ? 3 : Math.max(1, Math.min(6, queryConcurrencyRaw));
     const models = collectModelsFromForm(form);
     if (!models.length) { summaryEl.textContent = 'Select at least one model.'; return; }
 
@@ -2369,7 +2407,9 @@ async function renderEvaluationCreateForm(root) {
     const queryRowCache = new Map();
 
     try {
-      await streamEvalRun({ suiteId, models, judgeModel }, (evt) => {
+      await streamEvalRun({
+        suiteId, models, judgeModel, queryConcurrency,
+      }, (evt) => {
         if (evt.type === 'run-start') {
           evalRunId = evt.evalRunId;
           queriesTotal = evt.queryCount;
@@ -2546,7 +2586,7 @@ async function renderEvaluation(root, evalRunId) {
 
     ${summary?.perModel?.length
     ? `<section class="admin-card">
-        <h3>Per-model averages</h3>
+        <h3>Per-model averages <span class="admin-muted admin-eval-score-hint">· quality scale 1.00 (worst) – 5.00 (best)</span></h3>
         <div class="admin-table-wrap"><table class="admin-table admin-eval-summary-table">
           <thead><tr>
             <th>Model</th><th>Quality</th>
@@ -2572,7 +2612,8 @@ async function renderEvaluation(root, evalRunId) {
 
     <section class="admin-card">
       <h3>Matrix · queries × models</h3>
-      <p class="admin-muted">Each cell shows speed (TTFT, duration, tokens/sec) on top and Claude's quality score below. Click any cell to view that variant's generated page.</p>
+      <p class="admin-muted">Each cell shows speed (TTFT, duration, tokens/sec) on top and Claude's quality score below (range 1.00 – 5.00). Click any cell to view that variant's generated page.</p>
+      ${QUALITY_RUBRIC_HTML}
       <div class="admin-eval-matrix-wrap">
         <table class="admin-table admin-eval-matrix">
           <thead><tr>

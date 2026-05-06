@@ -2159,3 +2159,67 @@
   font-size: 0.78rem;
   font-variant-numeric: tabular-nums;
 }
+
+/* stylelint-disable no-descending-specificity */
+.admin .admin-eval-rubric {
+  margin: 0.5rem 0 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--background-color);
+  font-size: 0.82rem;
+}
+
+.admin .admin-eval-rubric > summary {
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--text-color);
+  list-style: none;
+}
+
+.admin .admin-eval-rubric > summary::-webkit-details-marker {
+  display: none;
+}
+
+.admin .admin-eval-rubric > summary::before {
+  content: '▸ ';
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+
+.admin .admin-eval-rubric[open] > summary::before {
+  content: '▾ ';
+}
+
+.admin .admin-eval-rubric-body {
+  padding: 0 0.75rem 0.75rem;
+  line-height: 1.55;
+}
+
+.admin .admin-eval-rubric-body p {
+  margin: 0.4rem 0;
+}
+
+.admin .admin-eval-rubric-list {
+  margin: 0.4rem 0 0.4rem 1.1rem;
+  padding: 0;
+}
+
+.admin .admin-eval-rubric-list li {
+  margin: 0.2rem 0;
+}
+
+.admin .admin-eval-rubric-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+
+.admin .admin-eval-score-hint {
+  font-size: 0.78rem;
+  font-weight: 400;
+  margin-left: 0.4rem;
+}
+/* stylelint-enable no-descending-specificity */

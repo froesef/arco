@@ -30,6 +30,8 @@ import {
 
 const VARIANT_KV_TTL = 60 * 60 * 24 * 90; // 90 days
 const JUDGE_CONCURRENCY = 4;
+const DEFAULT_QUERY_CONCURRENCY = 3;
+const MAX_QUERY_CONCURRENCY = 6;
 const KV_KEY = (expId, varId) => `experiment:${expId}:variant:${varId}`;
 
 // ── Validation ────────────────────────────────────────────────────────────────
@@ -74,11 +76,17 @@ export function validateRunBody(body, env) {
     return { error: `Unknown judge model: ${judgeModel}` };
   }
 
+  let queryConcurrency = typeof body.queryConcurrency === 'number'
+    ? Math.round(body.queryConcurrency)
+    : DEFAULT_QUERY_CONCURRENCY;
+  queryConcurrency = Math.max(1, Math.min(MAX_QUERY_CONCURRENCY, queryConcurrency));
+
   return {
     payload: {
       suite,
       models,
       judgeModel,
+      queryConcurrency,
     },
   };
 }
@@ -696,7 +704,9 @@ function buildSummary(models, queryResults) {
 // ── Public entry point ───────────────────────────────────────────────────────
 
 export async function startEvalRun(request, env, payload) {
-  const { suite, models, judgeModel } = payload;
+  const {
+    suite, models, judgeModel, queryConcurrency,
+  } = payload;
   const evalRunId = crypto.randomUUID();
   const variantCount = suite.queries.length * models.length;
   const estimatedCostUsd = estimateJudgeCost({
@@ -759,13 +769,17 @@ export async function startEvalRun(request, env, payload) {
         modelCount: models.length,
         variantCount,
         judgeModel,
+        queryConcurrency,
         estimatedCostUsd,
       });
 
-      // Sequential across queries so we don't blow Vectorize / RAG concurrency.
-      for (let qi = 0; qi < suite.queries.length; qi += 1) {
-        const queryDef = suite.queries[qi];
-        // eslint-disable-next-line no-await-in-loop
+      // Run queries with bounded concurrency. Variants within a query and
+      // judge calls within a query are still parallel (handled in runOneQuery).
+      // The hero-image module-level state can race across parallel queries —
+      // the same race that already exists between concurrent /api/generate
+      // requests in production, so we accept it here.
+      const ordered = new Array(suite.queries.length);
+      await runWithConcurrency(suite.queries, queryConcurrency, async (queryDef, idx) => {
         const qr = await runOneQuery({
           env,
           request,
@@ -776,14 +790,16 @@ export async function startEvalRun(request, env, payload) {
           judgeModel,
           writeLine,
         });
-        queryResults.push(qr);
+        ordered[idx] = qr;
         if (qr) {
           totalGenInput += qr.generationInputTokens;
           totalGenOutput += qr.generationOutputTokens;
           totalJudgeInput += qr.judgeInputTokens;
           totalJudgeOutput += qr.judgeOutputTokens;
         }
-      }
+        return qr;
+      });
+      queryResults.push(...ordered);
 
       const summary = buildSummary(models, queryResults);
       if (env.SESSIONS_DB) {

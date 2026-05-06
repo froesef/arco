@@ -63,5 +63,13 @@
     "ENVIRONMENT": "production",
     "DA_ORG": "froesef",
     "DA_REPO": "arco"
+  },
+
+  // Workers Paid: bump CPU time to the max so a full LLM evaluation run
+  // (15 queries × N models × judge) doesn't get cut off mid-stream.
+  // I/O wait doesn't count toward CPU time, so this only matters for
+  // the burst of work between LLM/judge calls.
+  "limits": {
+    "cpu_ms": 300000
   }
 }
