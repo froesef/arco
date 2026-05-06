@@ -374,12 +374,9 @@ The eval reuses the entire experiment storage path so the admin's variant viewer
 
 **Adding a query suite:** drop a JSON file in `eval/suites/` (see `coffee-default.json` for shape) and import it from `workers/recommender/src/evaluations/suites.js`. Suites are bundled into the worker — no D1 round-trip — and identified by `id` so renaming is a breaking change for historical runs.
 
-**Set the judge key once** (already reserved):
-```bash
-wrangler secret put ANTHROPIC_EVAL_API_KEY
-```
+**Authentication:** the judge calls Anthropic Claude **via AWS Bedrock**, reusing the existing `AWS_BEARER_TOKEN_BEDROCK` secret. No additional setup is needed — if the rest of the recommender's Bedrock models work, the judge works.
 
-**Cost expectations:** the in-form estimate covers judge tokens only (generation cost varies wildly by provider). Sonnet 4.6 default at ~5k input + 500 output per cell × 15 queries × 4 models ≈ 60 calls ≈ $1–2 per full sweep. Opus 4.7 is ~5× more.
+**Cost expectations:** the in-form estimate covers judge tokens only (generation cost varies wildly by provider). Bedrock Anthropic pricing matches the direct Anthropic API (Sonnet 4 at $3/$15 per million in/out). At ~5k input + 500 output per cell × 15 queries × 4 models ≈ 60 calls ≈ $1–2 per full sweep on Sonnet. Opus is ~5× more, Haiku ~3× less.
 
 **Admin API** (Basic auth, same `ADMIN_TOKEN` as Sessions/Experiments):
 - `GET /api/admin/eval-suites` → `{ suites: [...], judgeModels: [...] }`
