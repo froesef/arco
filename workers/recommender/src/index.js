@@ -33,6 +33,12 @@ import {
   handleGetExperiment,
   handleGetExperimentVariant,
 } from './experiments.js';
+import {
+  handleListEvalSuites,
+  handleCreateEvaluation,
+  handleListEvaluations,
+  handleGetEvaluation,
+} from './evaluations/admin.js';
 import handleSuggestRequest from './suggest.js';
 
 /**
@@ -424,6 +430,19 @@ export default {
     const expMatch = url.pathname.match(/^\/api\/admin\/experiments\/([^/]+)$/);
     if (expMatch && request.method === 'GET') {
       return handleGetExperiment(request, env, expMatch[1]);
+    }
+
+    // Admin routes — LLM evaluations (suite × models with Claude judge)
+    if (url.pathname === '/api/admin/eval-suites' && request.method === 'GET') {
+      return handleListEvalSuites(request, env);
+    }
+    if (url.pathname === '/api/admin/evaluations') {
+      if (request.method === 'POST') return handleCreateEvaluation(request, env);
+      if (request.method === 'GET') return handleListEvaluations(request, env);
+    }
+    const evalMatch = url.pathname.match(/^\/api\/admin\/evaluations\/([^/]+)$/);
+    if (evalMatch && request.method === 'GET') {
+      return handleGetEvaluation(request, env, evalMatch[1]);
     }
 
     // Admin routes — vectorize browser

@@ -1,0 +1,98 @@
+{
+  "id": "coffee-default",
+  "name": "Coffee — default suite",
+  "description": "Real questions a curious coffee shopper might ask the recommender. Mix of short single-line, medium follow-ups, and long 2–3 sentence scenarios.",
+  "version": 1,
+  "queries": [
+    {
+      "id": "short-001",
+      "size": "short",
+      "expectedIntent": "comparison",
+      "query": "best espresso machine under $1000"
+    },
+    {
+      "id": "short-002",
+      "size": "short",
+      "expectedIntent": "comparison",
+      "query": "moka pot vs french press"
+    },
+    {
+      "id": "short-003",
+      "size": "short",
+      "expectedIntent": "discovery",
+      "query": "what is a flat white"
+    },
+    {
+      "id": "short-004",
+      "size": "short",
+      "expectedIntent": "discovery",
+      "query": "burr grinder for beginners"
+    },
+    {
+      "id": "short-005",
+      "size": "short",
+      "expectedIntent": "product-detail",
+      "query": "best beans for cold brew"
+    },
+    {
+      "id": "med-001",
+      "size": "medium",
+      "expectedIntent": "discovery",
+      "query": "I'm new to coffee — what equipment should I get to make better coffee than my drip machine?"
+    },
+    {
+      "id": "med-002",
+      "size": "medium",
+      "expectedIntent": "comparison",
+      "query": "Which espresso machine would work best for a busy household with two coffee drinkers?"
+    },
+    {
+      "id": "med-003",
+      "size": "medium",
+      "expectedIntent": "discovery",
+      "query": "I want to learn latte art at home — what tools and beans do I need to start?"
+    },
+    {
+      "id": "med-004",
+      "size": "medium",
+      "expectedIntent": "deep-guidance",
+      "query": "How do I dial in a new bag of espresso beans without wasting half of them?"
+    },
+    {
+      "id": "med-005",
+      "size": "medium",
+      "expectedIntent": "product-detail",
+      "query": "Decaf espresso that actually tastes like coffee — what should I look at?"
+    },
+    {
+      "id": "long-001",
+      "size": "long",
+      "expectedIntent": "deep-guidance",
+      "query": "We just moved into a new place and want to set up a small coffee bar. Our budget is around $2000 total and we drink mostly espresso drinks but occasionally pour-over on weekends. What machine, grinder, and accessories should we look at?"
+    },
+    {
+      "id": "long-002",
+      "size": "long",
+      "expectedIntent": "deep-guidance",
+      "query": "I've been pulling shots on my Breville for two years and I'm wondering if I'm missing something with single-origin beans. Can you walk me through how the same recipe tastes different across origins, and recommend a few starter beans to try?"
+    },
+    {
+      "id": "long-003",
+      "size": "long",
+      "expectedIntent": "deep-guidance",
+      "query": "My partner only drinks decaf but I want them to enjoy real espresso. Most decaf I've had tastes flat — are there decaf options that hold up in a double shot, and does the brewing technique need to change at all?"
+    },
+    {
+      "id": "long-004",
+      "size": "long",
+      "expectedIntent": "deep-guidance",
+      "query": "I make pour-over every morning but my coffee always tastes either too bitter or too sour. I'm using a V60 with medium-fine grind and 1:16 ratio. What variables should I be adjusting and in what order?"
+    },
+    {
+      "id": "long-005",
+      "size": "long",
+      "expectedIntent": "comparison",
+      "query": "Looking for a coffee setup for our small office of about 10 people. We need something easy for everyone to use, makes consistent espresso drinks, and doesn't require a barista. Budget is flexible if it saves time."
+    }
+  ]
+}

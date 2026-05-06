@@ -346,7 +346,46 @@ curl -u admin:TOKEN https://arco-recommender.franklin-prod.workers.dev/api/admin
 
 Per-variant full NDJSON payloads (blocks, suggestions, debug snapshot, prompt, raw LLM output) live in `SESSION_STORE` KV under `experiment:{experimentId}:variant:{variantId}` with a 90-day TTL — the same shape as `page:{runId}` so the admin block reuses its existing `renderStoredSection()` helper to re-render any variant.
 
-**Phase 2 — LLM judge (planned)**: an evaluator endpoint will score variants against a rubric using Claude Sonnet or Opus. The key is reserved as `ANTHROPIC_EVAL_API_KEY` (set via `wrangler secret put ANTHROPIC_EVAL_API_KEY`), and the D1 columns above are already in place; no schema change needed when phase 2 ships.
+**Phase 2 — LLM judge (shipped)**: the *LLM Evaluation* admin tab runs a fixed coffee query suite across many models and scores each generation with Claude. See the next section.
+
+### LLM Evaluation Tab
+
+`/admin#/evaluations` runs a curated query suite against multiple models in one pass and produces a queries × models matrix scored on speed and quality.
+
+**Speed metrics** (per cell, no extra cost) — TTFT, total duration, tokens/sec. Captured during the existing streaming generation; surfaced from `experiment_variants.time_to_first_token_ms` and `duration_ms`.
+
+**Quality metrics** (per cell, costs Anthropic tokens) — Claude scores the generated page on four dimensions, each 1–5:
+- *structure* — well-formed EDS blocks, required sections present
+- *intent* — does the page actually answer the query?
+- *faithfulness* — products / prices / specs grounded in the RAG context (no hallucinated SKUs)
+- *helpfulness* — editorial polish, tone, useful next steps
+
+The composite score (mean of the four) lives in `experiment_variants.evaluator_score`. Per-dimension reasoning, judge model, and judge token counts live as JSON in `experiment_variants.evaluator_notes`.
+
+**Run-level data** (migration `0006_evaluations.sql`):
+
+| Table | Holds |
+|-------|-------|
+| `eval_runs` | Suite + models tested, judge model, status, totals, per-model summary JSON, estimated cost. |
+| `experiments` | One row per (eval_run × query). New columns: `eval_run_id`, `eval_query_id`. |
+| `experiment_variants` | One row per (eval_run × query × model). All existing columns + `evaluator_score` / `evaluator_notes` written by the judge step. |
+
+The eval reuses the entire experiment storage path so the admin's variant viewer (`renderExperimentVariantPreview`) re-renders any cell's generated page without new code.
+
+**Adding a query suite:** drop a JSON file in `eval/suites/` (see `coffee-default.json` for shape) and import it from `workers/recommender/src/evaluations/suites.js`. Suites are bundled into the worker — no D1 round-trip — and identified by `id` so renaming is a breaking change for historical runs.
+
+**Set the judge key once** (already reserved):
+```bash
+wrangler secret put ANTHROPIC_EVAL_API_KEY
+```
+
+**Cost expectations:** the in-form estimate covers judge tokens only (generation cost varies wildly by provider). Sonnet 4.6 default at ~5k input + 500 output per cell × 15 queries × 4 models ≈ 60 calls ≈ $1–2 per full sweep. Opus 4.7 is ~5× more.
+
+**Admin API** (Basic auth, same `ADMIN_TOKEN` as Sessions/Experiments):
+- `GET /api/admin/eval-suites` → `{ suites: [...], judgeModels: [...] }`
+- `POST /api/admin/evaluations` → start a run; streams NDJSON (`run-start`, `query-start`, `variant-done`, `judge-done`, `query-done`, `run-done`)
+- `GET /api/admin/evaluations` → paginated list of runs
+- `GET /api/admin/evaluations/:id` → run + experiments + variants + suite definition (everything needed to render the matrix)
 
 **Query D1 directly** (for ad-hoc analysis):
 

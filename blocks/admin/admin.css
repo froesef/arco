@@ -2017,3 +2017,145 @@
 .admin .admin-experiment-preview {
   margin: 0;
 }
+
+/* ── LLM Evaluation ───────────────────────────────────────────────────────── */
+
+/* stylelint-disable no-descending-specificity */
+.admin .admin-eval-runs-table td:first-child {
+  font-weight: 500;
+}
+
+.admin .admin-eval-progress-table {
+  margin-top: 0.75rem;
+}
+
+.admin .admin-eval-progress-table th,
+.admin .admin-eval-progress-table td {
+  font-size: 0.78rem;
+}
+
+.admin .admin-eval-summary-table th,
+.admin .admin-eval-summary-table td {
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+/* stylelint-enable no-descending-specificity */
+
+.admin .admin-eval-matrix-wrap {
+  overflow: auto;
+  max-height: 70vh;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--background-color);
+}
+
+.admin .admin-eval-matrix {
+  border-collapse: separate;
+  border-spacing: 0;
+  min-width: 100%;
+}
+
+.admin .admin-eval-matrix thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--light-color);
+  border-bottom: 1px solid var(--border-color);
+  text-align: left;
+}
+
+.admin .admin-eval-matrix tbody th {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: var(--light-color);
+  border-right: 1px solid var(--border-color);
+  text-align: left;
+  font-weight: 500;
+  vertical-align: top;
+  max-width: 280px;
+  min-width: 220px;
+  padding: 0.5rem 0.75rem;
+}
+
+.admin .admin-eval-query-label {
+  display: block;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--text-color);
+}
+
+.admin .admin-eval-query-id {
+  display: block;
+  font-size: 0.68rem;
+  margin-top: 0.2rem;
+  opacity: 0.7;
+}
+
+.admin .admin-eval-model-head strong {
+  display: block;
+  font-size: 0.78rem;
+}
+
+.admin .admin-eval-model-head span {
+  display: block;
+  font-size: 0.68rem;
+  margin-top: 0.15rem;
+}
+
+.admin .admin-eval-cell {
+  padding: 0.4rem 0.6rem;
+  border-bottom: 1px solid var(--border-color);
+  border-right: 1px solid var(--border-color);
+  vertical-align: top;
+  cursor: pointer;
+  min-width: 160px;
+  transition: background var(--transition);
+}
+
+.admin .admin-eval-cell:hover {
+  background: var(--light-color);
+}
+
+.admin .admin-eval-cell-empty {
+  cursor: default;
+  color: var(--secondary-color, #888);
+  text-align: center;
+}
+
+.admin .admin-eval-cell-error {
+  background: rgb(239 68 68 / 5%);
+}
+
+.admin .admin-eval-cell-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+}
+
+.admin .admin-eval-cell-row + .admin-eval-cell-row {
+  margin-top: 0.25rem;
+}
+
+.admin .admin-eval-cell-speed {
+  color: var(--secondary-color, #555);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin .admin-eval-cell-quality {
+  font-weight: 600;
+}
+
+.admin .admin-eval-cell-dims {
+  font-size: 0.68rem;
+  font-weight: 400;
+  color: var(--secondary-color, #777);
+  font-variant-numeric: tabular-nums;
+}
+
+.admin .admin-eval-preview-meta {
+  margin-bottom: 0.5rem;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
