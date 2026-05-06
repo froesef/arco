@@ -2036,24 +2036,24 @@ const QUALITY_RUBRIC_HTML = `
   </details>
 `;
 
-async function streamEvalRun(body, onEvent, signal) {
-  const token = getAdminToken();
-  if (!token) throw new Error('Admin token required');
-  const res = await fetch(`${ARCO_RECOMMENDER_URL}/api/admin/evaluations`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Basic ${btoa(`admin:${token}`)}`,
-      'Content-Type': 'application/json',
+async function streamPerQuery(token, evalRunId, queryId, onEvent, signal) {
+  const res = await fetch(
+    `${ARCO_RECOMMENDER_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/queries`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${btoa(`admin:${token}`)}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ queryId }),
+      signal,
     },
-    body: JSON.stringify(body),
-    signal,
-  });
-  if (res.status === 401) {
-    clearAdminToken();
-    throw new Error('Unauthorized — token cleared. Reload to retry.');
+  );
+  if (!res.ok) {
+    const text = await res.text().catch(() => '');
+    await onEvent({ type: 'query-error', queryId, message: `HTTP ${res.status}: ${text || 'request failed'}` });
+    return;
   }
-  if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
-
   const reader = res.body.getReader();
   const decoder = new TextDecoder();
   let buffer = '';
@@ -2080,6 +2080,117 @@ async function streamEvalRun(body, onEvent, signal) {
   if (buffer.trim()) {
     try { await onEvent(JSON.parse(buffer)); } catch { /* ignore */ }
   }
+}
+
+// Orchestrates an eval run by calling the worker once per query (bounded
+// concurrency). Each per-query call uses ~3 + 2N subrequests, well under the
+// Cloudflare Workers cap of 1000 per invocation. The onEvent callback API
+// (run-start, query-start, variant-done, judge-done, query-done, run-done)
+// is preserved so the existing UI code keeps working.
+async function streamEvalRun(body, onEvent, signal) {
+  const token = getAdminToken();
+  if (!token) throw new Error('Admin token required');
+
+  // 1. Create the eval_run row + return queries to drive.
+  const createRes = await fetch(`${ARCO_RECOMMENDER_URL}/api/admin/evaluations`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${btoa(`admin:${token}`)}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+    signal,
+  });
+  if (createRes.status === 401) {
+    clearAdminToken();
+    throw new Error('Unauthorized — token cleared. Reload to retry.');
+  }
+  if (!createRes.ok) {
+    throw new Error(`HTTP ${createRes.status}: ${await createRes.text().catch(() => '')}`);
+  }
+  const created = await createRes.json();
+  const {
+    evalRunId, queries, modelCount = (created.models || []).length, variantCount,
+    estimatedCostUsd, queryConcurrency, judgeModel, suiteId, suiteName,
+  } = created;
+
+  await onEvent({
+    type: 'run-start',
+    evalRunId,
+    suiteId,
+    suiteName,
+    judgeModel,
+    queryCount: queries.length,
+    modelCount,
+    variantCount,
+    queryConcurrency,
+    estimatedCostUsd,
+  });
+
+  // 2. Per-query worker pool.
+  let nextIdx = 0;
+  let aborted = false;
+  const onAbort = () => { aborted = true; };
+  if (signal) {
+    if (signal.aborted) aborted = true;
+    else signal.addEventListener('abort', onAbort, { once: true });
+  }
+
+  const worker = async () => {
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      if (aborted) return;
+      const i = nextIdx;
+      nextIdx += 1;
+      if (i >= queries.length) return;
+      const q = queries[i];
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await streamPerQuery(token, evalRunId, q.id, onEvent, signal);
+      } catch (err) {
+        if (err.name === 'AbortError') { aborted = true; return; }
+        // eslint-disable-next-line no-await-in-loop
+        await onEvent({ type: 'query-error', queryId: q.id, message: err.message || 'query failed' });
+      }
+    }
+  };
+
+  const concurrency = Math.max(1, Math.min(queryConcurrency || 3, queries.length));
+  await Promise.all(Array.from({ length: concurrency }, () => worker()));
+
+  if (aborted) {
+    const e = new Error('aborted');
+    e.name = 'AbortError';
+    throw e;
+  }
+
+  // 3. Finalize: aggregate from D1, write summary.
+  const finRes = await fetch(
+    `${ARCO_RECOMMENDER_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/finalize`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Basic ${btoa(`admin:${token}`)}` },
+      signal,
+    },
+  );
+  if (!finRes.ok) {
+    await onEvent({
+      type: 'error',
+      message: `Finalize failed: HTTP ${finRes.status}`,
+    });
+    return;
+  }
+  const final = await finRes.json();
+  await onEvent({
+    type: 'run-done',
+    evalRunId,
+    status: final.status || 'complete',
+    summary: final.summary || [],
+    totalInputTokens: final.totalInputTokens || 0,
+    totalOutputTokens: final.totalOutputTokens || 0,
+    judgeInputTokens: final.judgeInputTokens || 0,
+    judgeOutputTokens: final.judgeOutputTokens || 0,
+  });
 }
 
 async function renderEvaluationsList(root) {

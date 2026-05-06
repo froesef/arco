@@ -1,17 +1,25 @@
 /**
  * Admin route handlers for the LLM Evaluation tab.
  *
- *   GET  /api/admin/eval-suites           — bundled coffee suite(s) + judge models
- *   POST /api/admin/evaluations           — start a run (NDJSON stream)
- *   GET  /api/admin/evaluations           — paginated list of runs
- *   GET  /api/admin/evaluations/:id       — run detail (rows + per-query experiments)
+ *   GET  /api/admin/eval-suites                       — bundled suites + judge models
+ *   POST /api/admin/evaluations                       — create a run (returns JSON)
+ *   POST /api/admin/evaluations/:id/queries           — run one query (NDJSON stream)
+ *   POST /api/admin/evaluations/:id/finalize          — finalize + summary (JSON)
+ *   GET  /api/admin/evaluations                       — paginated list of runs
+ *   GET  /api/admin/evaluations/:id                   — run detail
+ *
+ * The split per-query endpoint exists because Cloudflare Workers cap each
+ * invocation at 1000 subrequests; running 15 queries × N models in one shot
+ * blows that budget. The client orchestrates the loop in parallel.
  */
 
 import { CORS_HEADERS } from '../pipeline/context.js';
 import { requireAdminAuth } from '../admin.js';
 import { listSuites, getSuite } from './suites.js';
 import { JUDGE_MODELS } from './judge.js';
-import { validateRunBody, startEvalRun } from './runner.js';
+import {
+  validateRunBody, createEvalRun, runEvalQueryStream, finalizeEvalRun,
+} from './runner.js';
 
 function jsonResponse(body, init = {}) {
   return new Response(JSON.stringify(body), {
@@ -52,7 +60,50 @@ export async function handleCreateEvaluation(request, env) {
   const validation = validateRunBody(rawBody, env);
   if (validation.error) return jsonResponse({ error: validation.error }, { status: 400 });
 
-  return startEvalRun(request, env, validation.payload);
+  try {
+    const result = await createEvalRun(env, validation.payload);
+    return jsonResponse(result);
+  } catch (err) {
+    console.error('[Eval] createEvalRun failed:', err);
+    return jsonResponse({ error: err.message || 'Failed to create eval run' }, { status: 500 });
+  }
+}
+
+// ── POST /api/admin/evaluations/:id/queries ───────────────────────────────────
+
+export async function handleRunEvalQuery(request, env, evalRunId) {
+  const unauth = await requireAdminAuth(request, env);
+  if (unauth) return unauth;
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return jsonResponse({ error: 'Invalid JSON body' }, { status: 400 });
+  }
+  const queryId = typeof body?.queryId === 'string' ? body.queryId.trim() : '';
+  if (!queryId) return jsonResponse({ error: 'queryId is required' }, { status: 400 });
+
+  return runEvalQueryStream(request, env, evalRunId, queryId);
+}
+
+// ── POST /api/admin/evaluations/:id/finalize ──────────────────────────────────
+
+export async function handleFinalizeEvaluation(request, env, evalRunId) {
+  const unauth = await requireAdminAuth(request, env);
+  if (unauth) return unauth;
+
+  try {
+    const result = await finalizeEvalRun(env, evalRunId);
+    if (result.error) {
+      const status = result.error === 'Eval run not found' ? 404 : 500;
+      return jsonResponse(result, { status });
+    }
+    return jsonResponse(result);
+  } catch (err) {
+    console.error('[Eval] finalizeEvalRun failed:', err);
+    return jsonResponse({ error: err.message || 'Failed to finalize' }, { status: 500 });
+  }
 }
 
 // ── GET /api/admin/evaluations ────────────────────────────────────────────────

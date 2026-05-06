@@ -623,9 +623,151 @@ async function runOneQuery({
   };
 }
 
-// ── Summary aggregation ──────────────────────────────────────────────────────
+// ── Split orchestration: client drives one Worker invocation per query ───────
+// Cloudflare Workers cap each invocation at 1000 subrequests (Vectorize, fetch,
+// D1, KV, AI). One full suite × N models × judge calls easily exceeds that, so
+// we split: create the run, run each query in its own invocation, finalize.
 
-function buildSummary(models, queryResults) {
+export async function createEvalRun(env, payload) {
+  const {
+    suite, models, judgeModel, queryConcurrency,
+  } = payload;
+  const evalRunId = crypto.randomUUID();
+  const variantCount = suite.queries.length * models.length;
+  const estimatedCostUsd = estimateJudgeCost({
+    queryCount: suite.queries.length,
+    modelCount: models.length,
+    judgeModel,
+  });
+
+  if (env.SESSIONS_DB) {
+    await insertEvalRunRow(env.SESSIONS_DB, {
+      id: evalRunId,
+      suiteId: suite.id,
+      suiteName: suite.name,
+      suiteVersion: suite.version || 1,
+      models,
+      judgeModel,
+      createdAt: Date.now(),
+      queryCount: suite.queries.length,
+      modelCount: models.length,
+      variantCount,
+      estimatedCostUsd,
+    });
+  }
+
+  return {
+    evalRunId,
+    suiteId: suite.id,
+    suiteName: suite.name,
+    queries: suite.queries.map((q) => ({
+      id: q.id,
+      size: q.size || null,
+      expectedIntent: q.expectedIntent || null,
+      query: q.query,
+    })),
+    models,
+    judgeModel,
+    queryConcurrency,
+    variantCount,
+    estimatedCostUsd,
+  };
+}
+
+async function loadEvalRunConfig(env, evalRunId) {
+  if (!env.SESSIONS_DB) return null;
+  const { results } = await env.SESSIONS_DB.prepare(
+    'SELECT id, suite_id, models_json, judge_model, status FROM eval_runs WHERE id = ?1',
+  ).bind(evalRunId).all();
+  const row = results?.[0];
+  if (!row) return null;
+  const suite = getSuite(row.suite_id);
+  if (!suite) return null;
+  let models = [];
+  try { models = JSON.parse(row.models_json || '[]'); } catch { models = []; }
+  return {
+    evalRunId,
+    suite,
+    models,
+    judgeModel: row.judge_model,
+    status: row.status,
+  };
+}
+
+export async function runEvalQueryStream(request, env, evalRunId, queryId) {
+  const cfg = await loadEvalRunConfig(env, evalRunId);
+  if (!cfg) {
+    return new Response(JSON.stringify({ error: 'Eval run not found' }), {
+      status: 404,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    });
+  }
+  const queryDef = cfg.suite.queries.find((q) => q.id === queryId);
+  if (!queryDef) {
+    return new Response(JSON.stringify({ error: `Query ${queryId} not in suite ${cfg.suite.id}` }), {
+      status: 404,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const { readable, writable } = new TransformStream();
+  const writer = writable.getWriter();
+  const encoder = new TextEncoder();
+  request.evalWriter = writer;
+  request.evalEncoder = encoder;
+
+  const writeLine = async (obj) => {
+    try {
+      await writer.write(encoder.encode(`${JSON.stringify(obj)}\n`));
+    } catch (err) {
+      console.error('[Eval] writeLine failed:', err.message);
+    }
+  };
+
+  const promise = (async () => {
+    try {
+      await runOneQuery({
+        env,
+        request,
+        query: queryDef.query,
+        queryDef,
+        models: cfg.models,
+        evalRunId,
+        judgeModel: cfg.judgeModel,
+        writeLine,
+      });
+    } catch (err) {
+      console.error('[Eval] runOneQuery failed:', err);
+      await writeLine({
+        type: 'query-error',
+        queryId: queryDef.id,
+        message: err.message || 'query failed',
+      });
+    } finally {
+      try { await writer.close(); } catch { /* already closed */ }
+    }
+  })();
+
+  request.ctx?.waitUntil?.(promise);
+  if (!request.ctx) promise.catch(() => {});
+
+  return new Response(readable, {
+    headers: {
+      ...CORS_HEADERS,
+      'Content-Type': 'application/x-ndjson',
+      'Transfer-Encoding': 'chunked',
+      'Cache-Control': 'no-cache',
+    },
+  });
+}
+
+function parseEvalNotes(notesJson) {
+  if (!notesJson) return null;
+  try { return JSON.parse(notesJson); } catch { return null; }
+}
+
+function buildSummaryFromD1(models, experiments, variants) {
+  const expById = new Map(experiments.map((e) => [e.id, e]));
   const perModel = new Map();
   models.forEach((m) => {
     const key = `${m.provider}::${m.model}`;
@@ -650,38 +792,48 @@ function buildSummary(models, queryResults) {
     });
   });
 
-  queryResults.forEach((qr) => {
-    if (!qr) return;
-    qr.variants.forEach((v, i) => {
-      const key = `${v.provider}::${v.model}`;
-      const bucket = perModel.get(key);
-      if (!bucket) return;
-      bucket.generations += 1;
-      if (v.status !== 'complete') {
-        bucket.errors += 1;
-        return;
-      }
-      if (v.ttftMs != null) { bucket.ttftSum += v.ttftMs; bucket.ttftCount += 1; }
-      if (v.startedAt && v.finishedAt) {
-        bucket.durationSum += v.finishedAt - v.startedAt;
-        bucket.durationCount += 1;
-      }
-      bucket.inputTokenSum += v.state.usage?.prompt_tokens || 0;
-      bucket.outputTokenSum += v.state.usage?.completion_tokens || 0;
+  let totalInputTokens = 0;
+  let totalOutputTokens = 0;
+  let judgeInputTokens = 0;
+  let judgeOutputTokens = 0;
 
-      const judge = qr.judgements[i];
-      if (judge && !judge.error) {
-        bucket.qualitySum += judge.score;
-        bucket.qualityCount += 1;
-        bucket.structureSum += judge.dims.structure.score || 0;
-        bucket.intentSum += judge.dims.intent.score || 0;
-        bucket.faithfulnessSum += judge.dims.faithfulness.score || 0;
-        bucket.helpfulnessSum += judge.dims.helpfulness.score || 0;
-      }
-    });
+  variants.forEach((v) => {
+    if (!expById.has(v.experiment_id)) return;
+    const key = `${v.provider}::${v.model}`;
+    const bucket = perModel.get(key);
+    if (!bucket) return;
+    bucket.generations += 1;
+    if (v.status !== 'complete') {
+      bucket.errors += 1;
+      return;
+    }
+    if (v.time_to_first_token_ms != null) {
+      bucket.ttftSum += v.time_to_first_token_ms;
+      bucket.ttftCount += 1;
+    }
+    if (v.duration_ms != null) {
+      bucket.durationSum += v.duration_ms;
+      bucket.durationCount += 1;
+    }
+    bucket.inputTokenSum += v.input_tokens || 0;
+    bucket.outputTokenSum += v.output_tokens || 0;
+    totalInputTokens += v.input_tokens || 0;
+    totalOutputTokens += v.output_tokens || 0;
+
+    const notes = parseEvalNotes(v.evaluator_notes);
+    if (notes && !notes.judge_error && v.evaluator_score != null) {
+      bucket.qualitySum += v.evaluator_score;
+      bucket.qualityCount += 1;
+      bucket.structureSum += notes.structure?.score || 0;
+      bucket.intentSum += notes.intent?.score || 0;
+      bucket.faithfulnessSum += notes.faithfulness?.score || 0;
+      bucket.helpfulnessSum += notes.helpfulness?.score || 0;
+      judgeInputTokens += notes.judge_input_tokens || 0;
+      judgeOutputTokens += notes.judge_output_tokens || 0;
+    }
   });
 
-  return [...perModel.values()].map((b) => ({
+  const summary = [...perModel.values()].map((b) => ({
     provider: b.provider,
     model: b.model,
     label: b.label,
@@ -699,170 +851,69 @@ function buildSummary(models, queryResults) {
     avgHelpfulness: b.qualityCount
       ? Math.round((b.helpfulnessSum / b.qualityCount) * 100) / 100 : null,
   }));
+
+  return {
+    perModel: summary,
+    totalInputTokens,
+    totalOutputTokens,
+    judgeInputTokens,
+    judgeOutputTokens,
+  };
 }
 
-// ── Public entry point ───────────────────────────────────────────────────────
+export async function finalizeEvalRun(env, evalRunId) {
+  if (!env.SESSIONS_DB) return { error: 'D1 not configured' };
 
-export async function startEvalRun(request, env, payload) {
-  const {
-    suite, models, judgeModel, queryConcurrency,
-  } = payload;
-  const evalRunId = crypto.randomUUID();
-  const variantCount = suite.queries.length * models.length;
-  const estimatedCostUsd = estimateJudgeCost({
-    queryCount: suite.queries.length,
-    modelCount: models.length,
-    judgeModel,
+  const { results: runRows } = await env.SESSIONS_DB.prepare(
+    'SELECT id, suite_id, models_json, status FROM eval_runs WHERE id = ?1',
+  ).bind(evalRunId).all();
+  const runRow = runRows?.[0];
+  if (!runRow) return { error: 'Eval run not found' };
+
+  let models = [];
+  try { models = JSON.parse(runRow.models_json || '[]'); } catch { models = []; }
+
+  const { results: experiments } = await env.SESSIONS_DB.prepare(
+    'SELECT id, eval_query_id, status FROM experiments WHERE eval_run_id = ?1',
+  ).bind(evalRunId).all();
+
+  let variants = [];
+  if (experiments.length) {
+    const expIds = experiments.map((e) => e.id);
+    const placeholders = expIds.map((_, i) => `?${i + 1}`).join(', ');
+    const { results } = await env.SESSIONS_DB.prepare(`
+      SELECT experiment_id, provider, model, status, duration_ms, time_to_first_token_ms,
+             input_tokens, output_tokens, evaluator_score, evaluator_notes
+      FROM experiment_variants
+      WHERE experiment_id IN (${placeholders})
+    `).bind(...expIds).all();
+    variants = results;
+  }
+
+  const summary = buildSummaryFromD1(models, experiments, variants);
+  const anyComplete = variants.some((v) => v.status === 'complete');
+  const status = anyComplete ? 'complete' : 'error';
+
+  await finalizeEvalRunRow(env.SESSIONS_DB, {
+    id: evalRunId,
+    status,
+    totalInputTokens: summary.totalInputTokens,
+    totalOutputTokens: summary.totalOutputTokens,
+    judgeInputTokens: summary.judgeInputTokens,
+    judgeOutputTokens: summary.judgeOutputTokens,
+    summaryJson: { perModel: summary.perModel },
+    error: anyComplete ? null : 'no completed variants',
   });
 
-  const { readable, writable } = new TransformStream();
-  const writer = writable.getWriter();
-  const encoder = new TextEncoder();
-  // Stash on the request so per-query ctx instances share the same writer.
-  request.evalWriter = writer;
-  request.evalEncoder = encoder;
-
-  const writeLine = async (obj) => {
-    try {
-      await writer.write(encoder.encode(`${JSON.stringify(obj)}\n`));
-    } catch (err) {
-      console.error('[Eval] writeLine failed:', err.message);
-    }
+  return {
+    evalRunId,
+    status,
+    summary: summary.perModel,
+    totalInputTokens: summary.totalInputTokens,
+    totalOutputTokens: summary.totalOutputTokens,
+    judgeInputTokens: summary.judgeInputTokens,
+    judgeOutputTokens: summary.judgeOutputTokens,
   };
-
-  const streamPromise = (async () => {
-    let runStatus = 'complete';
-    let runError = null;
-    const queryResults = [];
-    let totalGenInput = 0;
-    let totalGenOutput = 0;
-    let totalJudgeInput = 0;
-    let totalJudgeOutput = 0;
-
-    try {
-      if (env.SESSIONS_DB) {
-        try {
-          await insertEvalRunRow(env.SESSIONS_DB, {
-            id: evalRunId,
-            suiteId: suite.id,
-            suiteName: suite.name,
-            suiteVersion: suite.version || 1,
-            models,
-            judgeModel,
-            createdAt: Date.now(),
-            queryCount: suite.queries.length,
-            modelCount: models.length,
-            variantCount,
-            estimatedCostUsd,
-          });
-        } catch (dbErr) {
-          console.error('[Eval] eval_run insert failed:', dbErr.message);
-        }
-      }
-
-      await writeLine({
-        type: 'run-start',
-        evalRunId,
-        suiteId: suite.id,
-        suiteName: suite.name,
-        queryCount: suite.queries.length,
-        modelCount: models.length,
-        variantCount,
-        judgeModel,
-        queryConcurrency,
-        estimatedCostUsd,
-      });
-
-      // Run queries with bounded concurrency. Variants within a query and
-      // judge calls within a query are still parallel (handled in runOneQuery).
-      // The hero-image module-level state can race across parallel queries —
-      // the same race that already exists between concurrent /api/generate
-      // requests in production, so we accept it here.
-      const ordered = new Array(suite.queries.length);
-      await runWithConcurrency(suite.queries, queryConcurrency, async (queryDef, idx) => {
-        const qr = await runOneQuery({
-          env,
-          request,
-          query: queryDef.query,
-          queryDef,
-          models,
-          evalRunId,
-          judgeModel,
-          writeLine,
-        });
-        ordered[idx] = qr;
-        if (qr) {
-          totalGenInput += qr.generationInputTokens;
-          totalGenOutput += qr.generationOutputTokens;
-          totalJudgeInput += qr.judgeInputTokens;
-          totalJudgeOutput += qr.judgeOutputTokens;
-        }
-        return qr;
-      });
-      queryResults.push(...ordered);
-
-      const summary = buildSummary(models, queryResults);
-      if (env.SESSIONS_DB) {
-        try {
-          await finalizeEvalRunRow(env.SESSIONS_DB, {
-            id: evalRunId,
-            status: runStatus,
-            totalInputTokens: totalGenInput,
-            totalOutputTokens: totalGenOutput,
-            judgeInputTokens: totalJudgeInput,
-            judgeOutputTokens: totalJudgeOutput,
-            summaryJson: { perModel: summary },
-          });
-        } catch (dbErr) {
-          console.error('[Eval] eval_run finalize failed:', dbErr.message);
-        }
-      }
-
-      await writeLine({
-        type: 'run-done',
-        evalRunId,
-        status: runStatus,
-        summary,
-        totalInputTokens: totalGenInput,
-        totalOutputTokens: totalGenOutput,
-        judgeInputTokens: totalJudgeInput,
-        judgeOutputTokens: totalJudgeOutput,
-      });
-    } catch (err) {
-      runStatus = 'error';
-      runError = err.message || 'eval run failed';
-      console.error('[Eval] run failed:', err);
-      if (env.SESSIONS_DB) {
-        try {
-          await finalizeEvalRunRow(env.SESSIONS_DB, {
-            id: evalRunId,
-            status: 'error',
-            totalInputTokens: totalGenInput,
-            totalOutputTokens: totalGenOutput,
-            judgeInputTokens: totalJudgeInput,
-            judgeOutputTokens: totalJudgeOutput,
-            summaryJson: null,
-            error: runError,
-          });
-        } catch { /* ignore */ }
-      }
-      await writeLine({ type: 'error', message: runError });
-    } finally {
-      try { await writer.close(); } catch { /* already closed */ }
-    }
-  })();
-
-  request.ctx?.waitUntil?.(streamPromise);
-  if (!request.ctx) streamPromise.catch(() => {});
-
-  return new Response(readable, {
-    headers: {
-      ...CORS_HEADERS,
-      'Content-Type': 'application/x-ndjson',
-      'Transfer-Encoding': 'chunked',
-      'Cache-Control': 'no-cache',
-    },
-  });
 }
 
 // ── Constants for the admin form ──────────────────────────────────────────────

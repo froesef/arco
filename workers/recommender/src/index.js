@@ -36,6 +36,8 @@ import {
 import {
   handleListEvalSuites,
   handleCreateEvaluation,
+  handleRunEvalQuery,
+  handleFinalizeEvaluation,
   handleListEvaluations,
   handleGetEvaluation,
 } from './evaluations/admin.js';
@@ -439,6 +441,14 @@ export default {
     if (url.pathname === '/api/admin/evaluations') {
       if (request.method === 'POST') return handleCreateEvaluation(request, env);
       if (request.method === 'GET') return handleListEvaluations(request, env);
+    }
+    const evalQueriesMatch = url.pathname.match(/^\/api\/admin\/evaluations\/([^/]+)\/queries$/);
+    if (evalQueriesMatch && request.method === 'POST') {
+      return handleRunEvalQuery(request, env, evalQueriesMatch[1]);
+    }
+    const evalFinalizeMatch = url.pathname.match(/^\/api\/admin\/evaluations\/([^/]+)\/finalize$/);
+    if (evalFinalizeMatch && request.method === 'POST') {
+      return handleFinalizeEvaluation(request, env, evalFinalizeMatch[1]);
     }
     const evalMatch = url.pathname.match(/^\/api\/admin\/evaluations\/([^/]+)$/);
     if (evalMatch && request.method === 'GET') {
