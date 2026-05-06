@@ -63,13 +63,8 @@
     "ENVIRONMENT": "production",
     "DA_ORG": "froesef",
     "DA_REPO": "arco"
-  },
-
-  // Workers Paid: bump CPU time to the max so a full LLM evaluation run
-  // (15 queries × N models × judge) doesn't get cut off mid-stream.
-  // I/O wait doesn't count toward CPU time, so this only matters for
-  // the burst of work between LLM/judge calls.
-  "limits": {
-    "cpu_ms": 300000
   }
+  // CPU/wall-time: this worker is on the Unbound usage model, which already
+  // permits up to 30 minutes of wall clock per invocation — long enough for
+  // a full LLM eval. Don't set `limits.cpu_ms` here; Unbound rejects it.
 }
