@@ -2787,13 +2787,16 @@ async function renderEvaluation(root, evalRunId) {
       ? `TTFT ${dur(cell.time_to_first_token_ms)}`
       : 'TTFT —';
     const cellClass = classifyCell(cell);
-    const retryAction = cellClass === 'genErr' ? 'regenerate' : 'rejudge';
-    let retryTitle;
-    if (cellClass === 'genErr') retryTitle = 'Regenerate (full pipeline + judge)';
-    else if (cellClass === 'judgeErr' || cellClass === 'pending') retryTitle = 'Run judge for this cell';
-    else retryTitle = 'Re-judge this cell';
+    // Both retry actions are always available so the user can regenerate
+    // (full pipeline + judge) or re-judge from KV regardless of cell state.
+    // Re-judge is hidden for genErr cells because there are no blocks in KV
+    // to judge.
+    const showRejudge = cellClass !== 'genErr';
     return `<td class="admin-eval-cell admin-eval-cell-${status} admin-eval-cell-class-${cellClass}" data-experiment-id="${esc(exp.id)}" data-variant-id="${esc(cell.id)}" data-cell-class="${cellClass}">
-      <button type="button" class="admin-eval-cell-retry" data-action="retry" data-retry-action="${retryAction}" title="${esc(retryTitle)}">↻</button>
+      <div class="admin-eval-cell-retry-group">
+        <button type="button" class="admin-eval-cell-retry" data-action="retry" data-retry-action="regenerate" title="Regenerate — re-run full pipeline + judge">↻ gen</button>
+        ${showRejudge ? '<button type="button" class="admin-eval-cell-retry" data-action="retry" data-retry-action="rejudge" title="Re-judge only — uses persisted blocks (cheap)">↻ judge</button>' : ''}
+      </div>
       <div class="admin-eval-cell-row admin-eval-cell-speed">
         <span class="admin-eval-cell-ttft">${ttftLabel}</span>
         <span class="admin-eval-cell-duration">${dur(cell.duration_ms)}</span>
@@ -2975,8 +2978,33 @@ async function renderEvaluation(root, evalRunId) {
           headers: { Authorization: `Basic ${btoa(`admin:${getAdminToken()}`)}` },
         },
       );
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text().catch(() => '')}`);
-      await reload();
+      if (res.ok) {
+        const result = await res.json().catch(() => ({}));
+        // The endpoint returns { ok: true, result } on success, or
+        // { ok: false, error } when the judge call ran but the model errored,
+        // or { error } when the request itself can't be served.
+        const errMsg = result?.ok === false ? result.error : (result?.error || null);
+        if (errMsg && /not found in KV/i.test(errMsg)) {
+          // KV payload missing — cannot re-judge. Offer to regenerate instead.
+          cellEl.innerHTML = original;
+          cellEl.classList.remove('admin-eval-cell-busy');
+          if (window.confirm(`Re-judge failed: ${errMsg}\n\nRegenerate this cell instead? This re-runs the full pipeline (upstream LLM + judge).`)) {
+            await regenerateOneCell(cellEl); // eslint-disable-line no-use-before-define
+          } else {
+            setToolbarStatus(`Re-judge failed: ${errMsg}`);
+          }
+          return;
+        }
+        if (errMsg) {
+          cellEl.innerHTML = original;
+          cellEl.classList.remove('admin-eval-cell-busy');
+          setToolbarStatus(`Re-judge failed: ${errMsg}`);
+          return;
+        }
+        await reload();
+        return;
+      }
+      throw new Error(`HTTP ${res.status}: ${await res.text().catch(() => '')}`);
     } catch (err) {
       cellEl.innerHTML = original;
       cellEl.classList.remove('admin-eval-cell-busy');
@@ -3008,16 +3036,20 @@ async function renderEvaluation(root, evalRunId) {
   };
 
   root.querySelectorAll('.admin-eval-cell[data-variant-id]').forEach((td) => {
-    const retryBtn = td.querySelector('[data-action="retry"]');
-    if (!retryBtn) return;
-    retryBtn.addEventListener('click', async (e) => {
-      e.stopPropagation();
-      const { retryAction: action } = retryBtn.dataset;
-      const { cellClass } = td.dataset;
-      // Successfully judged cells need confirmation — re-judging costs Bedrock tokens.
-      if (cellClass === 'judged' && !window.confirm('Re-judge this cell? This will overwrite the existing score and use Bedrock tokens.')) return;
-      if (action === 'regenerate') await regenerateOneCell(td);
-      else await rejudgeOneCell(td);
+    td.querySelectorAll('[data-action="retry"]').forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const { retryAction: action } = btn.dataset;
+        const { cellClass } = td.dataset;
+        if (action === 'regenerate') {
+          if (cellClass === 'judged' && !window.confirm('Regenerate this cell? This re-runs the full pipeline (upstream LLM + judge tokens) and overwrites the existing result.')) return;
+          if (cellClass === 'pending' && !window.confirm('Regenerate this cell? This re-runs the full pipeline including the upstream LLM. Use ↻ judge if you only need to score the existing generation.')) return;
+          await regenerateOneCell(td);
+        } else {
+          if (cellClass === 'judged' && !window.confirm('Re-judge this cell? This overwrites the existing score and uses Bedrock tokens.')) return;
+          await rejudgeOneCell(td);
+        }
+      });
     });
   });
 
@@ -3074,18 +3106,32 @@ async function renderEvaluation(root, evalRunId) {
   const retryFailedBtn = root.querySelector('[data-role="retry-failed"]');
   if (retryFailedBtn) {
     retryFailedBtn.addEventListener('click', async () => {
-      // Failed cells split into two groups: gen errors (need regenerate) and
-      // judge errors (just need rejudge). Run gens sequentially (each costs a
-      // full pipeline run), then bulk-rejudge the rest in one streaming call.
+      // Failed cells split into three groups:
+      //   - genErr: must be regenerated (no blocks at all)
+      //   - judgeErr with KV-missing message: must be regenerated (KV expired
+      //     or pre-dates the rag-context persistence change)
+      //   - judgeErr (other): cheap re-judge from KV is enough
+      // Run regens sequentially (each costs a full pipeline run), then bulk-
+      // rejudge the rest in one streaming call.
+      const variantsById = new Map(variants.map((v) => [v.id, v]));
+      const judgeErrIsKvMissing = (variant) => {
+        const notes = parseEvaluatorNotes(variant?.evaluator_notes);
+        const msg = notes?.judge_error || '';
+        return /not found in KV/i.test(msg);
+      };
       const genErrCells = [...root.querySelectorAll('.admin-eval-cell-class-genErr')];
-      const judgeErrCount = counts.judgeErr;
-      const failureSummary = `${genErrCells.length} regen + ${judgeErrCount} re-judge`;
-      if (!window.confirm(`Retry failed cells: ${failureSummary}? Regenerations cost upstream LLM tokens; re-judges cost Bedrock tokens.`)) return;
+      const judgeErrCells = [...root.querySelectorAll('.admin-eval-cell-class-judgeErr')];
+      const judgeErrKvMissing = judgeErrCells
+        .filter((td) => judgeErrIsKvMissing(variantsById.get(td.dataset.variantId)));
+      const regenCells = [...genErrCells, ...judgeErrKvMissing];
+      const judgeErrCount = judgeErrCells.length - judgeErrKvMissing.length;
+      const failureSummary = `${regenCells.length} regen + ${judgeErrCount} re-judge`;
+      if (!window.confirm(`Retry failed cells: ${failureSummary}? Regenerations cost upstream LLM tokens; re-judges cost Bedrock tokens.${judgeErrKvMissing.length ? `\n\n(${judgeErrKvMissing.length} judge errors will be regenerated because their stored blocks are missing from KV.)` : ''}`)) return;
       retryFailedBtn.disabled = true;
       try {
-        if (genErrCells.length) {
+        if (regenCells.length) {
           // eslint-disable-next-line no-restricted-syntax
-          for (const td of genErrCells) {
+          for (const td of regenCells) {
             setToolbarStatus(`Regenerating ${td.dataset.variantId.substring(0, 8)}…`);
             // eslint-disable-next-line no-await-in-loop
             await regenerateOneCell(td);
