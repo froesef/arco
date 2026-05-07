@@ -417,9 +417,16 @@ The eval reuses the entire experiment storage path so the admin's variant viewer
 
 **Cost expectations:** the in-form estimate covers judge tokens only (generation cost varies wildly by provider). Bedrock Anthropic pricing matches the direct Anthropic API (Sonnet 4 at $3/$15 per million in/out). At ~5k input + 500 output per cell × 15 queries × 4 models ≈ 60 calls ≈ $1–2 per full sweep on Sonnet. Opus is ~5× more, Haiku ~3× less.
 
+**Two-phase orchestration & retry.** Every run is split into a generation phase (all queries × all models) followed by a judging phase (one bulk Bedrock pass with low concurrency). Generations are persisted to D1+KV before any judge call fires, so a Bedrock 429 storm during judging never wastes generation tokens — the partial state stays on disk and the matrix detail view exposes a **Continue judging** button that re-runs the judge against any cell whose `evaluator_score IS NULL`. The create form has a **Skip judging** checkbox for the case when you want to defer judging entirely (e.g. Bedrock is throttled at run time). The matrix toolbar also has **Retry failed cells** (regenerates `status='error'` cells, then re-judges `judge_error` cells in one bulk pass) and **Re-judge all** (overwrites every cell — confirm dialog gates it). Each cell has a hover-revealed `↻` for single-cell retry: full regeneration when the cell failed at generation, cheap KV-only re-judge otherwise. Re-judge does NOT re-run the upstream pipeline — RAG context is persisted at `experiment:{expId}:rag-context` in KV alongside the variant payloads, so the judge can be replayed without paying for retrieval again.
+
 **Admin API** (Basic auth, same `ADMIN_TOKEN` as Sessions/Experiments):
 - `GET /api/admin/eval-suites` → `{ suites: [...], judgeModels: [...] }`
-- `POST /api/admin/evaluations` → start a run; streams NDJSON (`run-start`, `query-start`, `variant-done`, `judge-done`, `query-done`, `run-done`)
+- `POST /api/admin/evaluations` → start a run; the server creates the eval_run row and returns the suite + queries + models. The client drives per-query generation in a worker pool, then triggers the bulk judge phase, then finalize.
+- `POST /api/admin/evaluations/:id/queries` (body `{ queryId, skipJudge? }`) → run one query, NDJSON stream. With `skipJudge: true` the per-query path stops after assertions and the judge is invoked separately via `/judge`.
+- `POST /api/admin/evaluations/:id/judge` (body `{ scope?: 'pending'\|'errors'\|'all', judgeConcurrency? }`) → bulk judge phase. Default scope `pending` re-judges only cells with `evaluator_score IS NULL`. Default `judgeConcurrency: 2` (max 4) keeps Bedrock under throttling pressure. NDJSON stream.
+- `POST /api/admin/evaluations/:id/variants/:variantId/rejudge` → re-judge a single cell from persisted KV blocks. JSON response.
+- `POST /api/admin/evaluations/:id/variants/:variantId/regenerate` → re-run upstream pipeline + LLM generate + judge for a single cell. NDJSON stream.
+- `POST /api/admin/evaluations/:id/finalize` → recompute summary + close the run.
 - `GET /api/admin/evaluations` → paginated list of runs
 - `GET /api/admin/evaluations/:id` → run + experiments + variants + suite definition (everything needed to render the matrix)
 

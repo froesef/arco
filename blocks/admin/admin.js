@@ -2071,22 +2071,12 @@ const QUALITY_RUBRIC_HTML = `
   </details>
 `;
 
-async function streamPerQuery(token, evalRunId, queryId, onEvent, signal) {
-  const res = await fetch(
-    `${ARCO_RECOMMENDER_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/queries`,
-    {
-      method: 'POST',
-      headers: {
-        Authorization: `Basic ${btoa(`admin:${token}`)}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ queryId }),
-      signal,
-    },
-  );
+async function consumeNdjson(res, onEvent, fallbackErrorEvent) {
   if (!res.ok) {
     const text = await res.text().catch(() => '');
-    await onEvent({ type: 'query-error', queryId, message: `HTTP ${res.status}: ${text || 'request failed'}` });
+    if (fallbackErrorEvent) {
+      await onEvent({ ...fallbackErrorEvent, message: `HTTP ${res.status}: ${text || 'request failed'}` });
+    }
     return;
   }
   const reader = res.body.getReader();
@@ -2117,12 +2107,47 @@ async function streamPerQuery(token, evalRunId, queryId, onEvent, signal) {
   }
 }
 
-// Orchestrates an eval run by calling the worker once per query (bounded
-// concurrency). Each per-query call uses ~3 + 2N subrequests, well under the
-// Cloudflare Workers cap of 1000 per invocation. The onEvent callback API
-// (run-start, query-start, variant-done, judge-done, query-done, run-done)
-// is preserved so the existing UI code keeps working.
+async function streamPerQuery(token, evalRunId, queryId, onEvent, signal, skipJudge = false) {
+  const res = await fetch(
+    `${ARCO_RECOMMENDER_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/queries`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${btoa(`admin:${token}`)}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ queryId, skipJudge }),
+      signal,
+    },
+  );
+  await consumeNdjson(res, onEvent, { type: 'query-error', queryId });
+}
+
+async function streamJudgePhase(token, evalRunId, onEvent, signal, body = {}) {
+  const res = await fetch(
+    `${ARCO_RECOMMENDER_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/judge`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Basic ${btoa(`admin:${token}`)}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+      signal,
+    },
+  );
+  await consumeNdjson(res, onEvent, { type: 'error' });
+}
+
+// Orchestrates an eval run as TWO phases:
+//   Phase 1 — generation: per-query worker pool (skipJudge=true). Cheap to retry,
+//             persists everything to D1+KV so judging can resume after 429s.
+//   Phase 2 — judging: single bulk call to /:id/judge (scope=pending) with low
+//             concurrency. Skipped entirely when body.skipJudge is true.
+// onEvent receives the full union of streamed events from both phases plus the
+// existing run-start / run-done bookends, so the UI code keeps working.
 async function streamEvalRun(body, onEvent, signal) {
+  const skipJudgePhase = body?.skipJudge === true;
   const token = getAdminToken();
   if (!token) throw new Error('Admin token required');
 
@@ -2181,7 +2206,7 @@ async function streamEvalRun(body, onEvent, signal) {
       const q = queries[i];
       try {
         // eslint-disable-next-line no-await-in-loop
-        await streamPerQuery(token, evalRunId, q.id, onEvent, signal);
+        await streamPerQuery(token, evalRunId, q.id, onEvent, signal, true);
       } catch (err) {
         if (err.name === 'AbortError') { aborted = true; return; }
         // eslint-disable-next-line no-await-in-loop
@@ -2197,6 +2222,26 @@ async function streamEvalRun(body, onEvent, signal) {
     const e = new Error('aborted');
     e.name = 'AbortError';
     throw e;
+  }
+
+  // 2b. Judge phase — bulk call after all generations have finished. Low
+  // concurrency to avoid Bedrock 429s. Skipped when the user opted to judge later.
+  if (!skipJudgePhase) {
+    await onEvent({ type: 'judge-phase-start', evalRunId });
+    try {
+      await streamJudgePhase(token, evalRunId, onEvent, signal, { scope: 'pending' });
+    } catch (err) {
+      if (err.name === 'AbortError') {
+        aborted = true;
+      } else {
+        await onEvent({ type: 'error', message: err.message || 'judge phase failed' });
+      }
+    }
+    if (aborted) {
+      const e = new Error('aborted');
+      e.name = 'AbortError';
+      throw e;
+    }
   }
 
   // 3. Finalize: aggregate from D1, write summary.
@@ -2420,6 +2465,11 @@ async function renderEvaluationCreateForm(root) {
           <input type="number" name="queryConcurrency" min="1" max="6" step="1" value="3" required>
         </label>
 
+        <label class="admin-field admin-field-checkbox">
+          <input type="checkbox" name="skipJudge">
+          <span>Skip judging — generate now, judge later from the matrix view (use this if Bedrock is throttling).</span>
+        </label>
+
         <div class="admin-experiment-actions">
           <button type="submit" class="admin-btn admin-btn-primary" data-role="run">Run evaluation</button>
           <button type="button" class="admin-btn admin-btn-ghost" data-role="cancel" hidden>Cancel</button>
@@ -2535,6 +2585,7 @@ async function renderEvaluationCreateForm(root) {
     const queryConcurrencyRaw = parseInt(form.querySelector('input[name="queryConcurrency"]').value, 10);
     const queryConcurrency = Number.isNaN(queryConcurrencyRaw)
       ? 3 : Math.max(1, Math.min(6, queryConcurrencyRaw));
+    const skipJudge = form.querySelector('input[name="skipJudge"]')?.checked === true;
     const models = collectModelsFromForm(form);
     if (!models.length) { summaryEl.textContent = 'Select at least one model.'; return; }
 
@@ -2555,13 +2606,19 @@ async function renderEvaluationCreateForm(root) {
 
     try {
       await streamEvalRun({
-        suiteId, models, judgeModel, queryConcurrency,
+        suiteId, models, judgeModel, queryConcurrency, skipJudge,
       }, (evt) => {
         if (evt.type === 'run-start') {
           evalRunId = evt.evalRunId;
           queriesTotal = evt.queryCount;
           progressIds.textContent = `eval ${evalRunId.substring(0, 8)}… · ${evt.queryCount} queries × ${evt.modelCount} models · est. $${(evt.estimatedCostUsd || 0).toFixed(2)} (judge only)`;
           progressPhase.textContent = `Running query 1 / ${queriesTotal}…`;
+        } else if (evt.type === 'judge-phase-start') {
+          progressPhase.textContent = 'Judging — phase 2 of 2…';
+        } else if (evt.type === 'judge-start') {
+          progressPhase.textContent = `Judging ${evt.count} variant${evt.count === 1 ? '' : 's'}…`;
+        } else if (evt.type === 'run-judge-done') {
+          progressPhase.textContent = `Judging done — ${evt.count} variant${evt.count === 1 ? '' : 's'}`;
         } else if (evt.type === 'query-start') {
           const tr = document.createElement('tr');
           tr.dataset.queryId = evt.queryId;
@@ -2701,6 +2758,22 @@ async function renderEvaluation(root, evalRunId) {
     return '';
   };
 
+  // Classify a cell so the toolbar counts and retry buttons can act on it.
+  // judged   — score persisted, no error
+  // pending  — generation succeeded, no judge run yet
+  // judgeErr — generation succeeded, but judge call failed
+  // genErr   — generation failed (status='error')
+  // running  — generation in progress (rare in detail view)
+  const classifyCell = (cell) => {
+    if (!cell) return 'empty';
+    const notes = parseEvaluatorNotes(cell.evaluator_notes);
+    if (notes?.judge_error) return 'judgeErr';
+    if (cell.status === 'error') return 'genErr';
+    if (cell.evaluator_score != null) return 'judged';
+    if (cell.status === 'complete') return 'pending';
+    return 'running';
+  };
+
   const cellHtml = (cell, exp) => {
     if (!cell) return '<td class="admin-eval-cell admin-eval-cell-empty">—</td>';
     const notes = parseEvaluatorNotes(cell.evaluator_notes);
@@ -2713,7 +2786,14 @@ async function renderEvaluation(root, evalRunId) {
     const ttftLabel = cell.time_to_first_token_ms != null
       ? `TTFT ${dur(cell.time_to_first_token_ms)}`
       : 'TTFT —';
-    return `<td class="admin-eval-cell admin-eval-cell-${status}" data-experiment-id="${esc(exp.id)}" data-variant-id="${esc(cell.id)}">
+    const cellClass = classifyCell(cell);
+    const retryAction = cellClass === 'genErr' ? 'regenerate' : 'rejudge';
+    let retryTitle;
+    if (cellClass === 'genErr') retryTitle = 'Regenerate (full pipeline + judge)';
+    else if (cellClass === 'judgeErr' || cellClass === 'pending') retryTitle = 'Run judge for this cell';
+    else retryTitle = 'Re-judge this cell';
+    return `<td class="admin-eval-cell admin-eval-cell-${status} admin-eval-cell-class-${cellClass}" data-experiment-id="${esc(exp.id)}" data-variant-id="${esc(cell.id)}" data-cell-class="${cellClass}">
+      <button type="button" class="admin-eval-cell-retry" data-action="retry" data-retry-action="${retryAction}" title="${esc(retryTitle)}">↻</button>
       <div class="admin-eval-cell-row admin-eval-cell-speed">
         <span class="admin-eval-cell-ttft">${ttftLabel}</span>
         <span class="admin-eval-cell-duration">${dur(cell.duration_ms)}</span>
@@ -2725,6 +2805,20 @@ async function renderEvaluation(root, evalRunId) {
       ${renderBlockerRow(notes)}
     </td>`;
   };
+
+  // Aggregate cell counts for the toolbar — drives Run/Continue judging and
+  // Retry failed cells visibility + N counts.
+  const counts = matrix.reduce((acc, { cells }) => {
+    cells.forEach((c) => {
+      const k = classifyCell(c);
+      acc[k] = (acc[k] || 0) + 1;
+    });
+    return acc;
+  }, {
+    judged: 0, pending: 0, judgeErr: 0, genErr: 0, running: 0, empty: 0,
+  });
+  const totalGenerated = counts.judged + counts.pending + counts.judgeErr;
+  const failedCount = counts.genErr + counts.judgeErr;
 
   const queryLabel = (exp) => {
     const def = suite?.queries?.find((q) => q.id === exp.eval_query_id);
@@ -2802,7 +2896,23 @@ async function renderEvaluation(root, evalRunId) {
 
     <section class="admin-card">
       <h3>Matrix · queries × models</h3>
-      <p class="admin-muted">Each cell shows speed (TTFT, duration, tokens/sec) on top and Claude's quality score below (range 1.00 – 5.00). Click any cell to view that variant's generated page.</p>
+      <p class="admin-muted">Each cell shows speed (TTFT, duration, tokens/sec) on top and Claude's quality score below (range 1.00 – 5.00). Click any cell to view that variant's generated page. Hover a cell and click ↻ to retry just that cell.</p>
+
+      <div class="admin-eval-toolbar" data-role="eval-toolbar">
+        <div class="admin-eval-counts">
+          <span class="admin-eval-count"><strong>${totalGenerated}</strong> generated</span>
+          <span class="admin-eval-count admin-eval-count-judged"><strong>${counts.judged}</strong> judged</span>
+          <span class="admin-eval-count admin-eval-count-pending"><strong>${counts.pending}</strong> pending</span>
+          <span class="admin-eval-count admin-eval-count-error"><strong>${failedCount}</strong> error${failedCount === 1 ? '' : 's'}</span>
+        </div>
+        <div class="admin-eval-toolbar-actions">
+          ${counts.pending > 0 ? `<button type="button" class="admin-btn admin-btn-primary" data-role="run-judging">${counts.judged > 0 ? 'Continue judging' : 'Run judging'} (${counts.pending})</button>` : ''}
+          ${failedCount > 0 ? `<button type="button" class="admin-btn" data-role="retry-failed">Retry failed cells (${failedCount})</button>` : ''}
+          <button type="button" class="admin-btn admin-btn-ghost" data-role="rejudge-all">Re-judge all</button>
+        </div>
+        <div class="admin-eval-toolbar-status admin-muted" data-role="toolbar-status"></div>
+      </div>
+
       ${QUALITY_RUBRIC_HTML}
       <div class="admin-eval-matrix-wrap">
         <table class="admin-table admin-eval-matrix">
@@ -2831,17 +2941,168 @@ async function renderEvaluation(root, evalRunId) {
   const cache = new Map();
 
   root.querySelectorAll('.admin-eval-cell[data-variant-id]').forEach((td) => {
-    td.addEventListener('click', async () => {
+    td.addEventListener('click', async (e) => {
+      // Don't open preview when the user clicks the retry button.
+      if (e.target.closest('[data-action="retry"]')) return;
       const expId = td.dataset.experimentId;
       const varId = td.dataset.variantId;
       previewCard.hidden = false;
-      const exp = experiments.find((e) => e.id === expId);
+      const exp = experiments.find((ex) => ex.id === expId);
       const variant = variants.find((v) => v.id === varId);
       previewMeta.textContent = `${exp?.eval_query_id || ''} · ${variant?.provider || ''} · ${variant?.model || ''} · TTFT ${variant?.time_to_first_token_ms != null ? dur(variant.time_to_first_token_ms) : '—'} · duration ${dur(variant?.duration_ms)} · quality ${variant?.evaluator_score != null ? variant.evaluator_score.toFixed(2) : '—'}`;
       previewCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
       await renderExperimentVariantPreview(previewSlot, expId, varId, cache);
     });
   });
+
+  // ── Retry actions ─────────────────────────────────────────────────────────
+  const toolbarStatus = root.querySelector('[data-role="toolbar-status"]');
+  const setToolbarStatus = (txt) => {
+    if (toolbarStatus) toolbarStatus.textContent = txt || '';
+  };
+  const reload = () => renderEvaluation(root, evalRunId);
+
+  const rejudgeOneCell = async (cellEl) => {
+    const { variantId } = cellEl.dataset;
+    const original = cellEl.innerHTML;
+    cellEl.classList.add('admin-eval-cell-busy');
+    cellEl.innerHTML = '<span class="admin-loading">Re-judging…</span>';
+    try {
+      const res = await fetch(
+        `${ARCO_RECOMMENDER_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/variants/${encodeURIComponent(variantId)}/rejudge`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Basic ${btoa(`admin:${getAdminToken()}`)}` },
+        },
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text().catch(() => '')}`);
+      await reload();
+    } catch (err) {
+      cellEl.innerHTML = original;
+      cellEl.classList.remove('admin-eval-cell-busy');
+      setToolbarStatus(`Re-judge failed: ${err.message}`);
+    }
+  };
+
+  const regenerateOneCell = async (cellEl) => {
+    const { variantId } = cellEl.dataset;
+    cellEl.classList.add('admin-eval-cell-busy');
+    cellEl.innerHTML = '<span class="admin-loading">Regenerating…</span>';
+    try {
+      const res = await fetch(
+        `${ARCO_RECOMMENDER_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/variants/${encodeURIComponent(variantId)}/regenerate`,
+        {
+          method: 'POST',
+          headers: { Authorization: `Basic ${btoa(`admin:${getAdminToken()}`)}` },
+        },
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text().catch(() => '')}`);
+      // Drain the NDJSON so the worker actually runs to completion. We don't
+      // need to render the events — we'll just reload the matrix at the end.
+      await consumeNdjson(res, () => {});
+      await reload();
+    } catch (err) {
+      cellEl.classList.remove('admin-eval-cell-busy');
+      setToolbarStatus(`Regenerate failed: ${err.message}`);
+    }
+  };
+
+  root.querySelectorAll('.admin-eval-cell[data-variant-id]').forEach((td) => {
+    const retryBtn = td.querySelector('[data-action="retry"]');
+    if (!retryBtn) return;
+    retryBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const { retryAction: action } = retryBtn.dataset;
+      const { cellClass } = td.dataset;
+      // Successfully judged cells need confirmation — re-judging costs Bedrock tokens.
+      if (cellClass === 'judged' && !window.confirm('Re-judge this cell? This will overwrite the existing score and use Bedrock tokens.')) return;
+      if (action === 'regenerate') await regenerateOneCell(td);
+      else await rejudgeOneCell(td);
+    });
+  });
+
+  const runBulkJudge = async (scope, label) => {
+    const btn = root.querySelector('[data-role="run-judging"]')
+      || root.querySelector('[data-role="rejudge-all"]');
+    if (btn) btn.disabled = true;
+    setToolbarStatus(`${label}…`);
+    let done = 0;
+    let errs = 0;
+    try {
+      const res = await fetch(
+        `${ARCO_RECOMMENDER_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/judge`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Basic ${btoa(`admin:${getAdminToken()}`)}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ scope }),
+        },
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text().catch(() => '')}`);
+      await consumeNdjson(res, async (evt) => {
+        if (evt.type === 'judge-done') {
+          done += 1;
+          setToolbarStatus(`${label}: ${done} done · ${errs} errors`);
+        } else if (evt.type === 'judge-error') {
+          errs += 1;
+          setToolbarStatus(`${label}: ${done} done · ${errs} errors`);
+        } else if (evt.type === 'judge-start') {
+          setToolbarStatus(`${label}: 0 / ${evt.count}`);
+        }
+      });
+      setToolbarStatus(`${label} complete — ${done} done, ${errs} errors`);
+      await reload();
+    } catch (err) {
+      setToolbarStatus(`${label} failed: ${err.message}`);
+      if (btn) btn.disabled = false;
+    }
+  };
+
+  const runJudgingBtn = root.querySelector('[data-role="run-judging"]');
+  if (runJudgingBtn) {
+    runJudgingBtn.addEventListener('click', () => runBulkJudge('pending', 'Judging pending cells'));
+  }
+  const rejudgeAllBtn = root.querySelector('[data-role="rejudge-all"]');
+  if (rejudgeAllBtn) {
+    rejudgeAllBtn.addEventListener('click', () => {
+      if (!window.confirm('Re-judge ALL completed cells in this run? This will overwrite existing scores and use Bedrock tokens for every cell.')) return;
+      runBulkJudge('all', 'Re-judging all cells');
+    });
+  }
+  const retryFailedBtn = root.querySelector('[data-role="retry-failed"]');
+  if (retryFailedBtn) {
+    retryFailedBtn.addEventListener('click', async () => {
+      // Failed cells split into two groups: gen errors (need regenerate) and
+      // judge errors (just need rejudge). Run gens sequentially (each costs a
+      // full pipeline run), then bulk-rejudge the rest in one streaming call.
+      const genErrCells = [...root.querySelectorAll('.admin-eval-cell-class-genErr')];
+      const judgeErrCount = counts.judgeErr;
+      const failureSummary = `${genErrCells.length} regen + ${judgeErrCount} re-judge`;
+      if (!window.confirm(`Retry failed cells: ${failureSummary}? Regenerations cost upstream LLM tokens; re-judges cost Bedrock tokens.`)) return;
+      retryFailedBtn.disabled = true;
+      try {
+        if (genErrCells.length) {
+          // eslint-disable-next-line no-restricted-syntax
+          for (const td of genErrCells) {
+            setToolbarStatus(`Regenerating ${td.dataset.variantId.substring(0, 8)}…`);
+            // eslint-disable-next-line no-await-in-loop
+            await regenerateOneCell(td);
+          }
+        }
+        if (judgeErrCount > 0) {
+          await runBulkJudge('errors', 'Re-judging error cells');
+        } else {
+          await reload();
+        }
+      } catch (err) {
+        setToolbarStatus(`Retry failed: ${err.message}`);
+      } finally {
+        retryFailedBtn.disabled = false;
+      }
+    });
+  }
 }
 
 // ── Entry ───────────────────────────────────────────────────────────────────

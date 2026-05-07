@@ -52,7 +52,10 @@ const VARIANT_KV_TTL = 60 * 60 * 24 * 90; // 90 days
 const JUDGE_CONCURRENCY = 4;
 const DEFAULT_QUERY_CONCURRENCY = 3;
 const MAX_QUERY_CONCURRENCY = 6;
+const DEFAULT_REJUDGE_CONCURRENCY = 2;
+const MAX_REJUDGE_CONCURRENCY = 4;
 const KV_KEY = (expId, varId) => `experiment:${expId}:variant:${varId}`;
+const RAG_KV_KEY = (expId) => `experiment:${expId}:rag-context`;
 
 // ── Validation ────────────────────────────────────────────────────────────────
 
@@ -359,7 +362,7 @@ async function runWithConcurrency(items, limit, fn) {
 // ── Per-query execution ───────────────────────────────────────────────────────
 
 async function runOneQuery({
-  env, request, query, queryDef, models, evalRunId, judgeModel, writeLine,
+  env, request, query, queryDef, models, evalRunId, judgeModel, writeLine, skipJudge,
 }) {
   // Fresh ctx for this query — upstream pipeline is run independently per query.
   const ctx = createContext({ query }, request);
@@ -410,6 +413,27 @@ async function runOneQuery({
   const intentType = ctx.intent?.type || null;
   const journeyStage = ctx.request?.inferredProfile?.journeyStage || null;
   const experimentId = crypto.randomUUID();
+
+  // Persist RAG context once per experiment so re-judge / re-generate can rebuild
+  // the judge prompt without re-running the upstream pipeline (which costs Vectorize +
+  // model calls). Shared by all variants of this query.
+  if (env.SESSION_STORE) {
+    try {
+      await env.SESSION_STORE.put(
+        RAG_KV_KEY(experimentId),
+        JSON.stringify({
+          rag: ctx.rag || {},
+          intent: ctx.intent || null,
+          journeyStage,
+          query,
+          queryId: queryDef.id,
+        }),
+        { expirationTtl: VARIANT_KV_TTL },
+      );
+    } catch (kvErr) {
+      console.error('[Eval] RAG context KV write failed:', kvErr.message);
+    }
+  }
 
   await writeLine({
     type: 'query-start',
@@ -565,9 +589,11 @@ async function runOneQuery({
     }));
   }
 
-  // Deterministic assertions — run on every completed variant before the judge.
-  // Cheap, perfectly reliable, no token cost. Catches structural defects the
-  // judge often misses (broken {{story:slug}} tokens, unbalanced HTML, etc.).
+  // Deterministic assertions — run on every completed variant. Cheap, perfectly
+  // reliable, no token cost. Catches structural defects the judge often misses
+  // (broken {{story:slug}} tokens, unbalanced HTML, etc.).
+  // Always run, even when skipJudge=true, so the matrix can show structural
+  // problems immediately after generation.
   const assertionsByVariant = new Map();
   await Promise.all(variants.map(async (v) => {
     if (v.status !== 'complete' || !v.state.sections.length) return;
@@ -588,6 +614,59 @@ async function runOneQuery({
       violations: assertions.violations,
     });
   }));
+
+  // When skipJudge is true (two-phase mode), persist assertion findings so the
+  // matrix can render structural blockers immediately, then return without
+  // calling the judge. The bulk judge phase will be invoked separately.
+  if (skipJudge) {
+    if (env.SESSIONS_DB) {
+      await Promise.all(variants.map(async (v) => {
+        const assertions = assertionsByVariant.get(v.id);
+        if (!assertions) return;
+        const blockerInfo = {
+          blocker: !assertions.passed,
+          reasons: assertions.passed ? [] : ['assertions-failed'],
+        };
+        try {
+          await writeVariantAssertionsOnly(env.SESSIONS_DB, v.id, assertions, blockerInfo);
+        } catch { /* ignore */ }
+      }));
+      try {
+        const anyComplete = variants.some((v) => v.status === 'complete');
+        const expStatus = anyComplete ? 'complete' : 'error';
+        await finalizeExperimentRow(env.SESSIONS_DB, experimentId, expStatus, sharedDurationMs);
+      } catch (dbErr) {
+        console.error('[Eval] experiment finalize failed:', dbErr.message);
+      }
+    }
+    await writeLine({
+      type: 'query-done',
+      queryId: queryDef.id,
+      experimentId,
+      variantCount: variants.length,
+      completedCount: variants.filter((v) => v.status === 'complete').length,
+      judgedCount: 0,
+      skippedJudge: true,
+    });
+    const generationInputTokensSkip = variants.reduce(
+      (n, v) => n + (v.state.usage?.prompt_tokens || 0),
+      0,
+    );
+    const generationOutputTokensSkip = variants.reduce(
+      (n, v) => n + (v.state.usage?.completion_tokens || 0),
+      0,
+    );
+    return {
+      queryId: queryDef.id,
+      experimentId,
+      variants,
+      judgements: [],
+      generationInputTokens: generationInputTokensSkip,
+      generationOutputTokens: generationOutputTokensSkip,
+      judgeInputTokens: 0,
+      judgeOutputTokens: 0,
+    };
+  }
 
   // Judge — concurrency-limited, only completed variants.
   const judgeable = variants.filter((v) => v.status === 'complete' && v.state.sections.length > 0);
@@ -777,7 +856,564 @@ async function loadEvalRunConfig(env, evalRunId) {
   };
 }
 
-export async function runEvalQueryStream(request, env, evalRunId, queryId) {
+// ── Re-judge / regenerate helpers ─────────────────────────────────────────────
+// These power the "Run judging" / "Continue judging" / per-cell retry buttons.
+// They reuse the persisted RAG context KV key written by runOneQuery so the
+// judge can be invoked without re-running the upstream pipeline.
+
+async function loadVariantKvPayload(env, expId, varId) {
+  if (!env.SESSION_STORE) return null;
+  const raw = await env.SESSION_STORE.get(KV_KEY(expId, varId));
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+async function loadRagContext(env, expId) {
+  if (!env.SESSION_STORE) return null;
+  const raw = await env.SESSION_STORE.get(RAG_KV_KEY(expId));
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+async function loadVariantRow(env, variantId) {
+  if (!env.SESSIONS_DB) return null;
+  const { results } = await env.SESSIONS_DB.prepare(`
+    SELECT id, experiment_id, provider, model, status, evaluator_score, evaluator_notes
+    FROM experiment_variants WHERE id = ?1
+  `).bind(variantId).all();
+  return results?.[0] || null;
+}
+
+async function loadExperimentRow(env, experimentId) {
+  if (!env.SESSIONS_DB) return null;
+  const { results } = await env.SESSIONS_DB.prepare(`
+    SELECT id, eval_run_id, eval_query_id, query, shared_intent_type, shared_journey_stage
+    FROM experiments WHERE id = ?1
+  `).bind(experimentId).all();
+  return results?.[0] || null;
+}
+
+/**
+ * Judge a single variant without re-running the pipeline. Loads blocks from KV,
+ * loads the experiment's persisted RAG context, runs the judge, persists the
+ * score + notes. Cheap — 1 Bedrock call, no LLM-generate.
+ */
+async function judgeOneVariantFromKv({
+  env, variantId, judgeModel, signal,
+}) {
+  const variantRow = await loadVariantRow(env, variantId);
+  if (!variantRow) throw new Error('Variant not found');
+  if (variantRow.status !== 'complete') {
+    throw new Error(`Variant generation not complete (status=${variantRow.status})`);
+  }
+  const expRow = await loadExperimentRow(env, variantRow.experiment_id);
+  if (!expRow) throw new Error('Experiment not found for variant');
+
+  const payload = await loadVariantKvPayload(env, variantRow.experiment_id, variantId);
+  if (!payload || !Array.isArray(payload.blocks) || !payload.blocks.length) {
+    throw new Error('Variant blocks not found in KV (payload missing or empty)');
+  }
+  const ragCtx = await loadRagContext(env, variantRow.experiment_id);
+
+  // Look up the suite query def from the eval_run so we can pass expectedIntent
+  // and expectedBehavior to the judge (these affect scoring for off-topic/decline
+  // cases). Falls back gracefully if the eval_run row is missing.
+  let queryDef = null;
+  let runJudgeModel = judgeModel;
+  if (expRow.eval_run_id) {
+    const cfg = await loadEvalRunConfig(env, expRow.eval_run_id);
+    if (cfg) {
+      queryDef = cfg.suite.queries.find((q) => q.id === expRow.eval_query_id) || null;
+      if (!runJudgeModel) runJudgeModel = cfg.judgeModel;
+    }
+  }
+  if (!runJudgeModel) runJudgeModel = 'claude-sonnet-4-6';
+
+  // Re-run assertions on the persisted blocks (idempotent, deterministic).
+  const assertions = runAssertions(payload.blocks, queryDef || {});
+
+  const result = await judgeVariant(env, {
+    judgeModel: runJudgeModel,
+    query: payload.request?.query || expRow.query || '',
+    expectedIntent: queryDef?.expectedIntent || null,
+    expectedBehavior: queryDef?.expectedBehavior || null,
+    classifiedIntent: ragCtx?.intent?.type || expRow.shared_intent_type || null,
+    journeyStage: ragCtx?.journeyStage || expRow.shared_journey_stage || null,
+    rag: ragCtx?.rag || {},
+    blocks: payload.blocks,
+    signal,
+  });
+  const blockerInfo = detectBlocker(result.dims, assertions);
+  if (env.SESSIONS_DB) {
+    await writeVariantJudgeResult(env.SESSIONS_DB, variantId, result, assertions, blockerInfo);
+  }
+  return {
+    variantId,
+    experimentId: variantRow.experiment_id,
+    queryId: expRow.eval_query_id,
+    score: result.score,
+    blocker: blockerInfo.blocker,
+    blockerReasons: blockerInfo.reasons,
+    summary: result.summary,
+    dims: result.dims,
+    judgeModel: result.judgeModel,
+    judgeInputTokens: result.inputTokens,
+    judgeOutputTokens: result.outputTokens,
+    judgeDurationMs: result.durationMs,
+    assertions,
+  };
+}
+
+/**
+ * Bulk judge phase across an entire eval run with shared concurrency limit.
+ * Scope filters which variants are judged:
+ *   pending — score IS NULL, status='complete', no judge_error in notes
+ *   errors  — judge_error in notes (i.e. previous attempt failed)
+ *   all     — every completed variant (force re-judge)
+ * Streams NDJSON: judge-start, judge-done, judge-error, run-judge-done.
+ */
+async function findVariantsForScope(env, evalRunId, scope) {
+  if (!env.SESSIONS_DB) return [];
+  const baseSql = `
+    SELECT v.id, v.experiment_id, v.provider, v.model, v.status,
+           v.evaluator_score, v.evaluator_notes, e.eval_query_id
+    FROM experiment_variants v
+    JOIN experiments e ON v.experiment_id = e.id
+    WHERE e.eval_run_id = ?1
+  `;
+  let where;
+  if (scope === 'errors') {
+    where = "AND v.evaluator_notes LIKE '%judge_error%'";
+  } else if (scope === 'all') {
+    where = "AND v.status = 'complete'";
+  } else {
+    // 'pending' default
+    where = "AND v.status = 'complete' AND v.evaluator_score IS NULL AND (v.evaluator_notes IS NULL OR v.evaluator_notes NOT LIKE '%judge_error%')";
+  }
+  const { results } = await env.SESSIONS_DB.prepare(`${baseSql} ${where}`).bind(evalRunId).all();
+  return results || [];
+}
+
+export async function judgeRunPendingStream(request, env, evalRunId, options = {}) {
+  const cfg = await loadEvalRunConfig(env, evalRunId);
+  if (!cfg) {
+    return new Response(JSON.stringify({ error: 'Eval run not found' }), {
+      status: 404,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    });
+  }
+  const scope = ['pending', 'errors', 'all'].includes(options.scope) ? options.scope : 'pending';
+  let concurrency = typeof options.judgeConcurrency === 'number'
+    ? Math.round(options.judgeConcurrency) : DEFAULT_REJUDGE_CONCURRENCY;
+  concurrency = Math.max(1, Math.min(MAX_REJUDGE_CONCURRENCY, concurrency));
+
+  const targets = await findVariantsForScope(env, evalRunId, scope);
+
+  const { readable, writable } = new TransformStream();
+  const writer = writable.getWriter();
+  const encoder = new TextEncoder();
+  const writeLine = async (obj) => {
+    try { await writer.write(encoder.encode(`${JSON.stringify(obj)}\n`)); } catch { /* ignore */ }
+  };
+
+  const promise = (async () => {
+    try {
+      await writeLine({
+        type: 'judge-start', evalRunId, scope, count: targets.length, concurrency,
+      });
+      await runWithConcurrency(targets, concurrency, async (t) => {
+        await writeLine({
+          type: 'variant-judge-start',
+          variantId: t.id,
+          experimentId: t.experiment_id,
+          queryId: t.eval_query_id,
+        });
+        try {
+          const result = await judgeOneVariantFromKv({
+            env, variantId: t.id, judgeModel: cfg.judgeModel,
+          });
+          await writeLine({
+            type: 'judge-done',
+            variantId: t.id,
+            experimentId: result.experimentId,
+            queryId: result.queryId,
+            score: result.score,
+            blocker: result.blocker,
+            blockerReasons: result.blockerReasons,
+            summary: result.summary,
+            dims: result.dims,
+            judgeModel: result.judgeModel,
+            judgeInputTokens: result.judgeInputTokens,
+            judgeOutputTokens: result.judgeOutputTokens,
+            judgeDurationMs: result.judgeDurationMs,
+          });
+        } catch (err) {
+          const message = err.message || 'judge failed';
+          console.error(`[Eval] re-judge failed (${t.id}):`, message);
+          if (env.SESSIONS_DB) {
+            try {
+              await writeVariantJudgeError(env.SESSIONS_DB, t.id, message);
+            } catch { /* ignore */ }
+          }
+          await writeLine({
+            type: 'judge-error',
+            variantId: t.id,
+            experimentId: t.experiment_id,
+            queryId: t.eval_query_id,
+            message,
+          });
+        }
+      });
+      await writeLine({
+        type: 'run-judge-done', evalRunId, scope, count: targets.length,
+      });
+    } catch (err) {
+      await writeLine({ type: 'error', message: err.message || 'judge phase failed' });
+    } finally {
+      try { await writer.close(); } catch { /* already closed */ }
+    }
+  })();
+
+  request.ctx?.waitUntil?.(promise);
+  if (!request.ctx) promise.catch(() => {});
+
+  return new Response(readable, {
+    headers: {
+      ...CORS_HEADERS,
+      'Content-Type': 'application/x-ndjson',
+      'Transfer-Encoding': 'chunked',
+      'Cache-Control': 'no-cache',
+    },
+  });
+}
+
+/**
+ * Re-judge a single variant. Returns JSON (no streaming — judge is short).
+ */
+export async function rejudgeOneVariant(env, evalRunId, variantId) {
+  const cfg = await loadEvalRunConfig(env, evalRunId);
+  if (!cfg) return { error: 'Eval run not found', status: 404 };
+  try {
+    const result = await judgeOneVariantFromKv({
+      env, variantId, judgeModel: cfg.judgeModel,
+    });
+    return { ok: true, result };
+  } catch (err) {
+    const message = err.message || 'judge failed';
+    if (env.SESSIONS_DB) {
+      try {
+        await writeVariantJudgeError(env.SESSIONS_DB, variantId, message);
+      } catch { /* ignore */ }
+    }
+    return { ok: false, error: message };
+  }
+}
+
+/**
+ * Regenerate a single variant: re-runs upstream pipeline for its query,
+ * regenerates the LLM output, runs assertions + judge. Updates the existing
+ * variant row (no new row created). Streams NDJSON.
+ */
+export async function regenerateOneVariantStream(request, env, evalRunId, variantId) {
+  const cfg = await loadEvalRunConfig(env, evalRunId);
+  if (!cfg) {
+    return new Response(JSON.stringify({ error: 'Eval run not found' }), {
+      status: 404,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    });
+  }
+  const variantRow = await loadVariantRow(env, variantId);
+  if (!variantRow) {
+    return new Response(JSON.stringify({ error: 'Variant not found' }), {
+      status: 404,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    });
+  }
+  const expRow = await loadExperimentRow(env, variantRow.experiment_id);
+  if (!expRow || !expRow.eval_query_id) {
+    return new Response(JSON.stringify({ error: 'Experiment / query not found' }), {
+      status: 404,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    });
+  }
+  const queryDef = cfg.suite.queries.find((q) => q.id === expRow.eval_query_id);
+  if (!queryDef) {
+    return new Response(JSON.stringify({ error: 'Query not in suite' }), {
+      status: 404,
+      headers: { ...CORS_HEADERS, 'Content-Type': 'application/json' },
+    });
+  }
+
+  const { readable, writable } = new TransformStream();
+  const writer = writable.getWriter();
+  const encoder = new TextEncoder();
+  request.evalWriter = writer;
+  request.evalEncoder = encoder;
+  const writeLine = async (obj) => {
+    try { await writer.write(encoder.encode(`${JSON.stringify(obj)}\n`)); } catch { /* ignore */ }
+  };
+
+  const promise = (async () => {
+    try {
+      await writeLine({
+        type: 'regenerate-start',
+        variantId,
+        experimentId: variantRow.experiment_id,
+        queryId: expRow.eval_query_id,
+      });
+
+      // Reset evaluator_* before regeneration so the matrix shows "in progress".
+      if (env.SESSIONS_DB) {
+        try {
+          await env.SESSIONS_DB.prepare(`
+            UPDATE experiment_variants
+            SET status = 'running', evaluator_score = NULL, evaluator_notes = NULL,
+                duration_ms = NULL, time_to_first_token_ms = NULL,
+                input_tokens = NULL, output_tokens = NULL, title = NULL,
+                block_count = NULL, error = NULL
+            WHERE id = ?1
+          `).bind(variantId).run();
+        } catch (dbErr) {
+          console.error('[Eval] regenerate D1 reset failed:', dbErr.message);
+        }
+      }
+
+      // Build a fresh ctx for this query — same as runOneQuery does.
+      const ctx = createContext({ query: queryDef.query }, request);
+      const flow = resolveFlow('default');
+      ctx.flowId = flow.id;
+      ctx.flowName = flow.name || flow.id;
+      ctx.writer = writer;
+      ctx.encoder = encoder;
+      ctx.timings.steps = [];
+
+      const gateSteps = flow.steps.filter((s) => s.gate);
+      for (let gi = 0; gi < gateSteps.length; gi += 1) {
+        if (ctx.earlyResponse) break;
+        const s = gateSteps[gi];
+        // eslint-disable-next-line no-await-in-loop
+        await STEPS[s.step](ctx, s.config || {}, env);
+      }
+      if (ctx.earlyResponse) {
+        await writeLine({ type: 'regenerate-error', variantId, message: 'gated before pipeline' });
+        return;
+      }
+
+      const upstreamSteps = flow.steps.filter(
+        (s) => !s.gate && !(s.step === 'llm-generate'),
+      );
+      await executeFlow(upstreamSteps, ctx, env);
+
+      const heroImage = selectHeroImage({
+        query: ctx.request?.query,
+        useCases: ctx.rag?.useCase?.useCases,
+        intentType: ctx.intent?.type,
+        productIds: extractProductIds(ctx.request?.query || ''),
+      }, ctx.rag?.heroImages || []);
+      setHeroResult(heroImage);
+
+      // Refresh persisted RAG context to match the new pipeline run.
+      if (env.SESSION_STORE) {
+        try {
+          await env.SESSION_STORE.put(
+            RAG_KV_KEY(variantRow.experiment_id),
+            JSON.stringify({
+              rag: ctx.rag || {},
+              intent: ctx.intent || null,
+              journeyStage: ctx.request?.inferredProfile?.journeyStage || null,
+              query: queryDef.query,
+              queryId: queryDef.id,
+            }),
+            { expirationTtl: VARIANT_KV_TTL },
+          );
+        } catch (kvErr) {
+          console.error('[Eval] RAG context KV refresh failed:', kvErr.message);
+        }
+      }
+
+      // Re-run the LLM step against the existing variant row.
+      const resolved = resolveLlmConfig(
+        {
+          provider: variantRow.provider,
+          model: variantRow.model,
+          temperature: null,
+          maxTokens: null,
+        },
+        flow.steps.find((s) => s.step === 'llm-generate')?.config || {},
+      );
+      const variant = {
+        id: variantId,
+        experimentId: variantRow.experiment_id,
+        variantIndex: 0,
+        provider: resolved.provider,
+        model: resolved.model,
+        temperature: resolved.temperature,
+        maxTokens: resolved.maxTokens,
+        state: createVariantState(),
+        timings: {},
+        status: 'running',
+        startedAt: Date.now(),
+        finishedAt: null,
+        error: null,
+        ttftMs: null,
+        title: null,
+      };
+
+      try {
+        const { title } = await runLlmVariant(ctx, env, {
+          variantId,
+          provider: variant.provider,
+          model: variant.model,
+          temperature: variant.temperature,
+          maxTokens: variant.maxTokens,
+          out: variant.state,
+          timings: variant.timings,
+          emitDebug: false,
+          emitDone: false,
+        });
+        variant.finishedAt = Date.now();
+        variant.status = 'complete';
+        variant.title = title || extractTitle(variant.state.sections[0] || '');
+        variant.ttftMs = (variant.timings.llmFirstToken && variant.timings.llmStart)
+          ? variant.timings.llmFirstToken - variant.timings.llmStart
+          : null;
+      } catch (err) {
+        variant.finishedAt = Date.now();
+        variant.status = 'error';
+        variant.error = err.message || 'variant failed';
+      }
+
+      // Persist KV payload + finalize variant row.
+      if (env.SESSION_STORE) {
+        try {
+          const payload = buildVariantPayload(ctx, variant);
+          await env.SESSION_STORE.put(
+            KV_KEY(variantRow.experiment_id, variantId),
+            JSON.stringify(payload),
+            { expirationTtl: VARIANT_KV_TTL },
+          );
+        } catch (kvErr) {
+          console.error(`[Eval] regen KV write failed (${variantId}):`, kvErr.message);
+        }
+      }
+      if (env.SESSIONS_DB) {
+        try {
+          await finalizeVariantRow(env.SESSIONS_DB, {
+            id: variantId,
+            status: variant.status,
+            durationMs: variant.finishedAt && variant.startedAt
+              ? variant.finishedAt - variant.startedAt : null,
+            ttftMs: variant.ttftMs ?? null,
+            inputTokens: variant.state.usage?.prompt_tokens || null,
+            outputTokens: variant.state.usage?.completion_tokens || null,
+            title: variant.title,
+            blockCount: variant.state.sections.length,
+            error: variant.error,
+          });
+        } catch (dbErr) {
+          console.error('[Eval] regen finalize failed:', dbErr.message);
+        }
+      }
+
+      await writeLine({
+        type: 'variant-done',
+        variantId,
+        experimentId: variantRow.experiment_id,
+        queryId: queryDef.id,
+        durationMs: variant.finishedAt && variant.startedAt
+          ? variant.finishedAt - variant.startedAt : null,
+        ttftMs: variant.ttftMs,
+        inputTokens: variant.state.usage?.prompt_tokens || 0,
+        outputTokens: variant.state.usage?.completion_tokens || 0,
+        title: variant.title,
+        blockCount: variant.state.sections.length,
+        status: variant.status,
+        error: variant.error,
+      });
+
+      if (variant.status !== 'complete') return;
+
+      // Run assertions + judge directly using the fresh ctx (no need to round-trip KV).
+      const blocks = variant.state.sections.map((html, i) => ({
+        index: i,
+        blockType: variant.state.rawJsonSections?.[i]?.block || 'unknown',
+        html,
+      }));
+      const assertions = runAssertions(blocks, queryDef);
+      try {
+        const result = await judgeVariant(env, {
+          judgeModel: cfg.judgeModel,
+          query: queryDef.query,
+          expectedIntent: queryDef.expectedIntent || null,
+          expectedBehavior: queryDef.expectedBehavior || null,
+          classifiedIntent: ctx.intent?.type || null,
+          journeyStage: ctx.request?.inferredProfile?.journeyStage || null,
+          rag: ctx.rag || {},
+          blocks,
+        });
+        const blockerInfo = detectBlocker(result.dims, assertions);
+        if (env.SESSIONS_DB) {
+          await writeVariantJudgeResult(
+            env.SESSIONS_DB,
+            variantId,
+            result,
+            assertions,
+            blockerInfo,
+          );
+        }
+        await writeLine({
+          type: 'judge-done',
+          variantId,
+          experimentId: variantRow.experiment_id,
+          queryId: queryDef.id,
+          score: result.score,
+          blocker: blockerInfo.blocker,
+          blockerReasons: blockerInfo.reasons,
+          summary: result.summary,
+          dims: result.dims,
+          judgeModel: result.judgeModel,
+          judgeInputTokens: result.inputTokens,
+          judgeOutputTokens: result.outputTokens,
+          judgeDurationMs: result.durationMs,
+        });
+      } catch (err) {
+        const message = err.message || 'judge failed';
+        if (env.SESSIONS_DB) {
+          try {
+            await writeVariantJudgeError(env.SESSIONS_DB, variantId, message);
+          } catch { /* ignore */ }
+        }
+        await writeLine({
+          type: 'judge-error',
+          variantId,
+          experimentId: variantRow.experiment_id,
+          queryId: queryDef.id,
+          message,
+        });
+      }
+    } catch (err) {
+      console.error('[Eval] regenerate failed:', err);
+      await writeLine({ type: 'regenerate-error', variantId, message: err.message || 'regenerate failed' });
+    } finally {
+      try { await writer.close(); } catch { /* already closed */ }
+    }
+  })();
+
+  request.ctx?.waitUntil?.(promise);
+  if (!request.ctx) promise.catch(() => {});
+
+  return new Response(readable, {
+    headers: {
+      ...CORS_HEADERS,
+      'Content-Type': 'application/x-ndjson',
+      'Transfer-Encoding': 'chunked',
+      'Cache-Control': 'no-cache',
+    },
+  });
+}
+
+export async function runEvalQueryStream(request, env, evalRunId, queryId, options = {}) {
+  const skipJudge = options.skipJudge === true;
   const cfg = await loadEvalRunConfig(env, evalRunId);
   if (!cfg) {
     return new Response(JSON.stringify({ error: 'Eval run not found' }), {
@@ -818,6 +1454,7 @@ export async function runEvalQueryStream(request, env, evalRunId, queryId) {
         evalRunId,
         judgeModel: cfg.judgeModel,
         writeLine,
+        skipJudge,
       });
     } catch (err) {
       console.error('[Eval] runOneQuery failed:', err);

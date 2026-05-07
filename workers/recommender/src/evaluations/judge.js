@@ -57,8 +57,12 @@ export function getJudgeRates(id) {
 const MAX_BLOCK_CHARS = 24_000; // ~6k tokens of generated HTML; truncates long pages.
 // ~1.5k tokens of RAG context — enough for prices+specs without crowding blocks.
 const MAX_RAG_CHARS = 6_000;
-const MAX_RETRIES = 3;
-const RETRY_BASE_MS = 800;
+const MAX_RETRIES = 5;
+// Exponential backoff base (ms). Sleep on attempt N is RETRY_BASE_MS * 2^N + jitter.
+// So 1s, 2s, 4s, 8s, 16s for attempts 0..4 — keeps Bedrock 429s recoverable
+// without blocking forever.
+const RETRY_BASE_MS = 1000;
+const RETRY_JITTER_MS = 500;
 
 const RUBRIC = `Score on each dimension 1-5 (1=poor, 5=excellent) with one short sentence of reasoning:
 
@@ -258,8 +262,9 @@ async function callWithRetry(args) {
       // Retry only on throttle / 5xx — bail immediately on auth + bad request.
       if (status && status !== 429 && status < 500) throw err;
       lastErr = err;
+      const sleepMs = RETRY_BASE_MS * (2 ** attempt) + Math.random() * RETRY_JITTER_MS;
       // eslint-disable-next-line no-await-in-loop
-      await new Promise((resolve) => { setTimeout(resolve, RETRY_BASE_MS * (attempt + 1)); });
+      await new Promise((resolve) => { setTimeout(resolve, sleepMs); });
     }
   }
   throw lastErr || new Error('Bedrock judge call failed');

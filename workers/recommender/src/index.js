@@ -40,6 +40,9 @@ import {
   handleFinalizeEvaluation,
   handleListEvaluations,
   handleGetEvaluation,
+  handleJudgeEvaluation,
+  handleRejudgeVariant,
+  handleRegenerateVariant,
 } from './evaluations/admin.js';
 import handleSuggestRequest from './suggest.js';
 
@@ -445,6 +448,22 @@ export default {
     const evalQueriesMatch = url.pathname.match(/^\/api\/admin\/evaluations\/([^/]+)\/queries$/);
     if (evalQueriesMatch && request.method === 'POST') {
       return handleRunEvalQuery(request, env, evalQueriesMatch[1]);
+    }
+    const evalJudgeMatch = url.pathname.match(/^\/api\/admin\/evaluations\/([^/]+)\/judge$/);
+    if (evalJudgeMatch && request.method === 'POST') {
+      return handleJudgeEvaluation(request, env, evalJudgeMatch[1]);
+    }
+    const evalRejudgeMatch = url.pathname.match(
+      /^\/api\/admin\/evaluations\/([^/]+)\/variants\/([^/]+)\/rejudge$/,
+    );
+    if (evalRejudgeMatch && request.method === 'POST') {
+      return handleRejudgeVariant(request, env, evalRejudgeMatch[1], evalRejudgeMatch[2]);
+    }
+    const evalRegenMatch = url.pathname.match(
+      /^\/api\/admin\/evaluations\/([^/]+)\/variants\/([^/]+)\/regenerate$/,
+    );
+    if (evalRegenMatch && request.method === 'POST') {
+      return handleRegenerateVariant(request, env, evalRegenMatch[1], evalRegenMatch[2]);
     }
     const evalFinalizeMatch = url.pathname.match(/^\/api\/admin\/evaluations\/([^/]+)\/finalize$/);
     if (evalFinalizeMatch && request.method === 'POST') {

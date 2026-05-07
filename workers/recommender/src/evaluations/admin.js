@@ -1,12 +1,17 @@
 /**
  * Admin route handlers for the LLM Evaluation tab.
  *
- *   GET  /api/admin/eval-suites                       — bundled suites + judge models
- *   POST /api/admin/evaluations                       — create a run (returns JSON)
- *   POST /api/admin/evaluations/:id/queries           — run one query (NDJSON stream)
- *   POST /api/admin/evaluations/:id/finalize          — finalize + summary (JSON)
- *   GET  /api/admin/evaluations                       — paginated list of runs
- *   GET  /api/admin/evaluations/:id                   — run detail
+ *   GET  /api/admin/eval-suites
+ *   POST /api/admin/evaluations
+ *   POST /api/admin/evaluations/:id/queries
+ *     body: { queryId, skipJudge? }
+ *   POST /api/admin/evaluations/:id/judge
+ *     body: { scope?: 'pending'|'errors'|'all', judgeConcurrency? }
+ *   POST /api/admin/evaluations/:id/variants/:variantId/rejudge
+ *   POST /api/admin/evaluations/:id/variants/:variantId/regenerate
+ *   POST /api/admin/evaluations/:id/finalize
+ *   GET  /api/admin/evaluations
+ *   GET  /api/admin/evaluations/:id
  *
  * The split per-query endpoint exists because Cloudflare Workers cap each
  * invocation at 1000 subrequests; running 15 queries × N models in one shot
@@ -19,6 +24,7 @@ import { listSuites, getSuite } from './suites.js';
 import { JUDGE_MODELS } from './judge.js';
 import {
   validateRunBody, createEvalRun, runEvalQueryStream, finalizeEvalRun,
+  judgeRunPendingStream, rejudgeOneVariant, regenerateOneVariantStream,
 } from './runner.js';
 
 function jsonResponse(body, init = {}) {
@@ -83,8 +89,55 @@ export async function handleRunEvalQuery(request, env, evalRunId) {
   }
   const queryId = typeof body?.queryId === 'string' ? body.queryId.trim() : '';
   if (!queryId) return jsonResponse({ error: 'queryId is required' }, { status: 400 });
+  const skipJudge = body?.skipJudge === true;
 
-  return runEvalQueryStream(request, env, evalRunId, queryId);
+  return runEvalQueryStream(request, env, evalRunId, queryId, { skipJudge });
+}
+
+// ── POST /api/admin/evaluations/:id/judge ─────────────────────────────────────
+
+export async function handleJudgeEvaluation(request, env, evalRunId) {
+  const unauth = await requireAdminAuth(request, env);
+  if (unauth) return unauth;
+
+  let body = {};
+  try {
+    body = await request.json();
+  } catch {
+    body = {};
+  }
+  const scope = typeof body?.scope === 'string' ? body.scope : 'pending';
+  const judgeConcurrency = typeof body?.judgeConcurrency === 'number'
+    ? body.judgeConcurrency : undefined;
+
+  return judgeRunPendingStream(request, env, evalRunId, { scope, judgeConcurrency });
+}
+
+// ── POST /api/admin/evaluations/:id/variants/:variantId/rejudge ───────────────
+
+export async function handleRejudgeVariant(request, env, evalRunId, variantId) {
+  const unauth = await requireAdminAuth(request, env);
+  if (unauth) return unauth;
+
+  try {
+    const result = await rejudgeOneVariant(env, evalRunId, variantId);
+    if (result.error) {
+      return jsonResponse({ error: result.error }, { status: result.status || 500 });
+    }
+    return jsonResponse(result);
+  } catch (err) {
+    console.error('[Eval] rejudge variant failed:', err);
+    return jsonResponse({ error: err.message || 'Rejudge failed' }, { status: 500 });
+  }
+}
+
+// ── POST /api/admin/evaluations/:id/variants/:variantId/regenerate ────────────
+
+export async function handleRegenerateVariant(request, env, evalRunId, variantId) {
+  const unauth = await requireAdminAuth(request, env);
+  if (unauth) return unauth;
+
+  return regenerateOneVariantStream(request, env, evalRunId, variantId);
 }
 
 // ── POST /api/admin/evaluations/:id/finalize ──────────────────────────────────
