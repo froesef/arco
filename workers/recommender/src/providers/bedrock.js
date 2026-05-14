@@ -97,7 +97,9 @@ async function* stream({
     messages: turnMessages,
     inferenceConfig: { maxTokens, temperature },
   };
-  if (systemParts.length) body.system = systemParts;
+  if (systemParts.length) {
+    body.system = [...systemParts, { cachePoint: { type: 'default' } }];
+  }
 
   const url = `https://bedrock-runtime.${region}.amazonaws.com/model/${encodeURIComponent(model)}/converse-stream`;
 
