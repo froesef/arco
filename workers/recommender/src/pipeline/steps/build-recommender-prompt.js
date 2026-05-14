@@ -1,7 +1,7 @@
 /**
  * Build Recommender Prompt Step — assembles system and user prompts
  * for the Arco coffee equipment recommender.
- * Reads ctx.rag.*, ctx.request.*. Writes ctx.prompt.system, ctx.prompt.user.
+ * Reads ctx.rag.*, ctx.request.*, ctx.intent. Writes ctx.prompt.system, ctx.prompt.user.
  */
 
 import {
@@ -12,6 +12,8 @@ import {
 // eslint-disable-next-line import/prefer-default-export, no-unused-vars
 export async function buildRecommenderPrompt(ctx, config = {}, env = {}) {
   const start = Date.now();
+
+  ctx.prompt.system = buildRecommenderSystemPrompt();
 
   const contextData = {
     products: ctx.rag.products,
@@ -27,9 +29,6 @@ export async function buildRecommenderPrompt(ctx, config = {}, env = {}) {
     useCase: ctx.rag.useCase,
   };
 
-  const priceFilter = ctx.rag.behaviorAnalysis?.catalogPriceRange || null;
-  ctx.prompt.system = buildRecommenderSystemPrompt(contextData, priceFilter);
-
   ctx.prompt.user = buildRecommenderUserMessage(
     ctx.request.query,
     ctx.rag.behaviorAnalysis,
@@ -37,6 +36,7 @@ export async function buildRecommenderPrompt(ctx, config = {}, env = {}) {
     ctx.request.followUp,
     ctx.request.shownContent,
     ctx.intent,
+    contextData,
   );
 
   ctx.timings.prompt = Date.now() - start;
