@@ -33,7 +33,17 @@ async function* stream({
     if (chunk.usage) usage = chunk.usage;
     if (chunk.x_cerebras?.usage) usage = chunk.x_cerebras.usage;
   }
-  if (usage) yield { type: 'usage', usage };
+  if (usage) {
+    const cached = usage.prompt_tokens_details?.cached_tokens || 0;
+    yield {
+      type: 'usage',
+      usage: {
+        ...usage,
+        cache_read_tokens: cached,
+        cache_write_tokens: 0,
+      },
+    };
+  }
 }
 
 export default { id: 'cerebras', stream };

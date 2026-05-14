@@ -123,6 +123,8 @@ async function* stream({
 
   let inputTokens = 0;
   let outputTokens = 0;
+  let cacheReadTokens = 0;
+  let cacheWriteTokens = 0;
 
   // eslint-disable-next-line no-restricted-syntax
   for await (const event of parseEventStream(response, signal)) {
@@ -134,6 +136,8 @@ async function* stream({
       if (usage) {
         inputTokens = usage.inputTokens || 0;
         outputTokens = usage.outputTokens || 0;
+        cacheReadTokens = usage.cacheReadInputTokenCount || 0;
+        cacheWriteTokens = usage.cacheWriteInputTokenCount || 0;
       }
     }
   }
@@ -145,6 +149,8 @@ async function* stream({
         prompt_tokens: inputTokens,
         completion_tokens: outputTokens,
         total_tokens: inputTokens + outputTokens,
+        cache_read_tokens: cacheReadTokens,
+        cache_write_tokens: cacheWriteTokens,
       },
     };
   }
