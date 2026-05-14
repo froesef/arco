@@ -61,10 +61,12 @@ function makeAccordion(title, contentEl, defaultOpen = false) {
 
 function formatCacheStatus(llm) {
   if (llm?.promptCacheHit) {
-    return `<span class="debug-badge timing-fast">HIT</span> ${llm.cacheReadTokens} read`;
+    const uncached = (llm.inputTokens || 0) - (llm.cacheReadTokens || 0);
+    return `<span class="debug-badge timing-fast">HIT</span> ${llm.cacheReadTokens} cached, ${uncached} uncached`;
   }
   if (llm?.cacheWriteTokens) {
-    return `<span class="debug-badge timing-med">WRITE</span> ${llm.cacheWriteTokens} written`;
+    const uncached = (llm.inputTokens || 0) - (llm.cacheWriteTokens || 0);
+    return `<span class="debug-badge timing-med">WRITE</span> ${llm.cacheWriteTokens} cached, ${uncached} uncached`;
   }
   return '<span class="debug-dim">none</span>';
 }
