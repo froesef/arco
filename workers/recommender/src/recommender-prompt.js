@@ -415,6 +415,7 @@ export function buildRecommenderUserMessage(
   followUp,
   shownContent,
   intent,
+  contextData,
 ) {
   const ba = behaviorAnalysis || { coldStart: true };
   let msg;
@@ -480,6 +481,10 @@ Start with a hero that acknowledges what they've been exploring. The hero MUST i
     if (ba.useCasePriorities?.length > 0) msg += `\n- Interested in: ${ba.useCasePriorities.join(', ')}`;
 
     msg += '\n\nUse this profile to personalize your recommendation. Lead with products matching their price tier and use-case interests.';
+
+    if (ba.catalogPriceRange) {
+      msg += `\n\n**Price guidance:** Focus your primary recommendation and comparison-table on products within the $${ba.catalogPriceRange.min}–$${ba.catalogPriceRange.max} range. You may include one stretch option outside this range if it's a compelling upgrade, but do not lead with it.`;
+    }
   }
 
   // For follow-ups, conversation history is already embedded in the message above.
@@ -518,6 +523,63 @@ Start with a hero that acknowledges what they've been exploring. The hero MUST i
       const list = matches.map((m) => `${m.name} ($${m.price})`).join(', ');
       msg += `\n\n## Feature Match — "${feature}"\nMachines with this feature: ${list}. Follow the "Feature-Specific Query / When 2–3 machines match" scenario. The comparison-table must include ONLY these machines — do NOT add a non-matching machine to pad the table.`;
     }
+  }
+
+  // --- RAG context (dynamic, per-request) ---
+  const {
+    products: ragProducts, guides, experiences, features, faqs, reviews, recipes,
+    comparisons, toolContent, persona, useCase,
+  } = contextData || {};
+
+  if (ragProducts?.length) {
+    msg += `\n\n## Recommended Products (from RAG — highest relevance to this query)\n${ragProducts.map((p) => `- ${p.name} (${p.id}) | $${p.price} | ${p.bestFor?.join(', ') || 'general'}`).join('\n')}`;
+  }
+
+  if (recipes?.length) {
+    msg += `\n\n## Recipes\n${recipes.map((r) => `- "${r.name}" (${r.id})`).join('\n')}`;
+  }
+
+  if (guides?.length) {
+    msg += `\n\n## Related Articles (use {{story:SLUG}} tokens in article-excerpt or blog-card blocks)\nIMPORTANT: Only use slugs that appear exactly in this list. Story SLUGs are the last path segment (e.g. "how-to-dial-in-espresso-in-under-10-minutes").\n${guides.map((g) => `- "${g.title}" | slug: ${g.slug} | category: ${g.category || ''}`).join('\n')}`;
+  }
+
+  if (experiences?.length) {
+    msg += `\n\n## Related Experiences (use {{experience:SLUG}} tokens in experience-cta blocks)\nIMPORTANT: Only use slugs that appear exactly in this list.\n${experiences.map((e) => `- "${e.title}" | slug: ${e.slug} | archetype: ${e.experience_archetype || ''} | anchor: ${e.anchor_product || ''}`).join('\n')}`;
+  }
+
+  if (reviews?.length) {
+    msg += `\n\n## Reviews (use {{review:ID}} tokens)\n${reviews.map((r) => `- ID: ${r.id} | ${r.author || 'Customer'}: "${(r.content || r.body || '').substring(0, 80)}..."`).join('\n')}`;
+  }
+
+  if (faqs?.length) {
+    msg += `\n\n## FAQs\n${faqs.map((f) => `- Q: ${f.question} | A: ${(f.answer || '').substring(0, 100)}...`).join('\n')}`;
+  }
+
+  if (features?.length) {
+    msg += `\n\n## Key Features\n${features.map((f) => `- ${f.name}: ${f.benefit || f.description || ''}`).join('\n')}`;
+  }
+
+  if (comparisons?.length) {
+    msg += `\n\n## Pre-Authored Comparisons (use as ground truth when available)\nWhen a pre-authored comparison matches your query, use its verdict and persona recommendations as the basis for your comparison-table rather than inventing new comparisons.\n${comparisons.map((c) => {
+      const verdict = typeof c.verdict === 'string' ? c.verdict.substring(0, 120) : '';
+      return `- "${c.title}" | ${c.slug} | Verdict: "${verdict}..."`;
+    }).join('\n')}`;
+  }
+
+  if (toolContent?.length) {
+    msg += `\n\n## Relevant Guides & Tools (maintenance, pairing, diagnostics)\nReference these when the user asks about maintenance, troubleshooting, bean pairing, or equipment compatibility.\n${toolContent.map((t) => `- "${t.title}" | ${t.slug} | Type: ${t.type || t.category || ''}`).join('\n')}`;
+  }
+
+  if (persona) {
+    msg += `\n\n## Matched Persona: ${persona.name}\nPriorities: ${(persona.priorities || []).join(', ')}\nSkill level: ${persona.skillLevel || 'unknown'}\nBudget: ${persona.budget || 'unknown'}`;
+  }
+  if (useCase) {
+    msg += `\n\n## Primary Use Case: ${useCase.name}\n${useCase.description || ''}`;
+  }
+
+  // Intent type — tells the LLM which page structure template to follow
+  if (intent?.type) {
+    msg += `\n\n## Intent Classification\nDetected intent: **${intent.type}**${intent.journeyStage ? ` | Journey stage: ${intent.journeyStage}` : ''}`;
   }
 
   msg += '\n\nRemember: output JSON blocks separated by ===. All product links must use the URL from the product data. End with information-gathering suggestions (type "explore" or "compare" only). Every block MUST have meaningful content. ONLY use product names, product IDs, and recipe names that appear in the data above — never invent or guess names.';
