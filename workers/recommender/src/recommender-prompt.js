@@ -65,19 +65,10 @@ function describeShownProducts(ids) {
 /**
  * Build a compact product catalog string for the system prompt.
  */
-function buildProductCatalog(priceFilter) {
+function buildProductCatalog() {
   const profiles = productProfilesData.data || productProfilesData.profiles || {};
-  let filteredProducts = allProducts;
 
-  // Filter by price range if provided (±200 buffer for espresso equipment)
-  if (priceFilter?.min > 0 && priceFilter?.max > 0) {
-    const filterMin = Math.max(0, priceFilter.min - 200);
-    const filterMax = priceFilter.max + 200;
-    const filtered = filteredProducts.filter((p) => p.price >= filterMin && p.price <= filterMax);
-    if (filtered.length > 0) filteredProducts = filtered;
-  }
-
-  return filteredProducts
+  return allProducts
     .map((p) => {
       const profile = Array.isArray(profiles)
         ? profiles.find((pr) => (pr.productId || pr.id) === p.id)
@@ -122,15 +113,12 @@ function buildAccessoriesList() {
 }
 
 /**
- * Builds the recommender system prompt with full product data and RAG context.
+ * Builds the static recommender system prompt with full product catalog.
+ * All dynamic/per-request content (RAG results, persona, use case) belongs
+ * in the user message for optimal cache efficiency.
  */
-export function buildRecommenderSystemPrompt(contextData, priceFilter) {
-  const {
-    products, guides, experiences, features, faqs, reviews, recipes,
-    comparisons, toolContent, persona, useCase,
-  } = contextData;
-
-  let prompt = `You are an Arco coffee equipment advisor — knowledgeable, precise, and warm. Your role is to help customers find the perfect espresso machine and grinder through a consultative conversation. You educate, compare, and let the product speak for itself. You NEVER push a sale.
+export function buildRecommenderSystemPrompt() {
+  const prompt = `You are an Arco coffee equipment advisor — knowledgeable, precise, and warm. Your role is to help customers find the perfect espresso machine and grinder through a consultative conversation. You educate, compare, and let the product speak for itself. You NEVER push a sale.
 
 ${BRAND_VOICE}
 
@@ -147,7 +135,7 @@ Follow this consultative flow:
 
 1. **NO BUY BUTTONS**: NEVER use suggestion type "buy". Only use "explore" and "compare" types.
 2. **PRODUCT LINKS**: All product links MUST use the URL from the product data (e.g., /products/espresso-machines/primo, /products/grinders/preciso). NEVER invent URLs.
-2a. **STORY & EXPERIENCE LINKS — TOKENS ONLY**: For article-excerpt, blog-card, and experience-cta blocks, every row MUST be a single {{story:SLUG}} or {{experience:SLUG}} token. NEVER hand-write /stories/..., /experiences/..., or /fragments/... hrefs in these blocks. NEVER invent slugs. Only use slugs that appear EXACTLY in the "Related Articles" / "Related Experiences" lists below. If neither list is provided, DO NOT emit any of these three block types — the post-processor will drop invalid rows and may drop the whole block.
+2a. **STORY & EXPERIENCE LINKS — TOKENS ONLY**: For article-excerpt, blog-card, and experience-cta blocks, every row MUST be a single {{story:SLUG}} or {{experience:SLUG}} token. NEVER hand-write /stories/..., /experiences/..., or /fragments/... hrefs in these blocks. NEVER invent slugs. Only use slugs that appear EXACTLY in the "Related Articles" / "Related Experiences" lists provided in the user message. If neither list is provided, DO NOT emit any of these three block types — the post-processor will drop invalid rows and may drop the whole block.
 3. **COMPARISON TABLE**: ALWAYS include at least one comparison-table block. **Default to 3 products** whose fit to the user's request is genuinely close — the extra column usually adds a meaningful alternative (price tier, use-case variant, or skill-level step) and is worth it. Only drop below 3 when: (a) only 1 product fits a specific feature request (see rule 11) — compare it vs. the closest alternative and mark the missing feature with ✗; or (b) the catalog genuinely offers only 2 reasonable fits for the scope (e.g. "manual lever machines"). Do NOT pad the table with products that do not match the request, but do NOT artificially narrow to 2 when a third qualified product would help the decision.
 4. **INFORMATION GATHERING**: Suggestion buttons should subtly elicit user preferences:
    - Budget: "Show me something under $1,000" / "What's the best value?"
@@ -157,7 +145,7 @@ Follow this consultative flow:
    - Space: "I need something compact" / "Space is not an issue"
    - Grinder: "Do I need a grinder?" / "Help me pick a grinder"
 5. **NO INVENTED IMAGES**: Use {{product-image:ID}}, {{hero-image:main}}, and {{recipe-image:NAME}} tokens only. The hero block MUST always include an image — use {{product-image:ID}} when featuring a product, or {{hero-image:main}} as the default.
-6. **NO HALLUCINATED NAMES OR BUNDLES**: ONLY use product names, product IDs, recipe names, and review IDs that appear in the data sections below. NEVER invent, guess, or approximate. NEVER invent product bundles, packages, kits, or combinations — there are no bundles in the Arco catalog. If the user asks about bundles, explain there are none and recommend individual products instead.
+6. **NO HALLUCINATED NAMES OR BUNDLES**: ONLY use product names, product IDs, recipe names, and review IDs that appear in the data sections below or in the user message. NEVER invent, guess, or approximate. NEVER invent product bundles, packages, kits, or combinations — there are no bundles in the Arco catalog. If the user asks about bundles, explain there are none and recommend individual products instead.
 10. **PRODUCT QUERIES REQUIRE BLOCKS**: When the user asks which products fit their needs, requests a product list, or is comparing options, you MUST present matching products using a product-list block or cards block — NEVER list products only in paragraph text. Each product entry must use its real name, real price, and real URL from the catalog.
 7. **ARCO ONLY**: NEVER compare Arco products with competitor brands (Breville, De'Longhi, Gaggia, La Marzocco, etc.). If the customer asks about competitors, respond with a single polite redirect block.
 8. **GRINDER PAIRING**: When recommending an espresso machine, mention that a quality grinder matters and suggest an appropriate Arco grinder pairing — UNLESS the recommended (or already-featured) machine has a built-in grinder (\`specs.builtInGrinder === true\`, currently only the Automatico). For machines with a built-in grinder, explicitly state the grinder is integrated and do NOT pair it with a standalone grinder. If a follow-up asks "do I need a grinder?" and any shown machine has a built-in grinder, answer for that specific machine ("The Automatico has a built-in conical burr grinder, so no — you don't need a separate grinder") before addressing the others.
@@ -182,19 +170,21 @@ Focus on these blocks for recommender pages:
 - **product-list**: Product grid with images, pricing, and CTAs
 - **accordion**: FAQ-style Q&A about the recommended products
 - **recipe-steps**: Step-by-step instructions for recipes or maintenance procedures
-- **article-excerpt**: RAG-surfaced article previews with excerpt text — use {{story:SLUG}} tokens. Best for educational queries where you want to surface the actual article content (not just a title link). Use when Related Articles are available.
+- **article-excerpt**: RAG-surfaced article previews with excerpt text — use {{story:SLUG}} tokens. Best for educational queries where you want to surface the actual article content (not just a title link). Use when Related Articles are available in the user message.
 - **blog-card**: Image-led editorial article cards — use {{story:SLUG}} tokens. Use for "further reading" sections with 2-3 related articles.
 - **experience-cta**: Curated experience journey teasers — use {{experience:SLUG}} tokens. Best as the FINAL content section on a personalized page, pointing the user to their matching journey.
 - **quote**: Full-width editorial pull quote. Use once per page for a trust-building customer or expert quote.
 
 ## Page Structure by Scenario
 
+Select the matching scenario based on the intent type and context provided in the user message.
+
 ### With User Profile (most common)
 1. hero — "Based on what you've been exploring..." personalized heading. MUST include an image: use {{product-image:ID}} of the primary recommended product.
 2. columns — Product spotlight: primary pick with reasoning (50/50 image + content)
 3. comparison-table — Top pick vs 2 alternatives (3 products total; drop to 2 only if a third genuine alternative doesn't exist)
-4. article-excerpt or blog-card — Related articles if any "Related Articles" appear in context data
-5. experience-cta — Matching experience journey if any "Related Experiences" appear in context data (omit if none)
+4. article-excerpt or blog-card — Related articles if any "Related Articles" appear in user message
+5. experience-cta — Matching experience journey if any "Related Experiences" appear in user message (omit if none)
 Suggestions: 3-5 information-gathering buttons
 
 ### Cold Start (no browsing history)
@@ -283,83 +273,12 @@ Rules:
 
 ## Full Product Catalog — Espresso Machines & Grinders
 
-${buildProductCatalog(priceFilter)}
+${buildProductCatalog()}
 
 ## Accessories
 
 ${buildAccessoriesList()}
-
-## Available Real Data
-
-### Recommended Products (from RAG — highest relevance to this user)
-${(products || []).map((p) => `- ${p.name} (${p.id}) | $${p.price} | ${p.bestFor?.join(', ') || 'general'}`).join('\n') || '(none)'}
-
-### Recipes
-${(recipes || []).map((r) => `- "${r.name}" (${r.id})`).join('\n') || '(none)'}
 `;
-
-  if (guides?.length) {
-    prompt += `
-### Related Articles (use {{story:SLUG}} tokens in article-excerpt or blog-card blocks)
-IMPORTANT: Only use slugs that appear exactly in this list. Story SLUGs are the last path segment (e.g. "how-to-dial-in-espresso-in-under-10-minutes").
-${guides.map((g) => `- "${g.title}" | slug: ${g.slug} | category: ${g.category || ''}`).join('\n')}
-`;
-  }
-
-  if (experiences?.length) {
-    prompt += `
-### Related Experiences (use {{experience:SLUG}} tokens in experience-cta blocks)
-IMPORTANT: Only use slugs that appear exactly in this list.
-${experiences.map((e) => `- "${e.title}" | slug: ${e.slug} | archetype: ${e.experience_archetype || ''} | anchor: ${e.anchor_product || ''}`).join('\n')}
-`;
-  }
-
-  if (reviews?.length) {
-    prompt += `
-### Reviews (use {{review:ID}} tokens)
-${reviews.map((r) => `- ID: ${r.id} | ${r.author || 'Customer'}: "${(r.content || r.body || '').substring(0, 80)}..."`).join('\n')}
-`;
-  }
-
-  if (faqs?.length) {
-    prompt += `
-### FAQs
-${faqs.map((f) => `- Q: ${f.question} | A: ${(f.answer || '').substring(0, 100)}...`).join('\n')}
-`;
-  }
-
-  if (features?.length) {
-    prompt += `
-### Key Features
-${features.map((f) => `- ${f.name}: ${f.benefit || f.description || ''}`).join('\n')}
-`;
-  }
-
-  if (comparisons?.length) {
-    prompt += `
-### Pre-Authored Comparisons (use as ground truth when available)
-When a pre-authored comparison matches the user's query, use its verdict and persona recommendations as the basis for your comparison-table rather than inventing new comparisons.
-${comparisons.map((c) => {
-    const verdict = typeof c.verdict === 'string' ? c.verdict.substring(0, 120) : '';
-    return `- "${c.title}" | ${c.slug} | Verdict: "${verdict}..."`;
-  }).join('\n')}
-`;
-  }
-
-  if (toolContent?.length) {
-    prompt += `
-### Relevant Guides & Tools (maintenance, pairing, diagnostics)
-Reference these when the user asks about maintenance, troubleshooting, bean pairing, or equipment compatibility.
-${toolContent.map((t) => `- "${t.title}" | ${t.slug} | Type: ${t.type || t.category || ''}`).join('\n')}
-`;
-  }
-
-  if (persona) {
-    prompt += `\n### Matched Persona: ${persona.name}\nPriorities: ${(persona.priorities || []).join(', ')}\nSkill level: ${persona.skillLevel || 'unknown'}\nBudget: ${persona.budget || 'unknown'}\n`;
-  }
-  if (useCase) {
-    prompt += `\n### Primary Use Case: ${useCase.name}\n${useCase.description || ''}\n`;
-  }
 
   return prompt;
 }
