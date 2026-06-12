@@ -1,36 +1,16 @@
-Codemap Analysis Report — 2026-04-22
-=====================================
+Codemap update — 2026-06-12 (branch worktree-gemma-diffusion)
 
-Status: INITIAL GENERATION (no previous codemaps existed)
+Modified:
+- backend.md     : added `ollama` + `vllm` provider rows (local-dev-only; vllm path
+                   also serves local DiffusionGemma via mlx-vlm/start-diffusion-gemma.sh).
+                   Clarified `cloudflare` REST auth. Updated stream-parser.js role
+                   (now tolerates ```json fences + stray prose around JSON blocks).
+- frontend.md    : api-config.js now routes localhost -> local wrangler dev worker
+                   (8789); documented ARCO_CONFIG / localStorage overrides.
+- dependencies.md: added local LLM runtime row (Ollama / vLLM / mlx-vlm, dev-only).
 
-Files Scanned: ~65 source files
+New files this branch:
+- workers/recommender/start-diffusion-gemma.sh  (MLX/vLLM launcher for DiffusionGemma)
 
-Architecture Summary:
-- AEM EDS frontend (vanilla JS/CSS) + Cloudflare Worker backend
-- AI recommender pipeline with 12 pipeline steps
-- Hybrid RAG: keyword matching + Cloudflare Vectorize semantic search
-- LLM: Cerebras gpt-oss-120b via Workers AI
-- Storage: D1 (metadata) + KV (payloads) + DA (generated pages)
-- Admin interface available as both EDS block and worker-hosted SPA
-
-Key Components Mapped:
-- 35 blocks in blocks/
-- 12 scripts in scripts/
-- 29 worker source files in workers/recommender/src/
-- 12 pipeline steps in workers/recommender/src/pipeline/steps/
-
-Notable Architecture Features:
-- Speculative prefetch engine (mouse deceleration heuristic)
-- Cache-first page serving via deterministic DA slugs
-- Session/Page/Run hierarchy (3 levels) tracked in D1
-- Three-phase page loading (eager/lazy/delayed)
-- Parallel pipeline steps for RAG retrieval
-
-Codemaps Generated:
-- docs/CODEMAPS/architecture.md — system diagram, service boundaries, data flow
-- docs/CODEMAPS/frontend.md — scripts, blocks, loading phases, session context
-- docs/CODEMAPS/backend.md — API routes, pipeline steps, worker source files
-- docs/CODEMAPS/data.md — D1 schema, KV structure, sessionStorage keys
-- docs/CODEMAPS/dependencies.md — external services, secrets, integration contracts
-
-Staleness Warnings: N/A (first generation)
+Architecture changes: none (no new routes/services). Local-model option + parser
+hardening only. Estimated codemap delta < 10%; updated in place.

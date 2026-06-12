@@ -1,4 +1,4 @@
-<!-- Generated: 2026-05-11 | Files scanned: 6 | Token estimate: ~600 -->
+<!-- Generated: 2026-06-12 | Files scanned: 6 | Token estimate: ~600 -->
 
 # Dependencies & Integrations
 
@@ -18,6 +18,7 @@
 | Cerebras | LLM provider (e.g. `gpt-oss-120b`) | `CEREBRAS_API_KEY` secret |
 | SambaNova | LLM provider (OpenAI-compatible REST, e.g. `DeepSeek-V3.2`) | `SAMBANOVA_API_KEY` secret |
 | AWS Bedrock | LLM provider (Claude / others) + LLM-judge | `AWS_BEARER_TOKEN_BEDROCK` + `AWS_REGION` |
+| Ollama / vLLM / mlx-vlm | Local LLM provider (incl. DiffusionGemma via `start-diffusion-gemma.sh`) — **dev only** | `OLLAMA_BASE_URL` / `VLLM_BASE_URL` var |
 | DA (Document Authoring) | Generated page storage + preview/publish | `DA_CLIENT_ID` + `DA_CLIENT_SECRET` (or `DA_SERVICE_TOKEN` / legacy `DA_TOKEN`) |
 
 ## Worker Secrets (`wrangler secret put`)
@@ -78,7 +79,7 @@ All other provider integrations (Cloudflare AI, SambaNova, Bedrock) use the plat
 
 Response: NDJSON SSE stream (`section` / `follow-up` / `debug` / `cache-hit` / `error` events).
 
-`scripts/api-config.js` auto-routes `*.aem.page` hostnames to a branch worker version (`{alias}-arco-recommender.franklin-prod.workers.dev`); `*.aem.live` and `arco.coffee` always use production.
+`scripts/api-config.js` routes `localhost`/`127.0.0.1` to the local `wrangler dev` worker (port 8789), `*.aem.page` hostnames to a branch worker version (`{alias}-arco-recommender.franklin-prod.workers.dev`), and `*.aem.live` / `arco.coffee` to production. `ARCO_CONFIG.RECOMMENDER_URL` or `localStorage['arco-recommender-url']` override all of the above.
 
 ### Worker → DA
 

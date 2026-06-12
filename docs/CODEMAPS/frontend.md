@@ -1,4 +1,4 @@
-<!-- Generated: 2026-05-11 | Files scanned: 30+ | Token estimate: ~900 -->
+<!-- Generated: 2026-06-12 | Files scanned: 30+ | Token estimate: ~900 -->
 
 # Frontend Architecture
 
@@ -32,7 +32,7 @@ head.html → scripts/aem.js              (core EDS decoration, DO NOT MODIFY)
 | `scripts/feedback-widget.js` | Run-level feedback widget (👍 / 👎, comment, flag categories, wrong-product chips) |
 | `scripts/speculative-engine.js` | Mouse-deceleration heuristic for prefetching follow-up chips |
 | `scripts/for-you-prefetch.js` | Background prefetch for personalized "For You" query |
-| `scripts/api-config.js` | `ARCO_RECOMMENDER_URL` — auto-routes `*.aem.page` previews to a branch worker version |
+| `scripts/api-config.js` | `ARCO_RECOMMENDER_URL` — routes `localhost`→local `wrangler dev` worker (8789), `*.aem.page`→branch worker version, else prod. Overridable via `ARCO_CONFIG.RECOMMENDER_URL` or `localStorage['arco-recommender-url']` |
 | `scripts/delayed.js` | Kicks off `collectBrowsingSignals()` |
 | `scripts/block-aliases.js` | Block-name aliases for author-friendly variants |
 | `scripts/section-metadata.js` | Section metadata parsing helpers |
