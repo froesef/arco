@@ -11,15 +11,39 @@
 
 const PRODUCTION_WORKER = 'https://arco-recommender.franklin-prod.workers.dev';
 
+// Local `wrangler dev` worker (run `npm run dev` in workers/recommender).
+// Wrangler picks 8787 by default but increments when ports are taken; this repo's
+// dev worker comes up on 8789. Override via the mechanisms below if yours differs.
+const LOCAL_WORKER = 'http://localhost:8789';
+
 /**
- * Detect EDS branch preview hostname: {branch}--{repo}--{owner}.aem.page
- * On a non-main branch preview, rewrite the worker URL to the branch alias version.
- * e.g. branch "feature-x" → https://feature-x-arco-recommender.franklin-prod.workers.dev
+ * Resolve the recommender worker URL for the current environment.
+ *
+ * Priority:
+ *   1. window.ARCO_CONFIG.RECOMMENDER_URL  — explicit global override
+ *   2. localStorage['arco-recommender-url'] — runtime toggle, no code edit:
+ *        localStorage.setItem('arco-recommender-url', 'http://localhost:8787')
+ *        localStorage.setItem('arco-recommender-url', '<prod url>')  // force prod locally
+ *        localStorage.removeItem('arco-recommender-url')             // back to default
+ *   3. localhost / 127.0.0.1 → the local `wrangler dev` worker (LOCAL_WORKER)
+ *   4. {branch}--{repo}--{owner}.aem.page → that branch's worker version
+ *   5. everything else → production
  */
-function resolveBranchWorkerURL() {
+function resolveRecommenderURL() {
   if (window.ARCO_CONFIG?.RECOMMENDER_URL) return window.ARCO_CONFIG.RECOMMENDER_URL;
 
+  try {
+    const stored = window.localStorage?.getItem('arco-recommender-url');
+    if (stored) return stored;
+  } catch { /* localStorage may be unavailable (private mode / sandbox) */ }
+
   const { hostname } = window.location;
+
+  // Local dev: point at the local worker so /api/generate uses locally-served
+  // models (e.g. DiffusionGemma via mlx-vlm). Override via the above to use prod.
+  if (hostname === 'localhost' || hostname === '127.0.0.1') return LOCAL_WORKER;
+
+  // EDS branch preview: rewrite to the branch alias worker version.
   const match = hostname.match(/^(.+)--[^.]+--[^.]+\.aem\.page$/);
   if (!match || match[1] === 'main') return PRODUCTION_WORKER;
 
@@ -33,7 +57,7 @@ function resolveBranchWorkerURL() {
 }
 
 // Main recommender service (Cloudflare Worker)
-export const ARCO_RECOMMENDER_URL = resolveBranchWorkerURL();
+export const ARCO_RECOMMENDER_URL = resolveRecommenderURL();
 
 // Analytics service — same worker, separate endpoint
 export const ARCO_ANALYTICS_URL = window.ARCO_CONFIG?.ANALYTICS_URL || ARCO_RECOMMENDER_URL;

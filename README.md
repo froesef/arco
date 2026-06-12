@@ -48,6 +48,31 @@ The site includes an AI-powered recommender at `/?q=...`. Generated pages are ca
 | `preset` | `/?q=...&preset=default` | Cache-slot preset |
 | `regen` | `/?q=...&regen` | Force regeneration, skip cache |
 
+### Local model: DiffusionGemma (MLX / vLLM)
+
+Two extra providers — `ollama` and `vllm` — let you drive the recommender from a model running on your own machine **under `wrangler dev` only** (a deployed Worker runs on Cloudflare's edge and can't reach `localhost`).
+
+[DiffusionGemma](https://blog.google/innovation-and-ai/technology/developers-tools/diffusion-gemma-faster-text-generation/) is Google's diffusion-based (non-autoregressive) Gemma. **Ollama and llama.cpp can't run it** — it needs **MLX** (the native Apple-Silicon path) or **vLLM** (CUDA). Both expose an OpenAI-compatible endpoint, so the existing `vllm` provider drives it with no new code.
+
+```sh
+cd workers/recommender
+
+# Start the model server (MLX on macOS, vLLM elsewhere; --install adds the backend).
+# Auto-installs nothing without --install; ~24GB unified memory for the 26B 4-bit MLX build.
+npm run model:diffusion-gemma -- --install
+#   or with overrides:
+#   ./start-diffusion-gemma.sh --backend mlx --model mlx-community/diffusiongemma-26B-A4B-it-4bit --port 8000
+
+# Point the worker at it (workers/recommender/.dev.vars — gitignored):
+echo 'VLLM_BASE_URL=http://localhost:8000/v1' >> .dev.vars
+
+# Run the worker locally and the EDS dev server, then select the served model
+# in /admin → Model Settings.
+npm run dev
+```
+
+Notes: the default model ids in the script are starting points — confirm the exact published Hugging Face / `mlx-community` id, as quant names change. DiffusionGemma emits text in parallel blocks rather than token-by-token, so streamed deltas arrive in bursts and the TTFT / tok-s figures in the debug panel (which assume per-token streaming) read approximately. See [`AGENTS.md`](AGENTS.md) for the full local-provider reference.
+
 ## Admin
 
 An EDS-hosted admin SPA at `/admin` provides session browsing, multi-model A/B experiments, large LLM evaluation sweeps with a Claude (Bedrock) judge, runtime model selection, Vectorize inspection, and real-user feedback dashboards. Login is HTTP Basic with the `ADMIN_TOKEN` worker secret.

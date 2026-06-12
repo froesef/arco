@@ -6,6 +6,20 @@
  */
 
 /**
+ * Strip a wrapping markdown code fence from a segment.
+ *
+ * Some models (notably diffusion models like DiffusionGemma, but also some
+ * autoregressive ones) wrap JSON blocks in ```json ... ``` fences despite being
+ * told to emit bare JSON. Left in place, the fence makes JSON.parse fail and the
+ * whole block is silently dropped. We strip a leading ``` (optionally with a
+ * language tag) and a trailing ```.
+ */
+function stripCodeFence(str) {
+  const fence = str.match(/^```[^\n]*\n([\s\S]*?)\n?```$/);
+  return fence ? fence[1].trim() : str;
+}
+
+/**
  * Parse a JSON string into a section or suggestions object.
  * Returns null if parsing fails.
  */
@@ -13,12 +27,28 @@ function tryParseJson(str) {
   const trimmed = str.trim();
   if (!trimmed) return null;
 
-  try {
-    return JSON.parse(trimmed);
-  } catch {
-    console.warn('[StreamParser] Failed to parse JSON segment:', trimmed.substring(0, 100));
-    return null;
+  const candidates = [trimmed];
+
+  // 1. Without a wrapping markdown code fence.
+  const defenced = stripCodeFence(trimmed);
+  if (defenced !== trimmed) candidates.push(defenced);
+
+  // 2. Outermost {...} only — tolerates stray prose the model emits around the
+  //    JSON object (e.g. "Here is the block:" prefixes or trailing commentary).
+  const first = defenced.indexOf('{');
+  const last = defenced.lastIndexOf('}');
+  if (first !== -1 && last > first) candidates.push(defenced.slice(first, last + 1));
+
+  for (let i = 0; i < candidates.length; i += 1) {
+    try {
+      return JSON.parse(candidates[i]);
+    } catch {
+      // try the next candidate
+    }
   }
+
+  console.warn('[StreamParser] Failed to parse JSON segment:', trimmed.substring(0, 100));
+  return null;
 }
 
 // eslint-disable-next-line import/prefer-default-export

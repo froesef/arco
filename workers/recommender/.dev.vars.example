@@ -37,6 +37,8 @@ OLLAMA_NUM_CTX=32768
 
 # vLLM (OpenAI-compatible server — local or SSH-forwarded). Set the base URL to
 # enable the vllm provider; the model name is whatever vLLM is serving.
+# Also used for a local DiffusionGemma server (MLX or vLLM) — start it with
+# `npm run model:diffusion-gemma` (see README) and point VLLM_BASE_URL here.
 # VLLM_BASE_URL=http://localhost:8000/v1
 # VLLM_API_KEY=                 # only if vLLM was started with --api-key
 # CF_THINK-style toggle for vLLM reasoning models (Model Settings overrides it):

@@ -6,6 +6,7 @@
     "precompile-prompts": "node tools/precompile-prompts.js",
     "dev": "node tools/precompile-prompts.js && wrangler dev",
     "bench:ollama": "node tools/bench-ollama.js",
+    "model:diffusion-gemma": "./start-diffusion-gemma.sh",
     "deploy": "node tools/precompile-prompts.js && wrangler deploy",
     "deploy:branch": "node tools/precompile-prompts.js && ./deploy-branch.sh",
     "cleanup:branch": "./cleanup-branch.sh",
