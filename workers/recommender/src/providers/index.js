@@ -385,3 +385,69 @@ export function catalogAvailability(entry, env = {}) {
   const missing = [...base, ...extra];
   return { available: missing.length === 0, missing };
 }
+
+/**
+ * Query a live local provider for the models it is actually serving, so the
+ * admin picker can show real ids instead of the `served-model` / `llama3.1:8b`
+ * placeholders. Returns null on any failure (server down, timeout, not
+ * configured) — callers fall back to the static catalog entries.
+ *
+ * Only ollama/vllm are dynamic; cloud providers stay hardcoded. In production
+ * the *_BASE_URL vars are unset, so these short-circuit with no network call.
+ */
+async function fetchJson(url, { headers, timeoutMs = 2500 } = {}) {
+  try {
+    const res = await fetch(url, { headers, signal: AbortSignal.timeout(timeoutMs) });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+async function fetchVllmModels(env) {
+  if (!env.VLLM_BASE_URL) return null;
+  const base = env.VLLM_BASE_URL.replace(/\/+$/, '');
+  const url = base.endsWith('/v1') ? `${base}/models` : `${base}/v1/models`;
+  const headers = env.VLLM_API_KEY ? { Authorization: `Bearer ${env.VLLM_API_KEY}` } : undefined;
+  const data = await fetchJson(url, { headers });
+  if (!data) return null;
+  return (data.data || []).map((m) => m.id).filter(Boolean);
+}
+
+async function fetchOllamaModels(env) {
+  if (!env.OLLAMA_BASE_URL) return null;
+  const base = env.OLLAMA_BASE_URL.replace(/\/+$/, '').replace(/\/v1$/, '');
+  const data = await fetchJson(`${base}/api/tags`);
+  if (!data) return null;
+  return (data.models || []).map((m) => m.name).filter(Boolean);
+}
+
+/**
+ * Build the selectable catalog for the admin picker. Starts from MODEL_CATALOG,
+ * then for any local provider that is configured AND reachable, replaces its
+ * placeholder rows with one entry per actually-served model. Falls back to the
+ * static placeholder when the server can't be reached.
+ */
+export async function getCatalog(env = {}) {
+  const [vllmModels, ollamaModels] = await Promise.all([
+    fetchVllmModels(env),
+    fetchOllamaModels(env),
+  ]);
+
+  // Drop placeholder rows for providers we have live data for.
+  const entries = MODEL_CATALOG.filter((e) => {
+    if (e.provider === 'vllm' && vllmModels) return false;
+    if (e.provider === 'ollama' && ollamaModels) return false;
+    return true;
+  });
+
+  (vllmModels || []).forEach((id) => {
+    entries.push({ provider: 'vllm', model: id, label: `vLLM · ${id}` });
+  });
+  (ollamaModels || []).forEach((name) => {
+    entries.push({ provider: 'ollama', model: name, label: `Ollama · ${name}` });
+  });
+
+  return entries;
+}

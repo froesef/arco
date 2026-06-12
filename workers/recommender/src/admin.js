@@ -16,7 +16,7 @@
 
 import { CORS_HEADERS } from './pipeline/context.js';
 import { rowToRunDto } from './storage.js';
-import { MODEL_CATALOG, catalogAvailability } from './providers/index.js';
+import { getCatalog, catalogAvailability, findCatalogEntry } from './providers/index.js';
 import { getActiveLlmConfig, putActiveLlmConfig, LLM_CONFIG_LIMITS } from './llm-config.js';
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
@@ -234,11 +234,24 @@ export async function handleAdminRun(request, env, runId) {
 }
 
 /**
- * Catalog of selectable provider/model pairs. Static — driven by source.
+ * Catalog of selectable provider/model pairs. Cloud providers are static;
+ * local providers (ollama/vllm) are resolved live from their server so the
+ * picker shows the real served model id instead of a placeholder.
  */
 export async function handleAdminCatalog(request, env) {
   if (!await checkCookieAuth(request, env) && !checkBasicAuth(request, env)) return unauthorized();
-  const catalog = MODEL_CATALOG.map((e) => {
+  const entries = await getCatalog(env);
+
+  // Ensure the currently-active model is always present so the picker reflects
+  // it even if its server is momentarily unreachable or it dropped out of the
+  // live list (e.g. an older selection).
+  const active = await getActiveLlmConfig(env);
+  if (active && !entries.some((e) => e.provider === active.provider && e.model === active.model)) {
+    const entry = findCatalogEntry(active.provider, active.model);
+    if (entry) entries.push(entry);
+  }
+
+  const catalog = entries.map((e) => {
     const { available, missing } = catalogAvailability(e, env);
     return { ...e, available, missing };
   });

@@ -128,7 +128,7 @@ safety-gate (rejects off-topic queries before any RAG/LLM)
 | `ollama` | ollama.js | `OLLAMA_BASE_URL` var — **local dev only** (`wrangler dev`) |
 | `vllm` | vllm.js | `VLLM_BASE_URL` var (OpenAI-compatible) — **local dev only**; also serves local DiffusionGemma via mlx-vlm (`start-diffusion-gemma.sh`) |
 
-`providers/index.js` exposes `MODEL_CATALOG` (the selectable list — add a row + redeploy to add a model). Each provider implements an async-iterable contract yielding `{ type: 'delta', text }` chunks and a terminal `{ type: 'usage', usage }` frame. Active provider/model is read from `CACHE` KV (`llm-config:active`) via `src/llm-config.js` — KV wins over per-flow defaults.
+`providers/index.js` exposes `MODEL_CATALOG` (the static cloud list — add a row + redeploy to add a model) and `getCatalog(env)`, which resolves local providers live: when `VLLM_BASE_URL`/`OLLAMA_BASE_URL` is set it queries the server (`/v1/models`, `/api/tags`) and replaces the placeholder rows with the real served model ids (falls back to the placeholder if unreachable). The admin picker (`GET /api/admin/catalog`) uses `getCatalog`. Each provider implements an async-iterable contract yielding `{ type: 'delta', text }` chunks and a terminal `{ type: 'usage', usage }` frame. Active provider/model is read from `CACHE` KV (`llm-config:active`) via `src/llm-config.js` — KV wins over per-flow defaults.
 
 ## Evaluation Subsystem (`src/evaluations/`)
 
