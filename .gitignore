@@ -46,3 +46,7 @@ build-demo/.venv/
 
 # Load test results
 tools/loadtest/results/
+
+.hlx/.da-token.json
+
+content
