@@ -41,6 +41,12 @@ RESET='\033[0m'
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 ENV_FILE="$(cd "$SCRIPT_DIR/.." && pwd)/.env"
 
+# Prefer the AEM CLI's DA login token (auto-refreshed by `aem up`).
+DA_TOKEN_FILE="$(cd "$SCRIPT_DIR/.." && pwd)/.hlx/.da-token.json"
+if [ -z "${DA_TOKEN:-}" ] && [ -f "$DA_TOKEN_FILE" ]; then
+  DA_TOKEN=$(python3 -c "import json,sys; print(json.load(open('$DA_TOKEN_FILE')).get('access_token',''))" 2>/dev/null || true)
+fi
+
 if [ -z "${DA_TOKEN:-}" ]; then
   DA_TOKEN=$(gcloud secrets versions access latest --secret=DA_TOKEN 2>/dev/null || true)
 fi

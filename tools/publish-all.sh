@@ -27,6 +27,12 @@ BRANCH_SLUG="${BRANCH//\//-}"
 ADMIN_API="https://admin.hlx.page/live/$DA_ORG/$DA_REPO/$BRANCH_SLUG"
 echo "Publishing branch: $BRANCH (as $BRANCH_SLUG)"
 
+# 0. Prefer the AEM CLI's DA login token (auto-refreshed by `aem up`).
+DA_TOKEN_FILE="$PROJECT_DIR/.hlx/.da-token.json"
+if [ -z "${DA_BEARER_TOKEN:-}" ] && [ -f "$DA_TOKEN_FILE" ]; then
+  DA_BEARER_TOKEN=$(python3 -c "import json; print(json.load(open('$DA_TOKEN_FILE')).get('access_token',''))" 2>/dev/null || true)
+fi
+
 # 1. DA_BEARER_TOKEN takes precedence (env var or .env, JWT starting with ey...)
 DA_BEARER_TOKEN="${DA_BEARER_TOKEN:-$(grep "DA_BEARER_TOKEN" "$PROJECT_DIR/.env" 2>/dev/null | sed 's/DA_BEARER_TOKEN=//' | tr -d '"' || true)}"
 

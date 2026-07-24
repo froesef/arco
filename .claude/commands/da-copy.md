@@ -10,7 +10,7 @@ Use the script at `tools/da-copy.sh` to copy missing DA files between orgs.
 
 ### Configuration
 
-- **DA token**: retrieved from `.env` as `DA_TOKEN`
+- **DA token**: preferred source is the AEM CLI login token at `.hlx/.da-token.json` (`.access_token`, auto-refreshed by `aem up`); falls back to gcloud secret `DA_TOKEN` then `.env` `DA_TOKEN`/`DA_BEARER_TOKEN`
 - **Script**: `./tools/da-copy.sh`
 
 ### Steps
