@@ -34,6 +34,11 @@ const PROVIDERS = {
 export const MODEL_CATALOG = [
   {
     provider: 'cerebras',
+    model: 'gemma-4-31b',
+    label: 'Cerebras · Gemma 4 31B (1500 tokens/s)',
+  },
+  {
+    provider: 'cerebras',
     model: 'gpt-oss-120b',
     label: 'Cerebras · GPT-OSS 120B (3000 tokens/s)',
   },
@@ -51,11 +56,6 @@ export const MODEL_CATALOG = [
     provider: 'cerebras',
     model: 'zai-glm-4.7',
     label: 'Cerebras · Z.ai GLM 4.7 (1000 tokens/s)',
-  },
-  {
-    provider: 'cerebras',
-    model: 'gemma-4-31b-trial',
-    label: 'Cerebras · Gemma 4 31B (1500 tokens/s)',
   },
   {
     provider: 'cloudflare',
