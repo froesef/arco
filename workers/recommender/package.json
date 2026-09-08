@@ -12,6 +12,8 @@
     "cleanup:branch": "./cleanup-branch.sh",
     "list:branch:live": "node scripts/list-cf-workers.js",
     "cleanup:merged": "node scripts/cleanup-merged-branches.js",
+    "migrate:events": "wrangler d1 execute arco-sessions --remote --file=./migrations/0009_events_conversions.sql",
+    "migrate:events:local": "wrangler d1 execute arco-sessions --local --file=./migrations/0009_events_conversions.sql",
     "index-content": "node scripts/index-content.js",
     "upload-kv": "node scripts/upload-kv.js",
     "test": "node tools/precompile-prompts.js && node --loader ./tools/json-loader.js --test 'tests/snapshots/*.test.js'",

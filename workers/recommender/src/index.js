@@ -9,7 +9,7 @@ import { createContext, CORS_HEADERS } from './pipeline/context.js';
 import { executeFlow } from './pipeline/executor.js';
 import { resolveFlow } from './pipeline/flows.js';
 import { STEPS } from './pipeline/steps/index.js';
-import { writeEvent, classifyPageType, queryStats } from './analytics.js';
+import { queryStats } from './analytics.js';
 import { saveGeneration } from './storage.js';
 import { parseGenerateBody } from './request-schema.js';
 import {
@@ -28,6 +28,15 @@ import {
   handleVectorizeSearch,
   handleVectorizeItem,
 } from './vectorize-admin.js';
+import {
+  handleTrack,
+  handleInsightsSummary,
+  handleInsightsFunnel,
+  handleInsightsModels,
+  handleInsightsSegments,
+  handleInsightsTimeseries,
+  handleInsightsAssumptions,
+} from './events.js';
 import {
   handleCreateExperiment,
   handleListExperiments,
@@ -311,29 +320,9 @@ async function handlePersist(request, env) {
 
 /**
  * Receive client-side analytics events (page views, product views, etc.)
- * Accepts the sendBeacon payload from browsing-signals.js.
+ * Handled by src/events.js — dual-sinks to Analytics Engine and D1.
  * POST /api/track
  */
-async function handleTrack(request, env) {
-  let body;
-  try {
-    const text = await request.text();
-    body = JSON.parse(text);
-  } catch {
-    return new Response(null, { status: 204, headers: CORS_HEADERS });
-  }
-
-  const {
-    eventType = 'page_view',
-    intent = '',
-    metadata = {},
-  } = body;
-  const path = metadata.path || '';
-  const pageType = classifyPageType(path);
-
-  writeEvent(env, eventType, pageType, intent, path);
-  return new Response(null, { status: 204, headers: CORS_HEADERS });
-}
 
 /**
  * Return aggregated analytics stats for the dashboard.
@@ -552,6 +541,31 @@ export default {
       const fbRunMatch = url.pathname.match(/^\/api\/admin\/feedback\/run\/([^/]+)$/);
       if (fbRunMatch && request.method === 'GET') {
         return handleRunFeedback(request, env, fbRunMatch[1]);
+      }
+    }
+
+    // Admin routes — marketing metrics / ROI insights
+    if (url.pathname.startsWith('/api/admin/insights')) {
+      const authResp = await requireAdminAuth(request, env);
+      if (authResp) return authResp;
+      if (url.pathname === '/api/admin/insights/summary' && request.method === 'GET') {
+        return handleInsightsSummary(request, env);
+      }
+      if (url.pathname === '/api/admin/insights/funnel' && request.method === 'GET') {
+        return handleInsightsFunnel(request, env);
+      }
+      if (url.pathname === '/api/admin/insights/models' && request.method === 'GET') {
+        return handleInsightsModels(request, env);
+      }
+      if (url.pathname === '/api/admin/insights/segments' && request.method === 'GET') {
+        return handleInsightsSegments(request, env);
+      }
+      if (url.pathname === '/api/admin/insights/timeseries' && request.method === 'GET') {
+        return handleInsightsTimeseries(request, env);
+      }
+      if (url.pathname === '/api/admin/insights/assumptions'
+        && (request.method === 'GET' || request.method === 'PUT')) {
+        return handleInsightsAssumptions(request, env);
       }
     }
 
