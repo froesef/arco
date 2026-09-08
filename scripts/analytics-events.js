@@ -102,13 +102,17 @@ export function flush() {
 
   try {
     if (navigator.sendBeacon) {
-      const blob = new Blob([payload], { type: 'application/json' });
+      // Must be a CORS-safelisted content type. sendBeacon always sends with
+      // credentials mode 'include', and the worker replies with a wildcard
+      // Access-Control-Allow-Origin — so any preflight would be rejected.
+      // text/plain keeps this a simple request; the worker JSON-parses the body.
+      const blob = new Blob([payload], { type: 'text/plain;charset=UTF-8' });
       if (navigator.sendBeacon(`${url}/api/track`, blob)) return;
     }
     fetch(`${url}/api/track`, {
       method: 'POST',
       body: payload,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
       keepalive: true,
     }).catch(() => { /* best effort */ });
   } catch { /* never let telemetry break the page */ }

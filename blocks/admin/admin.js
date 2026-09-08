@@ -177,7 +177,7 @@ function parseRoute() {
   if (hash === '/feedback' || hash.startsWith('/feedback?')) return { view: 'feedback' };
   const fbRunMatch = hash.match(/^\/feedback\/run\/([^/]+)$/);
   if (fbRunMatch) return { view: 'feedback-run', id: fbRunMatch[1] };
-  if (hash === '/insights') return { view: 'insights' };
+  if (hash === '/insights' || hash.startsWith('/insights?')) return { view: 'insights' };
 
   return { view: 'sessions' };
 }
@@ -3714,22 +3714,255 @@ async function renderFeedbackTab(panel, pageData) {
   panel.innerHTML = sections || '<p class="admin-empty">No feedback collected on this page yet.</p>';
 }
 
-function renderInsightsStub(root) {
+/* ── Insights (marketing metrics / ROI) ─────────────────────────────────── */
+
+const ROI_FIELDS = [
+  ['author_hours_per_page', 'Author hours per page', 0.5],
+  ['author_hourly_rate', 'Author hourly rate (USD)', 5],
+  ['gross_margin_pct', 'Gross margin (%)', 1],
+];
+
+function usd(n) {
+  if (n == null || !Number.isFinite(Number(n))) return '—';
+  const v = Number(n);
+  if (Math.abs(v) >= 1000) return `$${v.toLocaleString(undefined, { maximumFractionDigits: 0 })}`;
+  if (Math.abs(v) >= 1) return `$${v.toFixed(2)}`;
+  if (v === 0) return '$0';
+  return `$${v.toFixed(4)}`;
+}
+
+function pctFmt(n, digits = 1) {
+  if (n == null || !Number.isFinite(Number(n))) return '—';
+  return `${(Number(n) * 100).toFixed(digits)}%`;
+}
+
+function roiMultiple(n) {
+  if (n == null || !Number.isFinite(Number(n))) return '—';
+  const v = Number(n);
+  if (v >= 1000) return `${Math.round(v).toLocaleString()}×`;
+  if (v >= 10) return `${v.toFixed(0)}×`;
+  return `${v.toFixed(1)}×`;
+}
+
+function statCard(label, value, sub) {
+  return `
+    <div class="admin-insight-stat">
+      <span class="admin-insight-stat-label">${esc(label)}</span>
+      <strong class="admin-insight-stat-value">${esc(String(value))}</strong>
+      ${sub ? `<span class="admin-insight-stat-sub">${esc(sub)}</span>` : ''}
+    </div>`;
+}
+
+function renderFunnel(funnel) {
+  const top = funnel[0]?.sessions || 0;
+  return funnel.map((step, i) => {
+    const width = top ? Math.max(2, (step.sessions / top) * 100) : 2;
+    return `
+      <div class="admin-funnel-step">
+        <div class="admin-funnel-head">
+          <span class="admin-funnel-label">${esc(step.label)}</span>
+          <span class="admin-funnel-count">${step.sessions.toLocaleString()} sessions</span>
+        </div>
+        <div class="admin-funnel-bar-track">
+          <div class="admin-funnel-bar" style="width:${width}%"></div>
+        </div>
+        <div class="admin-funnel-meta admin-muted">
+          ${i === 0 ? 'entry point' : `${pctFmt(step.stepRate)} of previous · ${pctFmt(step.overallRate)} overall · ${step.dropOff.toLocaleString()} dropped off`}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderModelsTable(models) {
+  if (!models.length) {
+    return '<p class="admin-empty">No generations with a recorded model in this window.</p>';
+  }
+  return `
+    <table class="admin-table admin-insight-table">
+      <thead>
+        <tr>
+          <th>Model</th><th>Runs</th><th>Cost</th><th>$/run</th>
+          <th>PDP views</th><th>Carts</th><th>Conv. rate</th>
+          <th>Revenue/run</th><th>Judge</th><th>User</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${models.map((m) => `
+          <tr>
+            <td><span class="admin-mono">${esc(m.provider || '?')}</span><br>${esc(m.model || '?')}</td>
+            <td>${m.runs.toLocaleString()}</td>
+            <td>${usd(m.costUsd)}</td>
+            <td>${usd(m.costPerRunUsd)}</td>
+            <td>${m.productViews.toLocaleString()}</td>
+            <td>${m.carts.toLocaleString()}</td>
+            <td>${pctFmt(m.cartConversionRate)}</td>
+            <td>${usd(m.revenuePerRunUsd)}</td>
+            <td>${m.judgeScore != null ? Number(m.judgeScore).toFixed(2) : '—'}</td>
+            <td>👍${m.up} 👎${m.down}</td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`;
+}
+
+function renderSegmentTable(title, rows) {
+  if (!rows.length) return '';
+  return `
+    <div class="admin-insight-segment">
+      <h4>${esc(title)}</h4>
+      <table class="admin-table admin-insight-table">
+        <thead><tr><th>Segment</th><th>Runs</th><th>Carts</th><th>Conv. rate</th><th>Value</th></tr></thead>
+        <tbody>
+          ${rows.map((r) => `
+            <tr>
+              <td>${esc(r.segment)}</td>
+              <td>${r.runs.toLocaleString()}</td>
+              <td>${r.carts.toLocaleString()}</td>
+              <td>${pctFmt(r.conversionRate)}</td>
+              <td>${usd(r.cartValueUsd)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+}
+
+function renderTimeseries(series) {
+  if (!series.length) return '<p class="admin-empty">No activity in this window.</p>';
+  const max = Math.max(...series.map((d) => Math.max(d.costUsd, d.valueUsd)), 0.0001);
+  return `
+    <div class="admin-insight-chart">
+      ${series.map((d) => `
+        <div class="admin-insight-chart-col" title="${esc(d.day)} · cost ${usd(d.costUsd)} · value ${usd(d.valueUsd)}">
+          <div class="admin-insight-bars">
+            <div class="admin-insight-bar admin-insight-bar-value" style="height:${(d.valueUsd / max) * 100}%"></div>
+            <div class="admin-insight-bar admin-insight-bar-cost" style="height:${(d.costUsd / max) * 100}%"></div>
+          </div>
+          <span class="admin-insight-chart-label">${esc(d.day.slice(5))}</span>
+        </div>`).join('')}
+    </div>
+    <div class="admin-insight-legend admin-muted">
+      <span><i class="admin-swatch admin-swatch-value"></i> attributed cart value</span>
+      <span><i class="admin-swatch admin-swatch-cost"></i> inference cost</span>
+    </div>`;
+}
+
+async function renderInsights(root) {
+  const days = Number(new URLSearchParams(window.location.hash.split('?')[1] || '').get('days')) || 30;
+
   root.innerHTML = `
     <div class="admin-toolbar">
-      <h2>Feedback insights</h2>
+      <h2>Marketing insights &amp; ROI</h2>
+      <div class="admin-toolbar-actions">
+        <label class="admin-muted">Window
+          <select data-role="days">
+            ${[7, 30, 90, 365].map((d) => `<option value="${d}" ${d === days ? 'selected' : ''}>${d} days</option>`).join('')}
+          </select>
+        </label>
+      </div>
     </div>
-    <section class="admin-card admin-insights-stub">
-      <h3>Automated summaries (coming soon)</h3>
-      <p class="admin-muted">
-        This view will summarize accumulated user feedback into actionable
-        improvement suggestions: recurring flag categories, problematic
-        product hallucinations, and judge↔user score divergence.
-      </p>
-      <button type="button" class="admin-btn admin-btn-ghost" disabled
-        title="Coming soon">Generate summary</button>
+    <div data-role="body"><p class="admin-muted">Loading…</p></div>`;
+
+  root.querySelector('[data-role="days"]').addEventListener('change', (e) => {
+    window.location.hash = `#/insights?days=${e.target.value}`;
+  });
+
+  const body = root.querySelector('[data-role="body"]');
+  const q = `?days=${days}`;
+
+  let summary; let funnel; let models; let segments; let series;
+  try {
+    [summary, funnel, models, segments, series] = await Promise.all([
+      api(`/api/admin/insights/summary${q}`),
+      api(`/api/admin/insights/funnel${q}`),
+      api(`/api/admin/insights/models${q}`),
+      api(`/api/admin/insights/segments${q}`),
+      api(`/api/admin/insights/timeseries${q}`),
+    ]);
+  } catch (err) {
+    body.innerHTML = `<p class="admin-error">${esc(err.message)}</p>`;
+    return;
+  }
+
+  const { generation: g, conversions: c, roi } = summary;
+
+  body.innerHTML = `
+    <section class="admin-card">
+      <div class="admin-insight-stats">
+        ${statCard('Generated runs', g.runs.toLocaleString(), `${g.sessions.toLocaleString()} sessions`)}
+        ${statCard('Inference cost', usd(g.costUsd), `${usd(g.costPerRunUsd)} per run`)}
+        ${statCard('Product views', c.productViews.toLocaleString(), 'soft conversion')}
+        ${statCard('Add to cart', c.addToCart.toLocaleString(), `${c.attributedAddToCart} attributed`)}
+        ${statCard('Conversion rate', pctFmt(c.conversionRate), 'sessions with a cart')}
+        ${statCard('AOV', usd(c.aovUsd), 'per cart event')}
+        ${statCard('ROI', roiMultiple(roi.roiMultiple), 'value ÷ cost')}
+      </div>
+      <p class="admin-insight-caveat admin-muted">⚠ ${esc(summary.caveat)}</p>
     </section>
-  `;
+
+    <section class="admin-card">
+      <h3>Conversion funnel</h3>
+      ${renderFunnel(funnel.funnel)}
+    </section>
+
+    <section class="admin-card">
+      <h3>ROI model</h3>
+      <div class="admin-insight-roi">
+        <table class="admin-table admin-insight-table">
+          <tbody>
+            <tr><td>Attributed cart value × margin</td><td>${usd(roi.marginUsd)}</td></tr>
+            <tr><td>Authoring effort avoided</td><td>${usd(roi.authoringSavedUsd)}</td></tr>
+            <tr class="admin-insight-total"><td><strong>Total value</strong></td><td><strong>${usd(roi.totalValueUsd)}</strong></td></tr>
+            <tr><td>Inference cost</td><td>−${usd(roi.costUsd)}</td></tr>
+            <tr class="admin-insight-total"><td><strong>ROI multiple</strong></td><td><strong>${roiMultiple(roi.roiMultiple)}</strong></td></tr>
+          </tbody>
+        </table>
+        <form class="admin-insight-assumptions" data-role="assumptions">
+          <h4>Assumptions</h4>
+          ${ROI_FIELDS.map(([key, label, step]) => `
+            <label>${esc(label)}
+              <input type="number" name="${key}" step="${step}" min="0"
+                value="${esc(String(roi.assumptions[key]))}">
+            </label>`).join('')}
+          <button type="submit" class="admin-btn">Save assumptions</button>
+          <span class="admin-muted" data-role="assumptions-status"></span>
+        </form>
+      </div>
+    </section>
+
+    <section class="admin-card">
+      <h3>Cost vs. attributed value</h3>
+      ${renderTimeseries(series.series)}
+    </section>
+
+    <section class="admin-card">
+      <h3>By model</h3>
+      <p class="admin-muted">Does the LLM judge score predict actual conversion?</p>
+      ${renderModelsTable(models.models)}
+    </section>
+
+    <section class="admin-card">
+      <h3>By segment</h3>
+      ${renderSegmentTable('Query intent', segments.byIntent)}
+      ${renderSegmentTable('Journey stage', segments.byJourneyStage)}
+    </section>`;
+
+  const form = body.querySelector('[data-role="assumptions"]');
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const status = form.querySelector('[data-role="assumptions-status"]');
+    status.textContent = 'Saving…';
+    const payload = {};
+    ROI_FIELDS.forEach(([key]) => { payload[key] = Number(form.elements[key].value); });
+    try {
+      await api('/api/admin/insights/assumptions', {
+        method: 'PUT',
+        body: JSON.stringify(payload),
+      });
+      status.textContent = 'Saved — reloading…';
+      await renderInsights(root);
+    } catch (err) {
+      status.textContent = err.message;
+    }
+  });
 }
 
 // ── Entry ───────────────────────────────────────────────────────────────────
@@ -3789,7 +4022,7 @@ async function render(root) {
   } else if (route.view === 'feedback-run') {
     await renderFeedbackRun(root, route.id);
   } else if (route.view === 'insights') {
-    renderInsightsStub(root);
+    await renderInsights(root);
   } else {
     await renderSessions(root);
   }

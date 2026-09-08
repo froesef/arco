@@ -132,6 +132,10 @@ function normaliseEvent(raw, ctx) {
  * spoofed or stale client id can't inflate the ROI numbers.
  */
 async function validateAttribution(db, events) {
+  // Default everything to 'none' first — the early return below must not leave
+  // rows with a NULL attribution.
+  events.forEach((e) => { e.attribution = 'none'; });
+
   const ids = [...new Set(events.map((e) => e.attributedRunId).filter(Boolean))];
   if (!ids.length) return;
 
@@ -144,17 +148,14 @@ async function validateAttribution(db, events) {
     known = new Set((results || []).map((r) => r.id));
   } catch (err) {
     console.error('[Events] attribution lookup failed:', err.message);
+    events.forEach((e) => { e.attributedRunId = null; });
     return;
   }
 
   events.forEach((e) => {
-    if (!e.attributedRunId) {
-      e.attribution = 'none';
-      return;
-    }
+    if (!e.attributedRunId) return;
     if (!known.has(e.attributedRunId)) {
       e.attributedRunId = null;
-      e.attribution = 'none';
       return;
     }
     // Fired on the generated page itself vs. a downstream page it referred.
