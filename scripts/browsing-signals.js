@@ -20,7 +20,6 @@
  */
 
 import { SessionContextManager } from './session-context.js';
-import { ARCO_ANALYTICS_URL } from './api-config.js';
 
 const MAX_SIGNALS = 20;
 const ENGAGEMENT_THRESHOLD_MS = 5000;
@@ -320,7 +319,10 @@ export function collectBrowsingSignals() {
     addSignal(getEngagementSignal());
   }, DEEP_ENGAGEMENT_MS);
 
-  // 5. Capture final engagement and send analytics beacon on page leave
+  // 5. Capture final engagement on page leave.
+  //    Transport moved to analytics-events.js — it runs on every page (this
+  //    collector skips /discover/ and ?q=) and batches events, so emitting a
+  //    beacon here too would double-count page views.
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState !== 'hidden') return;
 
@@ -330,26 +332,6 @@ export function collectBrowsingSignals() {
       timeSpent: engagement.data.timeSpent,
       scrollDepth: engagement.data.scrollDepth,
     });
-
-    try {
-      const analyticsUrl = window.ARCO_CONFIG?.ANALYTICS_URL || ARCO_ANALYTICS_URL;
-      if (!analyticsUrl) return;
-      const payload = JSON.stringify({
-        sessionId: SessionContextManager.getSessionId(),
-        eventType: 'page-view',
-        query: '',
-        intent: classifyFromPath(window.location.pathname).intent,
-        metadata: {
-          path: window.location.pathname,
-          title: document.title,
-          timeSpent: engagement.data.timeSpent,
-          scrollDepth: engagement.data.scrollDepth,
-        },
-      });
-      if (navigator.sendBeacon) navigator.sendBeacon(`${analyticsUrl}/api/track`, payload);
-    } catch {
-      // Best-effort — silently ignore failures
-    }
   });
 
   // 6. Interaction listeners

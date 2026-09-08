@@ -1,4 +1,10 @@
 import { createOptimizedPicture } from '../../scripts/aem.js';
+import {
+  track,
+  flush,
+  parsePriceCents,
+  productSlugFromPath,
+} from '../../scripts/analytics-events.js';
 
 /**
  * Parses block rows into a config object keyed by the first cell text (lowercased).
@@ -216,6 +222,55 @@ function appendJsonLd(name, description, price) {
 }
 
 /**
+ * Builds the simulated "Add to cart" control.
+ *
+ * The demo has no checkout — this is the hard conversion event the ROI model
+ * counts, so the click must be recorded even though nothing is really sold.
+ *
+ * @param {string} name  Product name
+ * @param {string} price Raw authored price string
+ * @returns {Element}
+ */
+function buildAddToCart(name, price) {
+  const wrap = document.createElement('div');
+  wrap.className = 'product-detail-actions';
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'product-detail-add-to-cart';
+  button.textContent = 'Add to cart';
+
+  const status = document.createElement('span');
+  status.className = 'product-detail-cart-status';
+  status.setAttribute('role', 'status');
+  status.setAttribute('aria-live', 'polite');
+
+  button.addEventListener('click', async () => {
+    const slug = productSlugFromPath(window.location.pathname);
+    if (!slug) return;
+
+    const priceCents = parsePriceCents(price);
+    const { addToCart } = await import('../../scripts/cart.js');
+    const count = addToCart({ slug, name, priceCents });
+
+    track('add_to_cart', { productSlug: slug, valueCents: priceCents });
+    flush();
+
+    button.classList.add('is-added');
+    button.textContent = 'Added ✓';
+    status.textContent = `${count} item${count === 1 ? '' : 's'} in cart`;
+
+    setTimeout(() => {
+      button.classList.remove('is-added');
+      button.textContent = 'Add to cart';
+    }, 2000);
+  });
+
+  wrap.append(button, status);
+  return wrap;
+}
+
+/**
  * Loads and decorates the product-detail block.
  * @param {Element} block The block element
  */
@@ -265,6 +320,9 @@ export default async function decorate(block) {
     descEl.textContent = description;
     info.append(descEl);
   }
+
+  // Add to cart — hard conversion for the ROI funnel
+  info.append(buildAddToCart(name, price));
 
   // Variant selector
   if (config.variants) {
