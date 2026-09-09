@@ -1,0 +1,427 @@
+{
+  "_provenance": {
+    "renderedBy": "playwright",
+    "fetchedAt": "2026-09-09T13:44:38.223Z",
+    "waitMode": "medium",
+    "waitMs": 2500,
+    "httpStatus": 200
+  },
+  "slug": "index",
+  "url": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/",
+  "renderedBy": "playwright",
+  "fetchedAt": "2026-09-09T13:44:38.223Z",
+  "screenshot": "assets/screenshots/index.png",
+  "finalUrl": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/",
+  "title": "Precision Brewing, Beautiful Design",
+  "description": "Arco crafts espresso machines and grinders for people who care about every detail — from bean to cup.",
+  "og": {
+    "title": "Precision Brewing, Beautiful Design",
+    "description": "Arco crafts espresso machines and grinders for people who care about every detail — from bean to cup.",
+    "image": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_1f7e12f4bd38e8ecf4fdc73dc84ebd9a5fd516521.jpg?width=1200&format=pjpg&optimize=medium"
+  },
+  "headings": [
+    {
+      "tag": "h1",
+      "text": "Precision Brewing, Beautiful Design"
+    },
+    {
+      "tag": "h2",
+      "text": "Featured Products"
+    },
+    {
+      "tag": "h3",
+      "text": "Primo"
+    },
+    {
+      "tag": "h3",
+      "text": "Doppio"
+    },
+    {
+      "tag": "h3",
+      "text": "Macinino"
+    },
+    {
+      "tag": "h3",
+      "text": "Studio Pro"
+    },
+    {
+      "tag": "h3",
+      "text": "Macinino Pro"
+    },
+    {
+      "tag": "h2",
+      "text": "What's Your Brew Style?"
+    },
+    {
+      "tag": "h3",
+      "text": "How do you start your morning?"
+    },
+    {
+      "tag": "h2",
+      "text": "Latest Stories"
+    },
+    {
+      "tag": "h3",
+      "text": "Water Chemistry and Espresso"
+    },
+    {
+      "tag": "h3",
+      "text": "Morning Routines of Home Baristas"
+    },
+    {
+      "tag": "h3",
+      "text": "Flat vs. Conical Burrs"
+    },
+    {
+      "tag": "h2",
+      "text": "What Our Customers Say"
+    },
+    {
+      "tag": "h2",
+      "text": "Built to Last, Designed to Repair"
+    }
+  ],
+  "body": [
+    "Arco crafts espresso machines and grinders for people who care about every detail — from bean to cup.",
+    "Explore MachinesFind Your Brew Style",
+    "Primo Our signature single-boiler machine for the home barista. Compact, powerful, beautifully engineered. From $899",
+    "Our signature single-boiler machine for the home barista. Compact, powerful, beautifully engineered.",
+    "From $899",
+    "Doppio Dual-boiler performance. Steam and brew simultaneously without compromise. From $1,599",
+    "Dual-boiler performance. Steam and brew simultaneously without compromise.",
+    "From $1,599",
+    "Macinino 64mm flat burrs. Stepless adjustment. The grinder that elevates everything else. From $549",
+    "64mm flat burrs. Stepless adjustment. The grinder that elevates everything else.",
+    "From $549",
+    "Studio Pro Commercial DNA in a home-friendly footprint. Triple boiler, gear pump, touchscreen, and full pressure profiling. From $3,499",
+    "Commercial DNA in a home-friendly footprint. Triple boiler, gear pump, touchscreen, and full pressure profiling.",
+    "From $3,499",
+    "Macinino Pro 83mm flat burrs. Digital display. The grinder serious baristas have been waiting for. From $799",
+    "83mm flat burrs. Digital display. The grinder serious baristas have been waiting for.",
+    "From $799",
+    "Take our 30-second quiz and we'll match you with the perfect setup.",
+    "Water Chemistry and Espresso Why the water you use matters as much as the beans you grind. Read More",
+    "Why the water you use matters as much as the beans you grind.",
+    "Read More",
+    "Morning Routines of Home Baristas Five Arco owners share how they start every day. Read More",
+    "Five Arco owners share how they start every day.",
+    "Read More",
+    "Flat vs. Conical Burrs The definitive guide to choosing the right grinder for your taste. Read More",
+    "The definitive guide to choosing the right grinder for your taste.",
+    "Read More",
+    "★★★★★The Primo changed everything about my morning routine. It's the perfect balance of simplicity and performance.Marco L.",
+    "The Primo changed everything about my morning routine. It's the perfect balance of simplicity and performance.",
+    "The Primo changed everything about my morning routine. It's the perfect balance of simplicity and performance.",
+    "Marco L.",
+    "★★★★★I've used commercial machines for 15 years. The Doppio is the first home machine that matches that quality.Sarah K.",
+    "I've used commercial machines for 15 years. The Doppio is the first home machine that matches that quality.",
+    "I've used commercial machines for 15 years. The Doppio is the first home machine that matches that quality.",
+    "Sarah K.",
+    "★★★★★The Macinino grinder is absurdly good at this price point. My espresso has never been more consistent.James T.",
+    "The Macinino grinder is absurdly good at this price point. My espresso has never been more consistent.",
+    "The Macinino grinder is absurdly good at this price point. My espresso has never been more consistent.",
+    "James T.",
+    "Every Arco machine is engineered for a decade of daily use. When something does wear out, every part is replaceable — because sustainability starts with longevity.",
+    "Learn About Our Commitment"
+  ],
+  "ctas": [
+    {
+      "label": "Products",
+      "href": "/products/espresso-machines"
+    },
+    {
+      "label": "Stories",
+      "href": "/stories/"
+    },
+    {
+      "label": "Experiences",
+      "href": "/experiences/craft-at-home"
+    },
+    {
+      "label": "About",
+      "href": "/about"
+    },
+    {
+      "label": "White paper",
+      "href": null
+    },
+    {
+      "label": "Debug",
+      "href": null
+    },
+    {
+      "label": "Explore Machines",
+      "href": "/products/espresso-machines"
+    },
+    {
+      "label": "Find Your Brew Style",
+      "href": "/experiences/morning-minimalist"
+    },
+    {
+      "label": "From $899",
+      "href": "/products/espresso-machines/primo"
+    },
+    {
+      "label": "From $1,599",
+      "href": "/products/espresso-machines/doppio"
+    },
+    {
+      "label": "From $549",
+      "href": "/products/grinders/macinino"
+    },
+    {
+      "label": "From $3,499",
+      "href": "/products/espresso-machines/studio-pro"
+    },
+    {
+      "label": "From $799",
+      "href": "/products/grinders/macinino-pro"
+    },
+    {
+      "label": "Quick espresso and out the door",
+      "href": null
+    },
+    {
+      "label": "Slow ritual with a pour-over",
+      "href": null
+    },
+    {
+      "label": "On the go with a travel mug",
+      "href": null
+    },
+    {
+      "label": "Pressing a button and walking away",
+      "href": null
+    },
+    {
+      "label": "Read More",
+      "href": "/stories/water-chemistry-and-espresso"
+    },
+    {
+      "label": "Read More",
+      "href": "/stories/morning-routines-of-home-baristas"
+    },
+    {
+      "label": "Read More",
+      "href": "/stories/flat-vs-conical-burrs"
+    },
+    {
+      "label": "Learn About Our Commitment",
+      "href": "/about"
+    },
+    {
+      "label": "Dismiss",
+      "href": null
+    },
+    {
+      "label": "Next →",
+      "href": null
+    },
+    {
+      "label": "Dismiss",
+      "href": null
+    },
+    {
+      "label": "Got it ✓",
+      "href": null
+    }
+  ],
+  "links": [
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/grinders",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/accessories",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/water-chemistry-and-espresso",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/morning-routines-of-home-baristas",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/flat-vs-conical-burrs",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/from-bean-to-cup",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/dialing-in-your-espresso",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/the-science-of-milk-steaming",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/cleaning-your-espresso-machine",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/single-origin-vs-blends",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/espresso-pressure-profiling",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/travel-espresso-guide",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/experiences/craft-at-home",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/experiences/morning-minimalist",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/experiences/the-upgrade-path",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/experiences/espresso-anywhere",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/experiences/the-non-barista",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/about",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/primo",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/doppio",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/grinders/macinino",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/studio-pro",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/grinders/macinino-pro"
+  ],
+  "media": {
+    "imgs": [
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/icons/arco-logo.png",
+        "alt": "Arco",
+        "w": 1504,
+        "h": 704
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_1f7e12f4bd38e8ecf4fdc73dc84ebd9a5fd516521.jpg?width=2000&format=webply&optimize=medium",
+        "alt": "Arco espresso machine brewing a perfect shot on a sunlit kitchen counter",
+        "w": 1376,
+        "h": 768
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_1abbfdb7ccdbc8a53e8e4bba6322c039404608c57.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Arco Primo compact espresso machine in matte black",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_129f7a09c9849ce111140027cbab651246ab98e7c.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Arco Doppio dual-boiler espresso machine in brushed steel",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_1c771e99d27030dbdebcd37cd7d2fbd80972edb36.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Arco Macinino flat-burr grinder in walnut finish",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_1f17bba668fe467f67ae08dd99eb40c79369a4a95.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Arco Studio Pro dual-group commercial espresso machine in matte black with copper accents",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_19c236f641f7072fce950228b96bc7321ef5ec983.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Arco Macinino Pro high-end flat-burr grinder in matte black with copper accents",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_1890a1c077bcd94e22a69e2b4ca7313b1361eeb5a.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Close-up of water being poured into an espresso machine reservoir",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_158fc6be78bf03b180960be94f0de58c54a067923.jpg?width=750&format=webply&optimize=medium",
+        "alt": "A barista's hands pulling an espresso shot at sunrise",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_1d7f80e34b5e2ed9c7f62bfa4682218bc052e1de9.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Side-by-side comparison of flat and conical burr sets",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_1825b40057fc7413757adb4ac075a13b156baf2f6.jpg?width=2000&format=webply&optimize=medium",
+        "alt": "Photo of Marco L.",
+        "w": 1408,
+        "h": 768
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_1815ddf78d05839e0b84852750431be4184f25705.jpg?width=2000&format=webply&optimize=medium",
+        "alt": "Photo of Sarah K.",
+        "w": 1408,
+        "h": 768
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_1d7799b9861cb0b988e93198eadfd2c79c48fb1bb.jpg?width=2000&format=webply&optimize=medium",
+        "alt": "Photo of James T.",
+        "w": 1408,
+        "h": 768
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media_1edb1ae8a1f1a42f66ff00c7fb16efbc23231cdb8.jpg?width=2000&format=webply&optimize=medium",
+        "alt": "Coffee plants growing in a sustainable farm",
+        "w": 1408,
+        "h": 768
+      }
+    ],
+    "allImgCount": 14,
+    "cssBackgrounds": []
+  },
+  "styleSamples": {
+    "body": {
+      "color": "rgb(28, 43, 53)",
+      "bg": "rgb(245, 240, 232)",
+      "font": "Inter, sans-serif",
+      "weight": "400",
+      "size": "18px",
+      "radius": "0px",
+      "shadow": "none"
+    },
+    "h1": {
+      "color": "rgb(28, 43, 53)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "font": "Inter, sans-serif",
+      "weight": "700",
+      "size": "80px",
+      "radius": "0px",
+      "shadow": "none"
+    },
+    "h2": {
+      "color": "rgb(28, 43, 53)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "font": "Inter, sans-serif",
+      "weight": "600",
+      "size": "36px",
+      "radius": "0px",
+      "shadow": "none"
+    },
+    "h3": {
+      "color": "rgb(28, 43, 53)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "font": "Inter, sans-serif",
+      "weight": "600",
+      "size": "27px",
+      "radius": "0px",
+      "shadow": "none"
+    },
+    "a": {
+      "color": "rgb(181, 101, 29)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "font": "Inter, sans-serif",
+      "weight": "700",
+      "size": "18px",
+      "radius": "0px",
+      "shadow": "none"
+    },
+    "button": {
+      "color": "rgb(28, 43, 53)",
+      "bg": "rgba(0, 0, 0, 0)",
+      "font": "Inter, sans-serif",
+      "weight": "500",
+      "radius": "0px"
+    },
+    "card": {
+      "bg": "rgba(0, 0, 0, 0)",
+      "radius": "0px",
+      "shadow": "none"
+    }
+  },
+  "customProps": {
+    "--background-color": "#F5F0E8",
+    "--light-color": "#FFF",
+    "--dark-color": "#5C6B73",
+    "--text-color": "#1C2B35",
+    "--link-color": "#B5651D",
+    "--link-hover-color": "#8E4E14",
+    "--border-color": "#D4CFC5",
+    "--muted-color": "#5C6B73",
+    "--accent-color": "#B5651D",
+    "--accent-secondary": "#D4883A",
+    "--body-font-family": "'Inter', sans-serif",
+    "--heading-font-family": "'Inter', sans-serif",
+    "--border-radius": "12px",
+    "--card-radius": "12px"
+  },
+  "_signals": {
+    "distinctHeadings": 15,
+    "mainTextLen": 1913,
+    "realImageCount": 14
+  }
+}

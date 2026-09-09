@@ -1,0 +1,306 @@
+{
+  "_provenance": {
+    "renderedBy": "playwright",
+    "fetchedAt": "2026-09-09T13:44:38.223Z",
+    "waitMode": "medium",
+    "waitMs": 2500,
+    "httpStatus": 200
+  },
+  "slug": "products-espresso-machines",
+  "url": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines",
+  "renderedBy": "playwright",
+  "fetchedAt": "2026-09-09T13:44:38.223Z",
+  "screenshot": "assets/screenshots/products-espresso-machines.png",
+  "finalUrl": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines",
+  "title": "Espresso Machines",
+  "description": "From compact home setups to full commercial stations, Arco's espresso machines are engineered for precision, built to last, and designed to make every shot beautiful.",
+  "og": {
+    "title": "Espresso Machines",
+    "description": "From compact home setups to full commercial stations, Arco's espresso machines are engineered for precision, built to last, and designed to make every shot beautiful.",
+    "image": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/media_1abbfdb7ccdbc8a53e8e4bba6322c039404608c57.jpg?width=1200&format=pjpg&optimize=medium"
+  },
+  "headings": [
+    {
+      "tag": "h1",
+      "text": "Espresso Machines"
+    },
+    {
+      "tag": "h3",
+      "text": "Primo"
+    },
+    {
+      "tag": "h3",
+      "text": "Doppio"
+    },
+    {
+      "tag": "h3",
+      "text": "Studio"
+    },
+    {
+      "tag": "h3",
+      "text": "Studio Pro"
+    },
+    {
+      "tag": "h3",
+      "text": "Nano"
+    },
+    {
+      "tag": "h3",
+      "text": "Ufficio"
+    },
+    {
+      "tag": "h3",
+      "text": "Viaggio"
+    },
+    {
+      "tag": "h3",
+      "text": "Automatico"
+    }
+  ],
+  "body": [
+    "From compact home setups to full commercial stations, Arco's espresso machines are engineered for precision, built to last, and designed to make every shot beautiful.",
+    "Single BoilerPrimo$899View Product",
+    "$899",
+    "Dual BoilerDoppio$1,599View Product",
+    "$1,599",
+    "ProsumerStudio$2,299View Product",
+    "$2,299",
+    "CommercialStudio Pro$3,499View Product",
+    "$3,499",
+    "CompactNano$649View Product",
+    "$649",
+    "OfficeUfficio$4,299View Product",
+    "$4,299",
+    "PortableViaggio$399View Product",
+    "$399",
+    "AutomaticAutomatico$1,899View Product",
+    "$1,899"
+  ],
+  "ctas": [
+    {
+      "label": "Products",
+      "href": "/products/espresso-machines"
+    },
+    {
+      "label": "Stories",
+      "href": "/stories/"
+    },
+    {
+      "label": "Experiences",
+      "href": "/experiences/craft-at-home"
+    },
+    {
+      "label": "About",
+      "href": "/about"
+    },
+    {
+      "label": "For You",
+      "href": "/?q=I%27m+interested+in+espresso+machines.+what+do+you+recommend%3F"
+    },
+    {
+      "label": "White paper",
+      "href": null
+    },
+    {
+      "label": "Debug",
+      "href": null
+    },
+    {
+      "label": "All",
+      "href": null
+    },
+    {
+      "label": "Automatic",
+      "href": null
+    },
+    {
+      "label": "Commercial",
+      "href": null
+    },
+    {
+      "label": "Compact",
+      "href": null
+    },
+    {
+      "label": "Dual boiler",
+      "href": null
+    },
+    {
+      "label": "Office",
+      "href": null
+    },
+    {
+      "label": "Portable",
+      "href": null
+    },
+    {
+      "label": "Prosumer",
+      "href": null
+    },
+    {
+      "label": "Single boiler",
+      "href": null
+    },
+    {
+      "label": "Primo",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/primo"
+    },
+    {
+      "label": "View Product",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/primo"
+    },
+    {
+      "label": "Doppio",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/doppio"
+    },
+    {
+      "label": "View Product",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/doppio"
+    },
+    {
+      "label": "Studio",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/studio"
+    },
+    {
+      "label": "View Product",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/studio"
+    },
+    {
+      "label": "Studio Pro",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/studio-pro"
+    },
+    {
+      "label": "View Product",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/studio-pro"
+    },
+    {
+      "label": "Nano",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/nano"
+    },
+    {
+      "label": "View Product",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/nano"
+    },
+    {
+      "label": "Ufficio",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/ufficio"
+    },
+    {
+      "label": "View Product",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/ufficio"
+    },
+    {
+      "label": "Viaggio",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/viaggio"
+    },
+    {
+      "label": "View Product",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/viaggio"
+    },
+    {
+      "label": "Automatico",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/automatico"
+    },
+    {
+      "label": "View Product",
+      "href": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/automatico"
+    }
+  ],
+  "links": [
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/grinders",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/accessories",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/water-chemistry-and-espresso",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/morning-routines-of-home-baristas",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/flat-vs-conical-burrs",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/from-bean-to-cup",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/dialing-in-your-espresso",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/the-science-of-milk-steaming",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/cleaning-your-espresso-machine",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/single-origin-vs-blends",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/espresso-pressure-profiling",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/stories/travel-espresso-guide",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/experiences/craft-at-home",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/experiences/morning-minimalist",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/experiences/the-upgrade-path",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/experiences/espresso-anywhere",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/experiences/the-non-barista",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/about",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/?q=I%27m+interested+in+espresso+machines.+what+do+you+recommend%3F",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/primo",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/doppio",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/studio",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/studio-pro",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/nano",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/ufficio",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/viaggio",
+    "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/espresso-machines/automatico"
+  ],
+  "media": {
+    "imgs": [
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/icons/arco-logo.png",
+        "alt": "Arco",
+        "w": 1504,
+        "h": 704
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/media_1abbfdb7ccdbc8a53e8e4bba6322c039404608c57.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Arco Primo single boiler espresso machine",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/media_129f7a09c9849ce111140027cbab651246ab98e7c.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Arco Doppio dual boiler espresso machine",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/media_18a4e675acb3d161c38e2bd57b3faa3fb507f6e72.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Arco Studio prosumer espresso machine",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/media_1f17bba668fe467f67ae08dd99eb40c79369a4a95.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Arco Studio Pro commercial espresso machine",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/media_1e8fb0b992f25a5f998eee39094b129bc640db7c9.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Arco Nano compact espresso machine",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/media_11d5b4445610fcf48338ab8d7b4ffa2dbea75626c.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Arco Ufficio office espresso machine",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/media_11c9a58cd22b8603a88e88b08bd794b4149f1e19b.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Arco Viaggio portable espresso machine",
+        "w": 750,
+        "h": 409
+      },
+      {
+        "src": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/products/media_1289cb9c93fd3994a51c4ba81db0a659ae6a3d3bd.jpg?width=750&format=webply&optimize=medium",
+        "alt": "Arco Automatico automatic espresso machine",
+        "w": 750,
+        "h": 409
+      }
+    ],
+    "allImgCount": 9,
+    "cssBackgrounds": []
+  },
+  "_signals": {
+    "distinctHeadings": 9,
+    "mainTextLen": 524,
+    "realImageCount": 9
+  }
+}

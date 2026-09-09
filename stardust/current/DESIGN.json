@@ -1,0 +1,72 @@
+{
+  "_provenance": {
+    "source": "stardust:extract (via Playwright MCP browser, capture() logic ported from stardust:extract/scripts/crawl.mjs)",
+    "originUrl": "https://worktree-of1-data--arco--aem-growth-adoption.aem.page",
+    "extractedAt": "2026-09-09T13:41:00Z",
+    "pagesSampled": [
+      "/",
+      "/products/espresso-machines",
+      "/stories/from-bean-to-cup"
+    ]
+  },
+  "colors": {
+    "background": "#F5F0E8",
+    "light": "#FFFFFF",
+    "dark": "#5C6B73",
+    "text": "#1C2B35",
+    "link": "#B5651D",
+    "linkHover": "#8E4E14",
+    "border": "#D4CFC5",
+    "muted": "#5C6B73",
+    "accent": "#B5651D",
+    "accentSecondary": "#D4883A"
+  },
+  "typography": {
+    "heading": {
+      "family": "Inter, sans-serif",
+      "weight": "600",
+      "style": "normal"
+    },
+    "body": {
+      "family": "Inter, sans-serif",
+      "weight": "400",
+      "style": "normal"
+    }
+  },
+  "shapes": {
+    "card": {
+      "borderRadius": "12px"
+    },
+    "button": {
+      "borderRadius": "12px"
+    }
+  },
+  "spacing": {
+    "navHeight": "80px",
+    "bodyLineHeight": "1.75",
+    "headingLineHeight": "1.15"
+  },
+  "extensions": {
+    "componentStyle": "warm editorial layout with rounded cards, copper-accented CTAs on a cream background",
+    "motifs": [
+      "full-bleed product photography (matte-black espresso machines with copper/brass accents) as hero and card imagery",
+      "12px rounded corners on cards and buttons",
+      "soft layered shadows (--shadow-sm/md/lg/xl) for depth on cards",
+      "serif-free, confident sans headings (Inter, 600 weight) over warm cream backgrounds"
+    ],
+    "voice": {
+      "heroHeadline": "Precision Brewing, Beautiful Design",
+      "heroLede": "Arco crafts espresso machines and grinders for people who care about every detail — from bean to cup.",
+      "ctaSamples": [
+        "Explore Machines",
+        "Find Your Brew Style",
+        "Learn About Our Commitment"
+      ],
+      "register": "brand"
+    },
+    "systemComponents": {
+      "nav": ["Products", "Stories", "Experiences", "About"],
+      "footerNote": "not sampled in this 3-page cap"
+    }
+  }
+}
