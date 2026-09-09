@@ -316,6 +316,7 @@ export async function handleInsightsSummary(request, env) {
   const [gen, events, conv, assumptions] = await Promise.all([
     db.prepare(`
       SELECT COUNT(*) AS runs,
+             COUNT(DISTINCT COALESCE(page_id, id)) AS pages,
              COUNT(DISTINCT session_id) AS sessions,
              COALESCE(SUM(duration_ms), 0) AS total_duration_ms,
              COALESCE(SUM(input_tokens), 0) AS input_tokens,
@@ -362,7 +363,17 @@ export async function handleInsightsSummary(request, env) {
   const marginUsd = attributedValueUsd * grossMargin;
 
   const runs = Number(gen?.runs) || 0;
-  const authoringSavedUsd = runs
+  // Three denominators, three different questions:
+  //   run     — one /api/generate call (a follow-up chip click is its own run)
+  //   page    — one ?q= visit; the initial run plus every follow-up refining it.
+  //             This is "a personalised page" as a user would describe it.
+  //   session — one visitor (browser tab), who may ask several unrelated things.
+  // Cost per run is always the flattering one; cost per page/session is what it
+  // actually costs to serve somebody.
+  const pages = Number(gen?.pages) || 0;
+  const genSessions = Number(gen?.sessions) || 0;
+
+  const authoringSavedUsd = pages
     * assumptions.author_hours_per_page
     * assumptions.author_hourly_rate;
 
@@ -373,11 +384,15 @@ export async function handleInsightsSummary(request, env) {
     days,
     generation: {
       runs,
-      sessions: Number(gen?.sessions) || 0,
+      pages,
+      sessions: genSessions,
+      runsPerPage: pages ? runs / pages : 0,
       inputTokens: Number(gen?.input_tokens) || 0,
       outputTokens: Number(gen?.output_tokens) || 0,
       costUsd: costUsdTotal,
       costPerRunUsd: runs ? costUsdTotal / runs : 0,
+      costPerPageUsd: pages ? costUsdTotal / pages : 0,
+      costPerSessionUsd: genSessions ? costUsdTotal / genSessions : 0,
       avgDurationMs: runs ? (Number(gen?.total_duration_ms) || 0) / runs : 0,
     },
     events: eventCounts,
@@ -432,18 +447,21 @@ export async function handleInsightsFunnel(request, env) {
   (steps.results || []).forEach((r) => { byType[r.event_type] = r; });
   const get = (t, f = 'sessions') => Number(byType[t]?.[f]) || 0;
 
+  // Steps below the entry point count ATTRIBUTED sessions only. Organic traffic
+  // reaches product pages without ever seeing a generated page, and counting it
+  // here produced step rates above 100% ("more product views than card clicks").
   const funnel = [
     {
       key: 'query', label: 'Generated page viewed', sessions: Number(gen?.sessions) || 0, events: Number(gen?.runs) || 0,
     },
     {
-      key: 'product_card_click', label: 'Product card clicked', sessions: get('product_card_click'), events: get('product_card_click', 'n'),
+      key: 'product_card_click', label: 'Product card clicked', sessions: get('product_card_click', 'attributed_sessions'), events: get('product_card_click', 'n'),
     },
     {
-      key: 'product_view', label: 'Product page viewed', sessions: get('product_view'), events: get('product_view', 'n'),
+      key: 'product_view', label: 'Product page viewed', sessions: get('product_view', 'attributed_sessions'), events: get('product_view', 'n'),
     },
     {
-      key: 'add_to_cart', label: 'Added to cart', sessions: get('add_to_cart'), events: get('add_to_cart', 'n'),
+      key: 'add_to_cart', label: 'Added to cart', sessions: get('add_to_cart', 'attributed_sessions'), events: get('add_to_cart', 'n'),
     },
   ];
 
@@ -459,6 +477,28 @@ export async function handleInsightsFunnel(request, env) {
 }
 
 /**
+ * Per-run conversion rollup.
+ *
+ * Must be a CTE rather than correlated subqueries: inside a `GROUP BY` aggregate
+ * a correlated subquery on `gp.id` resolves against one arbitrary row of each
+ * group, so it silently reports the conversions of a single run instead of the
+ * whole model/segment. Rolling up first keeps it one row per run, so the outer
+ * LEFT JOIN cannot fan out and break the cost/token SUMs either.
+ */
+const RUN_CONVERSIONS_CTE = `
+  conv AS (
+    SELECT attributed_run_id AS run_id,
+           SUM(CASE WHEN conversion_type = 'add_to_cart' THEN 1 ELSE 0 END) AS carts,
+           SUM(CASE WHEN conversion_type = 'add_to_cart'
+                    THEN COALESCE(value_cents, 0) ELSE 0 END) AS cart_value_cents,
+           SUM(CASE WHEN conversion_type = 'product_view' THEN 1 ELSE 0 END) AS product_views
+    FROM conversions
+    WHERE attributed_run_id IS NOT NULL
+    GROUP BY attributed_run_id
+  )
+`;
+
+/**
  * GET /api/admin/insights/models
  *
  * Joins cost, conversion and the LLM-judge score per model — the "does the
@@ -471,6 +511,14 @@ export async function handleInsightsModels(request, env) {
   const costExpr = costSqlExpression();
 
   const { results } = await db.prepare(`
+    WITH ${RUN_CONVERSIONS_CTE},
+    fb AS (
+      SELECT run_id,
+             SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END)  AS up,
+             SUM(CASE WHEN rating = -1 THEN 1 ELSE 0 END) AS down
+      FROM run_feedback
+      GROUP BY run_id
+    )
     SELECT gp.llm_provider AS provider,
            gp.llm_model    AS model,
            COUNT(*)        AS runs,
@@ -478,17 +526,14 @@ export async function handleInsightsModels(request, env) {
            COALESCE(AVG(gp.duration_ms), 0) AS avg_duration_ms,
            COALESCE(SUM(gp.input_tokens), 0)  AS input_tokens,
            COALESCE(SUM(gp.output_tokens), 0) AS output_tokens,
-           (SELECT COUNT(*) FROM conversions c
-              WHERE c.attributed_run_id = gp.id AND c.conversion_type = 'add_to_cart') AS carts,
-           (SELECT COALESCE(SUM(c.value_cents), 0) FROM conversions c
-              WHERE c.attributed_run_id = gp.id AND c.conversion_type = 'add_to_cart') AS cart_value_cents,
-           (SELECT COUNT(*) FROM conversions c
-              WHERE c.attributed_run_id = gp.id AND c.conversion_type = 'product_view') AS product_views,
-           (SELECT COUNT(*) FROM run_feedback rf
-              WHERE rf.run_id = gp.id AND rf.rating = 1) AS up,
-           (SELECT COUNT(*) FROM run_feedback rf
-              WHERE rf.run_id = gp.id AND rf.rating = -1) AS down
+           COALESCE(SUM(conv.carts), 0)            AS carts,
+           COALESCE(SUM(conv.cart_value_cents), 0) AS cart_value_cents,
+           COALESCE(SUM(conv.product_views), 0)    AS product_views,
+           COALESCE(SUM(fb.up), 0)   AS up,
+           COALESCE(SUM(fb.down), 0) AS down
     FROM generated_pages gp
+    LEFT JOIN conv ON conv.run_id = gp.id
+    LEFT JOIN fb   ON fb.run_id   = gp.id
     WHERE gp.created_at >= ?1 AND gp.llm_model IS NOT NULL
     GROUP BY gp.llm_provider, gp.llm_model
     ORDER BY runs DESC
@@ -548,13 +593,13 @@ export async function handleInsightsSegments(request, env) {
   const { since, days } = sinceFrom(new URL(request.url));
 
   const build = (column) => db.prepare(`
+    WITH ${RUN_CONVERSIONS_CTE}
     SELECT COALESCE(gp.${column}, 'unknown') AS segment,
            COUNT(*) AS runs,
-           (SELECT COUNT(*) FROM conversions c
-              WHERE c.attributed_run_id = gp.id AND c.conversion_type = 'add_to_cart') AS carts,
-           (SELECT COALESCE(SUM(c.value_cents),0) FROM conversions c
-              WHERE c.attributed_run_id = gp.id AND c.conversion_type = 'add_to_cart') AS cart_value_cents
+           COALESCE(SUM(conv.carts), 0)            AS carts,
+           COALESCE(SUM(conv.cart_value_cents), 0) AS cart_value_cents
     FROM generated_pages gp
+    LEFT JOIN conv ON conv.run_id = gp.id
     WHERE gp.created_at >= ?1
     GROUP BY COALESCE(gp.${column}, 'unknown')
     ORDER BY runs DESC
