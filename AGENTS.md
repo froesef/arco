@@ -573,7 +573,7 @@ The widget only attaches on fresh `/?q=` runs. Cached `/discover/{slug}` pages a
 | `#/feedback/run/:runId` | Per-run detail — run metadata + every feedback row (rating, flags, wrong products, full comment, dwell, UA, timestamp) + "View generated page" link. |
 | `#/pages/:id` `Feedback` tab | Fifth tab on the page-detail view; lists feedback for every run on that page. |
 | `#/evaluations/:id` | Each query row's label gets a `👍N 👎M` chip when real-user feedback exists for the same query. Click → jumps to `#/feedback?q=…`. Refreshes on the 3s poll. |
-| `#/insights` | Marketing metrics & ROI — KPI strip, conversion funnel, editable ROI model, cost-vs-value chart, per-model and per-segment conversion. See "Marketing Metrics & ROI" below. |
+| `#/insights` | Marketing metrics — KPI strip (pages, cost per page, conversion, AOV), conversion funnel, cost-vs-value chart, per-model and per-segment conversion. See "Marketing Metrics" below. |
 
 **Admin API** (Basic-auth, same `ADMIN_TOKEN`):
 
@@ -622,10 +622,10 @@ wrangler d1 execute arco-sessions --command \
 | `scripts/recommender-stream.js` | Stamps `section.dataset.runId`; attaches widget after each run |
 | `blocks/admin/admin.js` + `blocks/admin/admin.css` | `#/feedback` list, `#/feedback/run/:id` detail, `#/insights` stub, Feedback tab on page detail, eval-matrix per-row chip |
 
-### Marketing Metrics & ROI (page_events, conversions, `#/insights`)
+### Marketing Metrics (page_events, conversions, `#/insights`)
 
-The site is a demo, but it has to make a business case: does AI-generated
-content actually earn its inference cost? Two stores answer that.
+The site is a demo, but it has to make a business case: what does generated
+content cost, and does it convert? Two stores answer that.
 
 **Why not just Analytics Engine?** `/api/track` has always written to Workers
 Analytics Engine (`arco_usage`). AE is cheap and non-blocking, but it is
@@ -644,8 +644,6 @@ page_events(id, session_id, page_id, run_id, attributed_run_id, attribution,
 
 conversions(id, session_id, event_id, attributed_run_id, attribution,
             conversion_type, product_slug, value_cents, created_at)
-
-roi_assumptions(key, value, updated_at)
 ```
 
 **Event types** (closed set, server-validated — unknown types are dropped):
@@ -661,7 +659,7 @@ is clicked, the run id is stashed in `sessionStorage['arco-attribution']`. Any
 `product_view` / `add_to_cart` within **30 minutes** credits that run;
 last touch wins. The server **re-validates every id against
 `generated_pages`** before storing it, so a spoofed or stale client id cannot
-inflate the ROI numbers. `attribution` is one of `direct` (fired on the
+inflate the conversion numbers. `attribution` is one of `direct` (fired on the
 generated page itself), `last-touch` (a downstream page it referred), or
 `none`.
 
@@ -669,16 +667,20 @@ generated page itself), `last-touch` (a downstream page it referred), or
 `provider:model` to USD per 1M in/out tokens; `costSqlExpression()` emits a SQL
 `CASE` so cost aggregates run **inside D1** rather than pulling every row into
 the worker. Unknown models fall back to `DEFAULT_PRICE` (never $0, which would
-silently flatter the ROI); `ollama` / `vllm` are treated as free since they
+silently flatter the cost); `ollama` / `vllm` are treated as free since they
 cost GPU time, not per-token fees.
 
-**ROI formula** (all inputs editable in the UI, persisted in `roi_assumptions`):
+**Cost denominators.** A *run* is one `/api/generate` call, so a follow-up chip
+click is its own run. A *page* is one `?q=` visit — the initial run plus every
+follow-up refining it, which is what a user means by "a personalised page". A
+*session* is one visitor. `costPerRunUsd` is always the flattering number;
+report `costPerPageUsd` when comparing against the cost of authoring a page.
 
-```
-value = (attributed_cart_value x gross_margin)      <- revenue side
-      + (runs x author_hours_per_page x hourly_rate) <- cost avoided
-ROI   = value / inference_cost
-```
+There is deliberately **no ROI multiple** and no authoring-hours-saved figure.
+Both depend on a counterfactual ("we would have paid someone to write these
+pages") that does not survive scrutiny, and the authoring term dominated the
+result so completely that it drowned out every measured number. Cost per page
+makes the same point using only observed data.
 
 **IMPORTANT — this is observational, not causal.** No control group is
 running, so the dashboard reports conversions *attributed to* generated pages,
@@ -707,12 +709,11 @@ keeps the demo cart in `localStorage` and fires `arco-cart-updated`.
 
 **Admin API** (Basic auth, same `ADMIN_TOKEN`), all accept `?days=N`:
 
-- `GET /api/admin/insights/summary` -> KPI strip + ROI model + caveat text
+- `GET /api/admin/insights/summary` -> KPI strip (cost, conversion) + caveat text
 - `GET /api/admin/insights/funnel` -> query -> card click -> PDP -> cart
 - `GET /api/admin/insights/models` -> per-model cost, conversion, judge score
 - `GET /api/admin/insights/segments` -> by intent and journey stage
 - `GET /api/admin/insights/timeseries` -> daily cost vs. attributed value
-- `GET|PUT /api/admin/insights/assumptions` -> ROI inputs
 
 **Key files:**
 

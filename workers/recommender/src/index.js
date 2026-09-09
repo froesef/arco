@@ -35,7 +35,6 @@ import {
   handleInsightsModels,
   handleInsightsSegments,
   handleInsightsTimeseries,
-  handleInsightsAssumptions,
 } from './events.js';
 import {
   handleCreateExperiment,
@@ -562,10 +561,6 @@ export default {
       }
       if (url.pathname === '/api/admin/insights/timeseries' && request.method === 'GET') {
         return handleInsightsTimeseries(request, env);
-      }
-      if (url.pathname === '/api/admin/insights/assumptions'
-        && (request.method === 'GET' || request.method === 'PUT')) {
-        return handleInsightsAssumptions(request, env);
       }
     }
 

@@ -3714,13 +3714,7 @@ async function renderFeedbackTab(panel, pageData) {
   panel.innerHTML = sections || '<p class="admin-empty">No feedback collected on this page yet.</p>';
 }
 
-/* ── Insights (marketing metrics / ROI) ─────────────────────────────────── */
-
-const ROI_FIELDS = [
-  ['author_hours_per_page', 'Author hours per page', 0.5],
-  ['author_hourly_rate', 'Author hourly rate (USD)', 5],
-  ['gross_margin_pct', 'Gross margin (%)', 1],
-];
+/* ── Insights (marketing metrics) ───────────────────────────────────────── */
 
 function usd(n) {
   if (n == null || !Number.isFinite(Number(n))) return '—';
@@ -3734,14 +3728,6 @@ function usd(n) {
 function pctFmt(n, digits = 1) {
   if (n == null || !Number.isFinite(Number(n))) return '—';
   return `${(Number(n) * 100).toFixed(digits)}%`;
-}
-
-function roiMultiple(n) {
-  if (n == null || !Number.isFinite(Number(n))) return '—';
-  const v = Number(n);
-  if (v >= 1000) return `${Math.round(v).toLocaleString()}×`;
-  if (v >= 10) return `${v.toFixed(0)}×`;
-  return `${v.toFixed(1)}×`;
 }
 
 function statCard(label, value, sub) {
@@ -3850,7 +3836,7 @@ async function renderInsights(root) {
 
   root.innerHTML = `
     <div class="admin-toolbar">
-      <h2>Marketing insights &amp; ROI</h2>
+      <h2>Marketing insights</h2>
       <div class="admin-toolbar-actions">
         <label class="admin-muted">Window
           <select data-role="days">
@@ -3882,7 +3868,7 @@ async function renderInsights(root) {
     return;
   }
 
-  const { generation: g, conversions: c, roi } = summary;
+  const { generation: g, conversions: c } = summary;
 
   body.innerHTML = `
     <section class="admin-card">
@@ -3894,7 +3880,6 @@ async function renderInsights(root) {
         ${statCard('Add to cart', c.addToCart.toLocaleString(), `${c.attributedAddToCart} attributed`)}
         ${statCard('Conversion rate', pctFmt(c.conversionRate), 'sessions with a cart')}
         ${statCard('AOV', usd(c.aovUsd), 'per cart event')}
-        ${statCard('ROI', roiMultiple(roi.roiMultiple), 'value ÷ cost')}
       </div>
       <p class="admin-insight-caveat admin-muted">⚠ ${esc(summary.caveat)}</p>
     </section>
@@ -3902,31 +3887,6 @@ async function renderInsights(root) {
     <section class="admin-card">
       <h3>Conversion funnel</h3>
       ${renderFunnel(funnel.funnel)}
-    </section>
-
-    <section class="admin-card">
-      <h3>ROI model</h3>
-      <div class="admin-insight-roi">
-        <table class="admin-table admin-insight-table">
-          <tbody>
-            <tr><td>Attributed cart value × margin</td><td>${usd(roi.marginUsd)}</td></tr>
-            <tr><td>Authoring effort avoided <span class="admin-muted">(${g.pages.toLocaleString()} pages × ${roi.assumptions.author_hours_per_page}h)</span></td><td>${usd(roi.authoringSavedUsd)}</td></tr>
-            <tr class="admin-insight-total"><td><strong>Total value</strong></td><td><strong>${usd(roi.totalValueUsd)}</strong></td></tr>
-            <tr><td>Inference cost</td><td>−${usd(roi.costUsd)}</td></tr>
-            <tr class="admin-insight-total"><td><strong>ROI multiple</strong></td><td><strong>${roiMultiple(roi.roiMultiple)}</strong></td></tr>
-          </tbody>
-        </table>
-        <form class="admin-insight-assumptions" data-role="assumptions">
-          <h4>Assumptions</h4>
-          ${ROI_FIELDS.map(([key, label, step]) => `
-            <label>${esc(label)}
-              <input type="number" name="${key}" step="${step}" min="0"
-                value="${esc(String(roi.assumptions[key]))}">
-            </label>`).join('')}
-          <button type="submit" class="admin-btn">Save assumptions</button>
-          <span class="admin-muted" data-role="assumptions-status"></span>
-        </form>
-      </div>
     </section>
 
     <section class="admin-card">
@@ -3945,25 +3905,6 @@ async function renderInsights(root) {
       ${renderSegmentTable('Query intent', segments.byIntent)}
       ${renderSegmentTable('Journey stage', segments.byJourneyStage)}
     </section>`;
-
-  const form = body.querySelector('[data-role="assumptions"]');
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const status = form.querySelector('[data-role="assumptions-status"]');
-    status.textContent = 'Saving…';
-    const payload = {};
-    ROI_FIELDS.forEach(([key]) => { payload[key] = Number(form.elements[key].value); });
-    try {
-      await api('/api/admin/insights/assumptions', {
-        method: 'PUT',
-        body: JSON.stringify(payload),
-      });
-      status.textContent = 'Saved — reloading…';
-      await renderInsights(root);
-    } catch (err) {
-      status.textContent = err.message;
-    }
-  });
 }
 
 // ── Entry ───────────────────────────────────────────────────────────────────

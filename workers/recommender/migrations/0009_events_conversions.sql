@@ -49,16 +49,3 @@ CREATE INDEX IF NOT EXISTS idx_conv_created    ON conversions(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_conv_type       ON conversions(conversion_type, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_conv_attributed ON conversions(attributed_run_id);
 CREATE INDEX IF NOT EXISTS idx_conv_session    ON conversions(session_id);
-
--- Editable inputs to the ROI formula. Surfaced in /admin#/insights so the
--- business case is transparent rather than hardcoded.
-CREATE TABLE IF NOT EXISTS roi_assumptions (
-  key        TEXT PRIMARY KEY,
-  value      REAL NOT NULL,
-  updated_at INTEGER NOT NULL
-);
-
-INSERT OR IGNORE INTO roi_assumptions (key, value, updated_at) VALUES
-  ('author_hours_per_page', 4.0,  strftime('%s','now')),
-  ('author_hourly_rate',    85.0, strftime('%s','now')),
-  ('gross_margin_pct',      45.0, strftime('%s','now'));

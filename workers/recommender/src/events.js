@@ -1,17 +1,15 @@
 /**
- * Marketing event ingest + ROI analytics.
+ * Marketing event ingest + conversion analytics.
  *
  * Public:
  *   POST /api/track                       → batch event ingest (AE + D1 dual sink)
  *
  * Admin:
- *   GET  /api/admin/insights/summary      → headline KPIs + ROI model
+ *   GET  /api/admin/insights/summary      → headline KPIs (cost, conversion)
  *   GET  /api/admin/insights/funnel       → query → card click → PDP → cart
  *   GET  /api/admin/insights/models       → per-model cost / conversion / quality
  *   GET  /api/admin/insights/segments     → per-intent and per-journey-stage breakdown
  *   GET  /api/admin/insights/timeseries   → daily cost vs. attributed value
- *   GET  /api/admin/insights/assumptions  → read ROI assumptions
- *   PUT  /api/admin/insights/assumptions  → update ROI assumptions
  *
  * Attribution: an event carries `attributedRunId` when the client saw the user
  * arrive from a generated page within the attribution window. We trust but
@@ -43,18 +41,6 @@ const CONVERSION_TYPES = new Map([
 const MAX_BATCH = 50;
 const MAX_VALUE_CENTS = 100_000_00; // $100k sanity ceiling
 const DAY = 86_400;
-
-const ASSUMPTION_KEYS = new Set([
-  'author_hours_per_page',
-  'author_hourly_rate',
-  'gross_margin_pct',
-]);
-
-const DEFAULT_ASSUMPTIONS = {
-  author_hours_per_page: 4,
-  author_hourly_rate: 85,
-  gross_margin_pct: 45,
-};
 
 function jsonResponse(value, init = {}) {
   return new Response(JSON.stringify(value), {
@@ -129,7 +115,7 @@ function normaliseEvent(raw, ctx) {
 
 /**
  * Keep only attribution ids that actually exist in generated_pages, so a
- * spoofed or stale client id can't inflate the ROI numbers.
+ * spoofed or stale client id can't inflate the conversion numbers.
  */
 async function validateAttribution(db, events) {
   // Default everything to 'none' first — the early return below must not leave
@@ -291,19 +277,6 @@ function sinceFrom(url, defaultDays = 30) {
   return { since: Math.floor(Date.now() / 1000) - (d * DAY), days: d };
 }
 
-async function readAssumptions(db) {
-  const out = { ...DEFAULT_ASSUMPTIONS };
-  try {
-    const { results } = await db.prepare('SELECT key, value FROM roi_assumptions').all();
-    (results || []).forEach((r) => {
-      if (ASSUMPTION_KEYS.has(r.key)) out[r.key] = Number(r.value);
-    });
-  } catch {
-    // Table may not exist yet — defaults are fine.
-  }
-  return out;
-}
-
 /**
  * GET /api/admin/insights/summary
  */
@@ -313,7 +286,7 @@ export async function handleInsightsSummary(request, env) {
   const { since, days } = sinceFrom(new URL(request.url));
   const costExpr = costSqlExpression();
 
-  const [gen, events, conv, assumptions] = await Promise.all([
+  const [gen, events, conv] = await Promise.all([
     db.prepare(`
       SELECT COUNT(*) AS runs,
              COUNT(DISTINCT COALESCE(page_id, id)) AS pages,
@@ -339,8 +312,6 @@ export async function handleInsightsSummary(request, env) {
              COALESCE(SUM(CASE WHEN attributed_run_id IS NOT NULL THEN value_cents ELSE 0 END), 0) AS attributed_value_cents
       FROM conversions WHERE created_at >= ?1 GROUP BY conversion_type
     `).bind(since).all(),
-
-    readAssumptions(db),
   ]);
 
   const eventCounts = {};
@@ -359,8 +330,6 @@ export async function handleInsightsSummary(request, env) {
 
   const costUsdTotal = Number(gen?.cost_usd) || 0;
   const attributedValueUsd = (Number(cart.attributed_value_cents) || 0) / 100;
-  const grossMargin = assumptions.gross_margin_pct / 100;
-  const marginUsd = attributedValueUsd * grossMargin;
 
   const runs = Number(gen?.runs) || 0;
   // Three denominators, three different questions:
@@ -372,13 +341,6 @@ export async function handleInsightsSummary(request, env) {
   // actually costs to serve somebody.
   const pages = Number(gen?.pages) || 0;
   const genSessions = Number(gen?.sessions) || 0;
-
-  const authoringSavedUsd = pages
-    * assumptions.author_hours_per_page
-    * assumptions.author_hourly_rate;
-
-  const totalValueUsd = marginUsd + authoringSavedUsd;
-  const roiMultiple = costUsdTotal > 0 ? totalValueUsd / costUsdTotal : null;
 
   return jsonResponse({
     days,
@@ -405,14 +367,6 @@ export async function handleInsightsSummary(request, env) {
       attributedCartValueUsd: attributedValueUsd,
       aovUsd: Number(cart.n) ? (Number(cart.value_cents) || 0) / 100 / Number(cart.n) : 0,
       conversionRate: totalSessions ? (Number(cart.sessions) || 0) / totalSessions : 0,
-    },
-    roi: {
-      assumptions,
-      marginUsd,
-      authoringSavedUsd,
-      totalValueUsd,
-      costUsd: costUsdTotal,
-      roiMultiple,
     },
     // Surfaced in the UI so the number is never mistaken for a causal claim.
     caveat: 'Observational, not randomized. No control group is running, so these'
@@ -665,38 +619,4 @@ export async function handleInsightsTimeseries(request, env) {
 
   const series = [...byDay.values()].sort((a, b) => a.day.localeCompare(b.day));
   return jsonResponse({ days, series });
-}
-
-/**
- * GET / PUT /api/admin/insights/assumptions
- */
-export async function handleInsightsAssumptions(request, env) {
-  if (!env.SESSIONS_DB) return jsonResponse({ error: 'Storage unavailable' }, { status: 503 });
-  const db = env.SESSIONS_DB;
-
-  if (request.method === 'GET') {
-    return jsonResponse({ assumptions: await readAssumptions(db) });
-  }
-
-  let body;
-  try {
-    body = await request.json();
-  } catch {
-    return jsonResponse({ error: 'Invalid JSON body' }, { status: 400 });
-  }
-
-  const now = Math.floor(Date.now() / 1000);
-  const updates = [];
-  Object.entries(body || {}).forEach(([key, value]) => {
-    if (!ASSUMPTION_KEYS.has(key)) return;
-    const n = Number(value);
-    if (!Number.isFinite(n) || n < 0 || n > 100_000) return;
-    updates.push(db.prepare(`
-      INSERT INTO roi_assumptions (key, value, updated_at) VALUES (?1, ?2, ?3)
-      ON CONFLICT(key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at
-    `).bind(key, n, now));
-  });
-
-  if (updates.length) await db.batch(updates);
-  return jsonResponse({ assumptions: await readAssumptions(db) });
 }

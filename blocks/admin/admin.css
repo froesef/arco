@@ -2601,31 +2601,6 @@
   font-size: 0.78rem;
 }
 
-.admin .admin-insight-roi {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-}
-
-.admin .admin-insight-total td {
-  border-top: 2px solid var(--border-color);
-}
-
-.admin .admin-insight-assumptions {
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-  padding: 1rem;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-}
-
-.admin .admin-insight-assumptions label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.85rem;
-}
 
 .admin .admin-insight-segment {
   margin-bottom: 1.5rem;
@@ -2701,11 +2676,6 @@
   background: #b0563f;
 }
 
-@media (width >= 900px) {
-  .admin .admin-insight-roi {
-    grid-template-columns: 1.4fr 1fr;
-  }
-}
 
 /* Eval-matrix per-query feedback chip */
 .admin .admin-eval-feedback-chip {
