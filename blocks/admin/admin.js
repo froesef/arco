@@ -35,7 +35,7 @@
 import {
   decorateBlock, decorateButtons, decorateIcons, loadBlock,
 } from '../../scripts/aem.js';
-import { ARCO_RECOMMENDER_URL } from '../../scripts/api-config.js';
+import { ARCO_ADMIN_URL } from '../../scripts/api-config.js';
 import { BLOCK_ALIASES } from '../../scripts/block-aliases.js';
 import { formatTimestamp as ts, formatDuration, formatInt as fmtInt } from '../../scripts/formatting.js';
 import { processSectionMetadata } from '../../scripts/section-metadata.js';
@@ -124,7 +124,7 @@ async function api(path, options = {}) {
   if (options.body && !headers['Content-Type']) {
     headers['Content-Type'] = 'application/json';
   }
-  const res = await fetch(`${ARCO_RECOMMENDER_URL}${path}`, {
+  const res = await fetch(`${ARCO_ADMIN_URL}${path}`, {
     method: options.method || 'GET',
     headers,
     body: options.body,
@@ -1457,7 +1457,7 @@ const EXPERIMENT_STATUS_TONE = { complete: 'ok', running: 'warn', error: 'muted'
 async function streamExperimentRun(body, onEvent, signal) {
   const token = getAdminToken();
   if (!token) throw new Error('Admin token required');
-  const res = await fetch(`${ARCO_RECOMMENDER_URL}/api/admin/experiments`, {
+  const res = await fetch(`${ARCO_ADMIN_URL}/api/admin/experiments`, {
     method: 'POST',
     headers: {
       Authorization: `Basic ${btoa(`admin:${token}`)}`,
@@ -3042,7 +3042,7 @@ async function renderEvaluation(root, evalRunId) {
     cellEl.removeAttribute('data-signature');
     try {
       const res = await fetch(
-        `${ARCO_RECOMMENDER_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/variants/${encodeURIComponent(variantId)}/rejudge`,
+        `${ARCO_ADMIN_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/variants/${encodeURIComponent(variantId)}/rejudge`,
         {
           method: 'POST',
           headers: { Authorization: `Basic ${btoa(`admin:${getAdminToken()}`)}` },
@@ -3063,7 +3063,7 @@ async function renderEvaluation(root, evalRunId) {
     cellEl.removeAttribute('data-signature');
     try {
       const res = await fetch(
-        `${ARCO_RECOMMENDER_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/variants/${encodeURIComponent(variantId)}/regenerate`,
+        `${ARCO_ADMIN_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/variants/${encodeURIComponent(variantId)}/regenerate`,
         {
           method: 'POST',
           headers: { Authorization: `Basic ${btoa(`admin:${getAdminToken()}`)}` },
@@ -3119,7 +3119,7 @@ async function renderEvaluation(root, evalRunId) {
     setToolbarStatus(`${label}…`);
     try {
       const res = await fetch(
-        `${ARCO_RECOMMENDER_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/judge`,
+        `${ARCO_ADMIN_URL}/api/admin/evaluations/${encodeURIComponent(evalRunId)}/judge`,
         {
           method: 'POST',
           headers: {
@@ -3536,8 +3536,8 @@ async function renderFeedbackList(root) {
         Has comment
       </label>
       <div class="admin-feedback-export">
-        <a class="admin-btn admin-btn-ghost" data-export="csv" href="${esc(ARCO_RECOMMENDER_URL)}/api/admin/feedback/export?format=csv" target="_blank" rel="noopener">Download CSV</a>
-        <a class="admin-btn admin-btn-ghost" data-export="json" href="${esc(ARCO_RECOMMENDER_URL)}/api/admin/feedback/export?format=json" target="_blank" rel="noopener">Download NDJSON</a>
+        <a class="admin-btn admin-btn-ghost" data-export="csv" href="${esc(ARCO_ADMIN_URL)}/api/admin/feedback/export?format=csv" target="_blank" rel="noopener">Download CSV</a>
+        <a class="admin-btn admin-btn-ghost" data-export="json" href="${esc(ARCO_ADMIN_URL)}/api/admin/feedback/export?format=json" target="_blank" rel="noopener">Download NDJSON</a>
       </div>
     </div>
 
@@ -3591,8 +3591,8 @@ async function renderFeedbackList(root) {
     if (filters.flag && filters.flag !== 'all') exportParams.set('flag', filters.flag);
     const csv = root.querySelector('[data-export="csv"]');
     const json = root.querySelector('[data-export="json"]');
-    csv.href = `${ARCO_RECOMMENDER_URL}/api/admin/feedback/export?format=csv${exportParams.toString() ? `&${exportParams.toString()}` : ''}`;
-    json.href = `${ARCO_RECOMMENDER_URL}/api/admin/feedback/export?format=json${exportParams.toString() ? `&${exportParams.toString()}` : ''}`;
+    csv.href = `${ARCO_ADMIN_URL}/api/admin/feedback/export?format=csv${exportParams.toString() ? `&${exportParams.toString()}` : ''}`;
+    json.href = `${ARCO_ADMIN_URL}/api/admin/feedback/export?format=json${exportParams.toString() ? `&${exportParams.toString()}` : ''}`;
   }
 
   root.querySelectorAll('[data-filter]').forEach((el) => {
@@ -3887,8 +3887,9 @@ async function renderInsights(root) {
   body.innerHTML = `
     <section class="admin-card">
       <div class="admin-insight-stats">
-        ${statCard('Generated runs', g.runs.toLocaleString(), `${g.sessions.toLocaleString()} sessions`)}
-        ${statCard('Inference cost', usd(g.costUsd), `${usd(g.costPerRunUsd)} per run`)}
+        ${statCard('Personalised pages', g.pages.toLocaleString(), `${g.runs.toLocaleString()} runs · ${g.sessions.toLocaleString()} visitors`)}
+        ${statCard('Cost per page', usd(g.costPerPageUsd), `${usd(g.costPerSessionUsd)} per visitor`)}
+        ${statCard('Inference cost', usd(g.costUsd), `${usd(g.costPerRunUsd)} per run · ${g.runsPerPage.toFixed(1)} runs/page`)}
         ${statCard('Product views', c.productViews.toLocaleString(), 'soft conversion')}
         ${statCard('Add to cart', c.addToCart.toLocaleString(), `${c.attributedAddToCart} attributed`)}
         ${statCard('Conversion rate', pctFmt(c.conversionRate), 'sessions with a cart')}
@@ -3909,7 +3910,7 @@ async function renderInsights(root) {
         <table class="admin-table admin-insight-table">
           <tbody>
             <tr><td>Attributed cart value × margin</td><td>${usd(roi.marginUsd)}</td></tr>
-            <tr><td>Authoring effort avoided</td><td>${usd(roi.authoringSavedUsd)}</td></tr>
+            <tr><td>Authoring effort avoided <span class="admin-muted">(${g.pages.toLocaleString()} pages × ${roi.assumptions.author_hours_per_page}h)</span></td><td>${usd(roi.authoringSavedUsd)}</td></tr>
             <tr class="admin-insight-total"><td><strong>Total value</strong></td><td><strong>${usd(roi.totalValueUsd)}</strong></td></tr>
             <tr><td>Inference cost</td><td>−${usd(roi.costUsd)}</td></tr>
             <tr class="admin-insight-total"><td><strong>ROI multiple</strong></td><td><strong>${roiMultiple(roi.roiMultiple)}</strong></td></tr>

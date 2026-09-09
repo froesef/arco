@@ -11,11 +11,6 @@
 
 const PRODUCTION_WORKER = 'https://arco-recommender.franklin-prod.workers.dev';
 
-// Local `wrangler dev` worker (run `npm run dev` in workers/recommender).
-// Wrangler picks 8787 by default but increments when ports are taken; this repo's
-// dev worker comes up on 8789. Override via the mechanisms below if yours differs.
-const LOCAL_WORKER = 'http://localhost:8787';
-
 /**
  * Resolve the recommender worker URL for the current environment.
  *
@@ -23,11 +18,15 @@ const LOCAL_WORKER = 'http://localhost:8787';
  *   1. window.ARCO_CONFIG.RECOMMENDER_URL  — explicit global override
  *   2. localStorage['arco-recommender-url'] — runtime toggle, no code edit:
  *        localStorage.setItem('arco-recommender-url', 'http://localhost:8787')
- *        localStorage.setItem('arco-recommender-url', '<prod url>')  // force prod locally
  *        localStorage.removeItem('arco-recommender-url')             // back to default
- *   3. localhost / 127.0.0.1 → the local `wrangler dev` worker (LOCAL_WORKER)
- *   4. {branch}--{repo}--{owner}.aem.page → that branch's worker version
- *   5. everything else → production
+ *   3. {branch}--{repo}--{owner}.aem.page → that branch's worker version
+ *   4. everything else (including localhost) → production
+ *
+ * Localhost deliberately defaults to PRODUCTION. `wrangler dev` cannot bind
+ * Vectorize ("Vectorize Index bindings do not support local development"), so a
+ * local worker silently returns empty RAG context and generates hollow pages.
+ * Opt into the local worker explicitly via option 2 when you are working on the
+ * worker itself.
  */
 function resolveRecommenderURL() {
   if (window.ARCO_CONFIG?.RECOMMENDER_URL) return window.ARCO_CONFIG.RECOMMENDER_URL;
@@ -38,10 +37,6 @@ function resolveRecommenderURL() {
   } catch { /* localStorage may be unavailable (private mode / sandbox) */ }
 
   const { hostname } = window.location;
-
-  // Local dev: point at the local worker so /api/generate uses locally-served
-  // models (e.g. DiffusionGemma via mlx-vlm). Override via the above to use prod.
-  if (hostname === 'localhost' || hostname === '127.0.0.1') return LOCAL_WORKER;
 
   // EDS branch preview: rewrite to the branch alias worker version.
   const match = hostname.match(/^(.+)--[^.]+--[^.]+\.aem\.page$/);
@@ -61,6 +56,33 @@ export const ARCO_RECOMMENDER_URL = resolveRecommenderURL();
 
 // Analytics service — same worker, separate endpoint
 export const ARCO_ANALYTICS_URL = window.ARCO_CONFIG?.ANALYTICS_URL || ARCO_RECOMMENDER_URL;
+
+/**
+ * Admin/metrics API base.
+ *
+ * Split from the recommender URL on purpose: the admin dashboards read D1 and KV
+ * directly, so when you are developing them you want your *local* worker and its
+ * local database, even while the page-generation flow keeps hitting production
+ * (which is the only place Vectorize actually works).
+ *
+ * Override with localStorage['arco-admin-url'], or set it to the production
+ * worker to inspect real traffic from a local admin page.
+ */
+function resolveAdminURL() {
+  if (window.ARCO_CONFIG?.ADMIN_URL) return window.ARCO_CONFIG.ADMIN_URL;
+
+  try {
+    const stored = window.localStorage?.getItem('arco-admin-url');
+    if (stored) return stored;
+  } catch { /* localStorage may be unavailable (private mode / sandbox) */ }
+
+  const { hostname } = window.location;
+  if (hostname === 'localhost' || hostname === '127.0.0.1') return 'http://localhost:8787';
+
+  return ARCO_RECOMMENDER_URL;
+}
+
+export const ARCO_ADMIN_URL = resolveAdminURL();
 
 // ============================================
 // Environment Detection
