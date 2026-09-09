@@ -1,0 +1,37 @@
+{
+  "personality": "precise, confident, craftsman-like, understated, warm",
+  "tone": "Technical credibility balanced with approachable warmth — declarative and unhurried, treating the reader as a capable enthusiast rather than a novice to be sold to.",
+  "vocabulary": [
+    "single-boiler",
+    "dual-boiler",
+    "group head",
+    "PID",
+    "flat burrs",
+    "stepless adjustment",
+    "pressure profiling",
+    "gear pump",
+    "extraction",
+    "dialing in",
+    "grind size",
+    "dose",
+    "TDS",
+    "scale accumulation",
+    "remineralization",
+    "tolerances"
+  ],
+  "avoidWords": [
+    "revolutionary",
+    "game-changing",
+    "hack",
+    "cutting-edge",
+    "cheap",
+    "budget"
+  ],
+  "sentenceStyle": "Short, declarative statements alternate with longer explanatory technical sentences. Negations are used to assert authority (e.g. 'We do not add features for the sake of marketing'). Parallel construction reinforces values (e.g. 'a pleasure to look at and a pleasure to use').",
+  "toneByContext": {
+    "recommendations": "Confident and specific — grounds every claim in real specs and price rather than superlatives (e.g. '$899 | Single Boiler').",
+    "comparisons": "Educational and precise — uses named technical criteria (flat vs. conical burrs, boiler count) instead of hype to differentiate.",
+    "educational": "Patient and detailed — cites standards and data (e.g. SCA TDS ranges of 75-250ppm) while staying accessible to a home enthusiast.",
+    "discovery": "Warm and inviting, low-pressure — e.g. 'What's Your Brew Style? Take our 30-second quiz and we'll match you with the perfect setup.'"
+  }
+}
