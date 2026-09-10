@@ -3716,6 +3716,52 @@ async function renderFeedbackTab(panel, pageData) {
 
 /* ── Insights (marketing metrics) ───────────────────────────────────────── */
 
+/**
+ * Plain-language definitions for the jargon on this page. Marketing acronyms
+ * (AOV, PDP) and our own coinages (run vs. page) both need spelling out — and
+ * where a number has a known limitation, the tooltip says so rather than
+ * letting the reader assume it means more than it does.
+ */
+const METRIC_TIPS = {
+  pages: 'Distinct ?q= visits in this window. Each one is a personalised page: '
+    + 'the first generation plus any follow-up refinements the visitor clicked.',
+  costPerPage: 'Total inference cost divided by personalised pages. This is the '
+    + 'figure to compare against what it costs to author a landing page by hand.',
+  inferenceCost: 'LLM token cost of generating pages, priced at vendor list rates. '
+    + 'Excludes search embeddings, evaluation/judge runs and Cloudflare platform '
+    + 'fees — so it is the cost of generation, not full cost-to-serve.',
+  productViews: 'Visitors who reached a product detail page (PDP). Treated as the '
+    + 'soft conversion: it shows interest, not yet an intent to buy.',
+  addToCart: 'The hard conversion. This demo has no checkout, so the funnel ends at '
+    + 'the cart. "Attributed" means the cart followed a generated page within the '
+    + '30-minute attribution window.',
+  conversionRate: 'Share of all sessions that added something to the cart. Blends '
+    + 'assisted and organic traffic, so it understates how well generated pages '
+    + 'convert on their own.',
+  aov: 'Average Order Value — total cart value divided by the number of cart events. '
+    + 'Tells you whether visitors chose more expensive products, not how many bought. '
+    + 'Measured on carts rather than orders, so no abandonment is deducted.',
+  costPerRun: 'Inference cost divided by generation calls. A follow-up chip click is '
+    + 'its own run, so this reads lower than cost per page.',
+  modelPdp: 'Product detail page views attributed to pages this model generated.',
+  modelConv: 'Attributed carts divided by this model\'s runs.',
+  modelRevenue: 'Attributed cart value per run — comparable across models even when '
+    + 'they ran a different number of times.',
+  modelJudge: 'Mean LLM-judge quality score (1–5) from the evaluation suite. Worth '
+    + 'comparing against actual conversion: if they disagree, the rubric is wrong.',
+  modelUser: 'Real thumbs up / down left by visitors on pages from this model.',
+  segmentRuns: 'Generation calls whose classified intent or journey stage fell into '
+    + 'this segment.',
+  segmentValue: 'Attributed cart value originating from this segment.',
+};
+
+/** Wrap any label in a focusable tooltip trigger. */
+function withTip(label, text) {
+  if (!text) return esc(label);
+  return `<span class="admin-tip" tabindex="0" data-tip="${esc(text)}">${esc(label)}<span
+    class="admin-tip-marker" aria-hidden="true">?</span><span class="admin-sr-only">${esc(text)}</span></span>`;
+}
+
 function usd(n) {
   if (n == null || !Number.isFinite(Number(n))) return '—';
   const v = Number(n);
@@ -3730,14 +3776,25 @@ function pctFmt(n, digits = 1) {
   return `${(Number(n) * 100).toFixed(digits)}%`;
 }
 
-function statCard(label, value, sub) {
+function statCard(label, value, sub, tipText) {
   return `
     <div class="admin-insight-stat">
-      <span class="admin-insight-stat-label">${esc(label)}</span>
+      <span class="admin-insight-stat-label">${withTip(label, tipText)}</span>
       <strong class="admin-insight-stat-value">${esc(String(value))}</strong>
       ${sub ? `<span class="admin-insight-stat-sub">${esc(sub)}</span>` : ''}
     </div>`;
 }
+
+const FUNNEL_TIPS = {
+  query: 'Sessions that generated at least one personalised page. The funnel starts '
+    + 'here, so every step below is measured against this.',
+  product_card_click: 'Sessions that clicked a product card inside a generated page.',
+  product_view: 'Sessions that reached a product detail page and were attributed to a '
+    + 'generated page. Organic visits are excluded, otherwise this step could exceed '
+    + 'the one above it.',
+  add_to_cart: 'Sessions that added a product to the cart within the attribution '
+    + 'window. There is no checkout step in this demo.',
+};
 
 function renderFunnel(funnel) {
   const top = funnel[0]?.sessions || 0;
@@ -3746,7 +3803,7 @@ function renderFunnel(funnel) {
     return `
       <div class="admin-funnel-step">
         <div class="admin-funnel-head">
-          <span class="admin-funnel-label">${esc(step.label)}</span>
+          <span class="admin-funnel-label">${withTip(step.label, FUNNEL_TIPS[step.key])}</span>
           <span class="admin-funnel-count">${step.sessions.toLocaleString()} sessions</span>
         </div>
         <div class="admin-funnel-bar-track">
@@ -3767,9 +3824,14 @@ function renderModelsTable(models) {
     <table class="admin-table admin-insight-table">
       <thead>
         <tr>
-          <th>Model</th><th>Runs</th><th>Cost</th><th>$/run</th>
-          <th>PDP views</th><th>Carts</th><th>Conv. rate</th>
-          <th>Revenue/run</th><th>Judge</th><th>User</th>
+          <th>Model</th><th>Runs</th><th>Cost</th>
+          <th>${withTip('$/run', METRIC_TIPS.costPerRun)}</th>
+          <th>${withTip('PDP views', METRIC_TIPS.modelPdp)}</th>
+          <th>Carts</th>
+          <th>${withTip('Conv. rate', METRIC_TIPS.modelConv)}</th>
+          <th>${withTip('Revenue/run', METRIC_TIPS.modelRevenue)}</th>
+          <th>${withTip('Judge', METRIC_TIPS.modelJudge)}</th>
+          <th>${withTip('User', METRIC_TIPS.modelUser)}</th>
         </tr>
       </thead>
       <tbody>
@@ -3796,7 +3858,7 @@ function renderSegmentTable(title, rows) {
     <div class="admin-insight-segment">
       <h4>${esc(title)}</h4>
       <table class="admin-table admin-insight-table">
-        <thead><tr><th>Segment</th><th>Runs</th><th>Carts</th><th>Conv. rate</th><th>Value</th></tr></thead>
+        <thead><tr><th>Segment</th><th>${withTip('Runs', METRIC_TIPS.segmentRuns)}</th><th>Carts</th><th>${withTip('Conv. rate', METRIC_TIPS.modelConv)}</th><th>${withTip('Value', METRIC_TIPS.segmentValue)}</th></tr></thead>
         <tbody>
           ${rows.map((r) => `
             <tr>
@@ -3873,13 +3935,13 @@ async function renderInsights(root) {
   body.innerHTML = `
     <section class="admin-card">
       <div class="admin-insight-stats">
-        ${statCard('Personalised pages', g.pages.toLocaleString(), `${g.runs.toLocaleString()} runs · ${g.sessions.toLocaleString()} visitors`)}
-        ${statCard('Cost per page', usd(g.costPerPageUsd), `${usd(g.costPerSessionUsd)} per visitor`)}
-        ${statCard('Inference cost', usd(g.costUsd), `${usd(g.costPerRunUsd)} per run · ${g.runsPerPage.toFixed(1)} runs/page`)}
-        ${statCard('Product views', c.productViews.toLocaleString(), 'soft conversion')}
-        ${statCard('Add to cart', c.addToCart.toLocaleString(), `${c.attributedAddToCart} attributed`)}
-        ${statCard('Conversion rate', pctFmt(c.conversionRate), 'sessions with a cart')}
-        ${statCard('AOV', usd(c.aovUsd), 'per cart event')}
+        ${statCard('Personalised pages', g.pages.toLocaleString(), `${g.runs.toLocaleString()} runs · ${g.sessions.toLocaleString()} visitors`, METRIC_TIPS.pages)}
+        ${statCard('Cost per page', usd(g.costPerPageUsd), `${usd(g.costPerSessionUsd)} per visitor`, METRIC_TIPS.costPerPage)}
+        ${statCard('Inference cost', usd(g.costUsd), `${usd(g.costPerRunUsd)} per run · ${g.runsPerPage.toFixed(1)} runs/page`, METRIC_TIPS.inferenceCost)}
+        ${statCard('Product views', c.productViews.toLocaleString(), 'soft conversion', METRIC_TIPS.productViews)}
+        ${statCard('Add to cart', c.addToCart.toLocaleString(), `${c.attributedAddToCart} attributed`, METRIC_TIPS.addToCart)}
+        ${statCard('Conversion rate', pctFmt(c.conversionRate), 'sessions with a cart', METRIC_TIPS.conversionRate)}
+        ${statCard('AOV', usd(c.aovUsd), 'per cart event', METRIC_TIPS.aov)}
       </div>
       <p class="admin-insight-caveat admin-muted">⚠ ${esc(summary.caveat)}</p>
     </section>

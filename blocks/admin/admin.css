@@ -2549,6 +2549,90 @@
   opacity: 0.7;
 }
 
+/* ── Tooltips ────────────────────────────────────────────────── */
+
+.admin .admin-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  clip-path: inset(50%);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.admin .admin-tip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  cursor: help;
+}
+
+.admin .admin-tip-marker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  border: 1px solid currentcolor;
+  border-radius: 50%;
+  opacity: 0.55;
+  font-size: 0.85em;
+  line-height: 1;
+  text-transform: none;
+}
+
+.admin .admin-tip:hover .admin-tip-marker,
+.admin .admin-tip:focus-visible .admin-tip-marker {
+  opacity: 1;
+}
+
+/* The bubble. content comes from data-tip so no extra markup is needed. */
+.admin .admin-tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  z-index: 20;
+  width: max-content;
+  max-width: 280px;
+  padding: 0.6rem 0.7rem;
+  border-radius: 6px;
+  background: #1f2933;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: normal;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s ease;
+  pointer-events: none;
+}
+
+.admin .admin-tip:hover::after,
+.admin .admin-tip:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Right-hand columns would push the bubble off-screen; anchor those to the end. */
+.admin .admin-insight-table th:nth-last-child(-n+3) .admin-tip::after {
+  left: auto;
+  right: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin .admin-tip::after {
+    transition: none;
+  }
+}
+
 .admin .admin-insight-stat-value {
   font-size: 1.5rem;
   line-height: 1.2;
