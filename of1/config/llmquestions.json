@@ -1,0 +1,110 @@
+[
+  {
+    "url": "/products/espresso-machines",
+    "questions": [
+      "Choosing your first home espresso machine",
+      "Semi-automatic vs fully automatic espresso machines",
+      "What separates entry-level machines from prosumer models",
+      "Upgrading from a pod machine to a real espresso setup"
+    ]
+  },
+  {
+    "url": "/products/grinders",
+    "questions": [
+      "Why the grinder matters more than the machine",
+      "Flat burr vs conical burr grinders",
+      "Single dosing vs hopper-fed grinders",
+      "Choosing a grinder to match your espresso machine"
+    ]
+  },
+  {
+    "url": "/products/accessories",
+    "questions": [
+      "Essential accessories for a home espresso setup",
+      "What tools do I actually need to dial in espresso",
+      "Building a complete barista station at home",
+      "Cleaning and maintenance accessories for espresso machines"
+    ]
+  },
+  {
+    "url": "/guides/fundamentals/what-is-extraction",
+    "questions": [
+      "Understanding espresso extraction basics",
+      "What does dialing in espresso actually mean",
+      "Grind size, dose, and yield explained",
+      "Troubleshooting sour or bitter espresso shots"
+    ]
+  },
+  {
+    "url": "/guides/milk/steaming-technique",
+    "questions": [
+      "How to steam milk for latte art at home",
+      "Getting microfoam right with a home machine",
+      "Plant milk vs dairy for steaming",
+      "Common milk steaming mistakes beginners make"
+    ]
+  },
+  {
+    "url": "/guides/filter/pour-over-vs-aeropress-vs-french-press",
+    "questions": [
+      "Choosing a filter brewing method",
+      "Pour-over vs Aeropress vs French press",
+      "Water ratio and grind size for filter coffee",
+      "Why filter coffee is having a moment"
+    ]
+  },
+  {
+    "url": "/guides/sourcing/single-origin-vs-blend",
+    "questions": [
+      "Single origin vs blend, what's the difference",
+      "How to read a specialty coffee bag label",
+      "Understanding roast dates and degassing",
+      "What processing method means for flavor"
+    ]
+  },
+  {
+    "url": "/guides/advanced/espresso-water-chemistry",
+    "questions": [
+      "How water chemistry affects espresso extraction",
+      "TDS and extraction yield explained",
+      "Flow control and pressure profiling basics",
+      "Building a cupping vocabulary for tasting notes"
+    ]
+  },
+  {
+    "url": "/experiences/",
+    "questions": [
+      "Coffee setups for small apartments and rented kitchens",
+      "Building a coffee corner in a home office",
+      "Espresso rituals for morning routines",
+      "Gift experiences for a coffee-obsessed friend"
+    ]
+  },
+  {
+    "url": "/about",
+    "questions": [
+      "Arco's approach to espresso machine engineering",
+      "Why Arco chose brass for the studio boiler",
+      "Arco's sustainability and refurbishment programs",
+      "Meet the people behind Arco machines"
+    ]
+  },
+  {
+    "url": "/products/comparison/arco-primo-vs-arco-doppio",
+    "questions": [
+      "Arco Primo vs Arco Doppio, which is right for me",
+      "Comparing entry-level Arco espresso machines",
+      "Single boiler vs dual boiler tradeoffs",
+      "Upgrading from Arco Primo to a dual boiler machine"
+    ]
+  },
+  {
+    "url": "/bundles/gift-guides/gift-for-a-coffee-lover-with-no-machine",
+    "questions": [
+      "Gift ideas for a coffee lover without a machine yet",
+      "Best starter gifts for someone new to espresso",
+      "Budget-friendly coffee gift bundles",
+      "Building a gift bundle around a first espresso machine"
+    ]
+  }
+]
