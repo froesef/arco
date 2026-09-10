@@ -1,0 +1,195 @@
+[
+  {
+    "id": "morning-minimalist",
+    "name": "The Morning Minimalist",
+    "description": "Values speed and consistency over ritual. Wants cafe-quality espresso in under five minutes with minimal fuss, no dialing-in every day.",
+    "keywords": [
+      "quick espresso",
+      "fast morning coffee",
+      "simple espresso machine",
+      "no fuss coffee",
+      "easy morning routine",
+      "single boiler",
+      "entry level espresso",
+      "beginner espresso machine",
+      "compact espresso setup",
+      "minimal countertop",
+      "espresso in five minutes",
+      "PID temperature control"
+    ],
+    "priorities": [
+      "speed",
+      "consistency",
+      "simplicity",
+      "compact footprint"
+    ],
+    "recommendedProducts": [
+      "primo",
+      "preciso",
+      "tamper-set"
+    ],
+    "intentProfile": {
+      "explore": 0.4,
+      "research": 0.2,
+      "compare": 0.3,
+      "purchase": 0.8,
+      "deals": 0.3,
+      "support": 0.3
+    }
+  },
+  {
+    "id": "the-upgrade-path",
+    "name": "The Upgrade Path",
+    "description": "A home barista in transition who has outgrown a starter machine and wants meaningful, data-backed improvements without full commercial complexity.",
+    "keywords": [
+      "upgrade espresso machine",
+      "dual boiler",
+      "better espresso setup",
+      "next level coffee",
+      "outgrown starter machine",
+      "serious home barista upgrade",
+      "precision scale",
+      "digital dose grinder",
+      "improve my espresso",
+      "invest in better gear",
+      "consistent extraction",
+      "anti static grinder"
+    ],
+    "priorities": [
+      "meaningful upgrades",
+      "data-driven consistency",
+      "long-term investment",
+      "eliminating entry-level frustrations"
+    ],
+    "recommendedProducts": [
+      "doppio",
+      "macinino",
+      "precision-scale",
+      "tamper-set"
+    ],
+    "intentProfile": {
+      "explore": 0.4,
+      "research": 0.6,
+      "compare": 0.8,
+      "purchase": 0.5,
+      "deals": 0.2,
+      "support": 0.2
+    }
+  },
+  {
+    "id": "craft-at-home",
+    "name": "Craft at Home",
+    "description": "A dedicated home barista who treats espresso as a craft: weighs every dose, logs shots, and wants professional-grade tools with full control over every variable.",
+    "keywords": [
+      "pressure profiling",
+      "flagship espresso machine",
+      "flat burr grinder zero retention",
+      "dial in espresso",
+      "single origin espresso",
+      "home barista setup",
+      "commercial grade home machine",
+      "saturated group head",
+      "latte art practice",
+      "extraction percentage",
+      "professional home bar",
+      "specialty coffee at home"
+    ],
+    "priorities": [
+      "full control over variables",
+      "professional-grade results",
+      "hands-on craft",
+      "no shortcuts"
+    ],
+    "recommendedProducts": [
+      "studio",
+      "zero",
+      "precision-scale",
+      "tamper-set",
+      "milk-pitcher"
+    ],
+    "intentProfile": {
+      "explore": 0.5,
+      "research": 0.9,
+      "compare": 0.5,
+      "purchase": 0.4,
+      "deals": 0.2,
+      "support": 0.2
+    }
+  },
+  {
+    "id": "espresso-anywhere",
+    "name": "Espresso Anywhere",
+    "description": "Travelers and remote workers who refuse to let geography dictate coffee quality and need light, durable gear that needs no electricity or plumbed water.",
+    "keywords": [
+      "portable espresso maker",
+      "travel espresso machine",
+      "manual lever espresso",
+      "espresso without electricity",
+      "camping coffee",
+      "hotel room espresso",
+      "hand grinder travel",
+      "lightweight espresso",
+      "coffee on the road",
+      "carry on espresso",
+      "espresso for travelers",
+      "remote work coffee"
+    ],
+    "priorities": [
+      "portability",
+      "durability",
+      "no electricity required",
+      "simplicity under jet lag"
+    ],
+    "recommendedProducts": [
+      "viaggio",
+      "viaggio-grinder",
+      "precision-scale",
+      "tamper-set"
+    ],
+    "intentProfile": {
+      "explore": 0.8,
+      "research": 0.5,
+      "compare": 0.4,
+      "purchase": 0.5,
+      "deals": 0.3,
+      "support": 0.2
+    }
+  },
+  {
+    "id": "the-non-barista",
+    "name": "The Non-Barista",
+    "description": "Loves great coffee but has zero interest in becoming a home barista. Wants specialty-quality espresso with no learning curve, ritual, or counter full of accessories.",
+    "keywords": [
+      "automatic espresso machine",
+      "one button espresso",
+      "easy espresso machine",
+      "bean to cup automatic",
+      "no learning curve coffee",
+      "self cleaning espresso",
+      "hands off espresso",
+      "espresso machine for beginners",
+      "built in grinder machine",
+      "press button coffee",
+      "effortless espresso",
+      "automated milk frother"
+    ],
+    "priorities": [
+      "zero learning curve",
+      "consistent quality without effort",
+      "minimal maintenance",
+      "automation"
+    ],
+    "recommendedProducts": [
+      "automatico",
+      "cleaning-kit"
+    ],
+    "intentProfile": {
+      "explore": 0.3,
+      "research": 0.2,
+      "compare": 0.2,
+      "purchase": 0.6,
+      "deals": 0.3,
+      "support": 0.8
+    }
+  }
+]

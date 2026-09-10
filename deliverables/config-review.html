@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Config Review</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#1C1917;--fg:#F5F0E8;--accent:#FF3D00;--teal:#00E5A0;--dim:rgba(245,240,232,0.55);--faint:rgba(245,240,232,0.06);--border:rgba(245,240,232,0.1); }
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--fg);font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.6;padding:32px;max-width:1100px;margin:0 auto}
+h1{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:600;margin-bottom:8px}
+h2{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;margin:32px 0 12px;color:var(--teal)}
+h3{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--dim);margin:16px 0 8px}
+h4{font-size:10px;font-weight:600;color:var(--dim);margin:10px 0 4px;text-transform:uppercase;letter-spacing:0.08em}
+.section{margin-bottom:24px;padding:16px;border:1px solid var(--border);border-radius:10px}
+.stats{display:flex;gap:16px;margin-bottom:24px;flex-wrap:wrap}
+.stat{text-align:center;padding:16px 24px;background:var(--faint);border-radius:10px;border:1px solid var(--border)}
+.stat-num{font-size:24px;font-weight:700;color:var(--accent)}
+.stat-label{font-size:9px;color:var(--dim);text-transform:uppercase;letter-spacing:0.1em;margin-top:4px}
+
+/* Loading / missing-config banners */
+.banner{padding:12px 16px;border-radius:10px;margin-bottom:20px;font-size:11px}
+.banner-loading{background:var(--faint);border:1px solid var(--border);color:var(--dim)}
+.banner-warn{background:rgba(255,61,0,0.08);border:1px solid rgba(255,61,0,0.35);color:var(--accent)}
+.empty-note{color:var(--dim);font-style:italic;font-size:10px}
+
+/* Products */
+.products-list{display:flex;flex-direction:column;gap:8px}
+.product-card{border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:all 0.2s}
+.product-card:hover{border-color:rgba(0,229,160,0.3)}
+.product-card.expanded{border-color:var(--teal)}
+.product-card.expanded .expand-icon{transform:rotate(45deg)}
+.product-card.expanded .product-detail{display:grid}
+.product-summary{display:flex;align-items:center;gap:12px;padding:10px 14px}
+.product-thumb{width:48px;height:48px;object-fit:cover;border-radius:8px;background:#fff}
+.product-info{flex:1}
+.product-name{font-weight:600;font-size:11px}
+.product-meta{font-size:9px;color:var(--dim);display:flex;gap:8px;margin-top:2px}
+.product-meta .cat{text-transform:uppercase;letter-spacing:0.05em}
+.product-meta .price{color:var(--teal);font-weight:600}
+.product-meta .img-count{color:var(--accent)}
+.expand-icon{font-size:16px;color:var(--dim);transition:transform 0.2s}
+.product-detail{display:none;grid-template-columns:1fr 1fr;gap:16px;padding:16px;border-top:1px solid var(--border);background:var(--faint)}
+.product-gallery{display:flex;gap:8px;flex-wrap:wrap}
+.gallery-img{width:120px;height:120px;object-fit:cover;border-radius:8px;background:#fff;border:1px solid var(--border)}
+.product-desc{font-size:11px;color:var(--fg);margin-bottom:10px;line-height:1.6}
+.product-detail ul{list-style:none;padding:0;margin:4px 0 12px}
+.product-detail li{font-size:10px;color:var(--dim);padding:2px 0}
+.product-detail li::before{content:"→ ";color:var(--teal)}
+.kw{display:inline-block;padding:2px 8px;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);border-radius:12px;font-size:9px;color:var(--teal);margin:2px}
+.kw-list{margin:4px 0 8px}
+.product-persona,.product-usecase{font-size:9px;color:var(--dim);margin:4px 0}
+.product-link{display:inline-block;margin-top:8px;font-size:10px;color:var(--teal);text-decoration:none;border:1px solid rgba(0,229,160,0.3);padding:4px 12px;border-radius:20px}
+.product-link:hover{background:rgba(0,229,160,0.1)}
+
+/* Personas */
+.personas-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.persona-card{padding:12px;background:var(--faint);border-radius:8px;border:1px solid var(--border)}
+.persona-name{font-weight:600;color:var(--teal);margin-bottom:4px}
+.persona-desc{font-size:10px;color:var(--fg);margin-bottom:6px}
+.persona-kw{font-size:9px;color:var(--dim)}
+
+/* Suggestions */
+.suggestion-chip{display:inline-flex;flex-direction:column;padding:8px 14px;background:var(--faint);border:1px solid var(--border);border-radius:12px;margin:4px;max-width:320px;vertical-align:top}
+.sug-label{font-weight:600;font-size:11px;color:var(--fg)}
+.sug-query{font-size:9px;color:var(--dim);margin-top:2px}
+.sug-meta{margin-bottom:12px;padding:10px;background:var(--faint);border-radius:8px;border:1px solid var(--border)}
+.sug-meta span{display:block;margin:2px 0}
+.sug-meta .sug-title{font-weight:600;color:var(--fg)}
+.sug-meta .sug-sub{color:var(--dim);font-size:10px}
+.sug-meta .sug-ph{color:var(--accent);font-size:10px;font-style:italic}
+
+/* Brand */
+.brand-section p{margin-bottom:8px}
+
+/* Use cases */
+.usecase-card{padding:10px;background:var(--faint);border-radius:8px;border:1px solid var(--border);margin-bottom:8px}
+.usecase-name{font-weight:600;color:var(--fg);margin-bottom:4px}
+.usecase-desc{font-size:10px;color:var(--dim);margin-bottom:4px}
+.usecase-kw{font-size:9px;color:var(--dim)}
+
+/* Features */
+.feature-chip{display:inline-block;padding:4px 12px;background:var(--faint);border:1px solid var(--border);border-radius:20px;font-size:10px;color:var(--fg);margin:3px}
+
+/* FAQs */
+.faq-item{padding:10px 0;border-bottom:1px solid var(--border)}
+.faq-item:last-child{border-bottom:none}
+.faq-q{font-weight:600;color:var(--fg);margin-bottom:4px}
+.faq-a{font-size:10px;color:var(--dim)}
+
+/* Testimonials */
+.testimonial-card{padding:12px;background:var(--faint);border-radius:8px;border:1px solid var(--border);margin-bottom:8px}
+.testimonial-quote{font-size:11px;color:var(--fg);font-style:italic;margin-bottom:6px}
+.testimonial-attr{font-size:9px;color:var(--teal)}
+.testimonial-src{display:inline-block;margin-left:8px;padding:1px 8px;background:rgba(0,229,160,0.08);border:1px solid rgba(0,229,160,0.2);border-radius:12px;font-size:8px;color:var(--teal);text-transform:uppercase;letter-spacing:0.05em}
+
+/* CTA */
+.cta-json{font-size:10px;color:var(--dim);overflow-x:auto;white-space:pre-wrap}
+</style>
+</head>
+<body>
+<h1>Config Review: <span id="domain" style="color:var(--accent)">…</span></h1>
+<p style="color:var(--dim);margin-bottom:24px">Review all configuration before deploy. Click any product to expand details and see all assets. This page reads the live <code>/of1/config/*.json</code> files on load — it always reflects what will deploy.</p>
+
+<div id="banner" class="banner banner-loading">Loading config from <code>/of1/config/…</code></div>
+
+<div class="stats" id="stats"></div>
+
+<h2>Products (<span id="c-products">0</span>)</h2>
+<div class="section">
+  <p style="color:var(--dim);margin-bottom:12px;font-size:10px">Click any product to expand — see all images, description, features, keywords, and metadata.</p>
+  <div class="products-list" id="products"></div>
+</div>
+
+<h2>Brand Voice</h2>
+<div class="section brand-section" id="brand"></div>
+
+<h2>Personas (<span id="c-personas">0</span>)</h2>
+<div class="section"><div class="personas-grid" id="personas"></div></div>
+
+<h2>Use Cases (<span id="c-usecases">0</span>)</h2>
+<div class="section" id="usecases"></div>
+
+<h2>Features (<span id="c-features">0</span>)</h2>
+<div class="section"><div id="features"></div></div>
+
+<h2>FAQs (<span id="c-faqs">0</span>)</h2>
+<div class="section" id="faqs"></div>
+
+<h2>Testimonials (<span id="c-testimonials">0</span>)</h2>
+<div class="section" id="testimonials"></div>
+
+<h2>Suggestions (<span id="c-suggestions">0</span>)</h2>
+<div class="section">
+  <div class="sug-meta" id="sug-meta"></div>
+  <div id="suggestions"></div>
+</div>
+
+<h2>CTA Template</h2>
+<div class="section"><pre class="cta-json" id="cta"></pre></div>
+
+<script>
+// Config lives at the site root (same origin); this page is served from
+// /deliverables/. The worker reads the same files (worker/src/tenant.js
+// CONFIG_FILES) — that list is the canonical config inventory. If a new
+// human-reviewable config JSON is added there, add a section here too.
+const CONFIG_BASE = '/of1/config';
+
+// --- DOM helpers (XSS-safe: text always goes through createTextNode; URLs are
+// sanitized before hitting an attribute — config values are LLM-authored). ---
+function el(tag, opts, ...children) {
+  const n = document.createElement(tag);
+  if (opts && opts.class) n.className = opts.class;
+  if (opts && opts.attrs) for (const [k, v] of Object.entries(opts.attrs)) n.setAttribute(k, v);
+  if (opts && opts.style) n.setAttribute('style', opts.style);
+  for (const c of children) {
+    if (c === null || c === undefined || c === false) continue;
+    n.append(c.nodeType ? c : document.createTextNode(String(c)));
+  }
+  return n;
+}
+function safeUrl(u) {
+  const s = String(u ?? '').trim();
+  if (s === '') return '';
+  if (/^(https?:|mailto:|tel:)/i.test(s)) return s;
+  if (/^[/#?]/.test(s) || /^data:image\//i.test(s)) return s;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(s)) return ''; // disallowed scheme (e.g. javascript:)
+  return s; // bare relative path
+}
+function formatPrice(v) {
+  if (v === null || v === undefined || v === '') return '';
+  const s = String(v).trim();
+  return s.startsWith('$') ? s : '$' + s;
+}
+function asArray(data, key) {
+  if (Array.isArray(data)) return data;
+  if (data && typeof data === 'object') return data[key] ?? data[key.replace('-', '')] ?? [];
+  return [];
+}
+
+async function loadJson(name, missing) {
+  try {
+    const r = await fetch(`${CONFIG_BASE}/${name}.json`, { cache: 'no-store' });
+    if (!r.ok) { missing.push(`${name}.json (HTTP ${r.status})`); return null; }
+    return await r.json();
+  } catch (e) {
+    missing.push(`${name}.json (${e.message})`);
+    return null;
+  }
+}
+
+function renderProducts(products) {
+  const root = document.getElementById('products');
+  root.replaceChildren();
+  if (!products.length) { root.append(el('p', { class: 'empty-note' }, 'No products.')); return; }
+  for (const p of products) {
+    const imgs = Array.isArray(p.images) ? p.images : [];
+    const name = p.name ?? 'Unknown';
+    const detail = el('div', { class: 'product-detail' },
+      el('div', { class: 'product-gallery' },
+        ...imgs.map((u) => el('img', { class: 'gallery-img', attrs: { src: safeUrl(u), alt: name, loading: 'lazy' } }))),
+      (() => {
+        const c = el('div', { class: 'product-detail-content' }, el('p', { class: 'product-desc' }, p.description ?? ''));
+        const feats = Array.isArray(p.features) ? p.features : [];
+        const highs = Array.isArray(p.highlights) ? p.highlights : [];
+        const kws = Array.isArray(p.keywords) ? p.keywords : [];
+        if (feats.length) { c.append(el('h4', {}, 'Features'), el('ul', {}, ...feats.map((f) => el('li', {}, f)))); }
+        if (highs.length) { c.append(el('h4', {}, 'Highlights'), el('ul', {}, ...highs.map((h) => el('li', {}, h)))); }
+        const tags = el('div', { class: 'product-tags' });
+        if (kws.length) tags.append(el('h4', {}, 'Keywords'), el('div', { class: 'kw-list' }, ...kws.slice(0, 8).map((k) => el('span', { class: 'kw' }, k))));
+        if (p.persona) tags.append(el('div', { class: 'product-persona' }, 'Persona: ', el('strong', {}, p.persona)));
+        if (p.useCase) tags.append(el('div', { class: 'product-usecase' }, 'Use case: ', el('strong', {}, p.useCase)));
+        c.append(tags);
+        const url = safeUrl(p.url ?? '');
+        if (url) c.append(el('a', { class: 'product-link', attrs: { href: url, target: '_blank', rel: 'noopener' } }, 'View on site →'));
+        return c;
+      })());
+    const card = el('div', { class: 'product-card' },
+      el('div', { class: 'product-summary' },
+        el('img', { class: 'product-thumb', attrs: { src: imgs.length ? safeUrl(imgs[0]) : '', alt: name, loading: 'lazy' } }),
+        el('div', { class: 'product-info' },
+          el('div', { class: 'product-name' }, name),
+          el('div', { class: 'product-meta' },
+            el('span', { class: 'cat' }, p.category ?? ''),
+            el('span', { class: 'price' }, formatPrice(p.price)),
+            el('span', { class: 'img-count' }, `${imgs.length} img${imgs.length === 1 ? '' : 's'}`))),
+        el('div', { class: 'expand-icon' }, '+')),
+      detail);
+    card.querySelector('.product-summary').addEventListener('click', () => card.classList.toggle('expanded'));
+    root.append(card);
+  }
+}
+
+function renderBrand(brand) {
+  const b = brand ?? {};
+  const vocab = (b.vocabulary ?? b.preferredWords ?? []).slice(0, 10).join(', ');
+  const avoid = (b.avoidWords ?? b.avoid ?? []).slice(0, 10).join(', ');
+  document.getElementById('brand').replaceChildren(
+    el('h3', {}, 'Personality'), el('p', {}, b.personality ?? 'N/A'),
+    el('h3', {}, 'Tone'), el('p', {}, b.tone ?? 'N/A'),
+    el('h3', {}, 'Vocabulary'), el('p', { style: 'color:var(--teal)' }, vocab || 'N/A'),
+    el('h3', {}, 'Avoid Words'), el('p', { style: 'color:var(--accent)' }, avoid || 'N/A'));
+}
+
+function renderPersonas(personas) {
+  const root = document.getElementById('personas');
+  root.replaceChildren();
+  if (!personas.length) { root.append(el('p', { class: 'empty-note' }, 'No personas.')); return; }
+  for (const p of personas) {
+    root.append(el('div', { class: 'persona-card' },
+      el('div', { class: 'persona-name' }, p.name ?? 'Unknown'),
+      el('div', { class: 'persona-desc' }, p.description ?? ''),
+      el('div', { class: 'persona-kw' }, 'Keywords: ' + (p.keywords ?? []).slice(0, 8).join(', '))));
+  }
+}
+
+function renderUsecases(useCases) {
+  const root = document.getElementById('usecases');
+  root.replaceChildren();
+  if (!useCases.length) { root.append(el('p', { class: 'empty-note' }, 'No use cases.')); return; }
+  for (const uc of useCases) {
+    const card = el('div', { class: 'usecase-card' },
+      el('div', { class: 'usecase-name' }, uc.name ?? uc.title ?? 'Unknown'),
+      el('div', { class: 'usecase-desc' }, uc.description ?? ''));
+    const kw = (uc.keywords ?? []).slice(0, 6).join(', ');
+    if (kw) card.append(el('div', { class: 'usecase-kw' }, 'Keywords: ' + kw));
+    root.append(card);
+  }
+}
+
+function renderFeatures(features) {
+  const root = document.getElementById('features');
+  root.replaceChildren();
+  if (!features.length) { root.append(el('p', { class: 'empty-note' }, 'No features.')); return; }
+  for (const f of features) {
+    const name = (f && typeof f === 'object') ? (f.name ?? f.title ?? '') : f;
+    root.append(el('span', { class: 'feature-chip' }, name));
+  }
+}
+
+function renderFaqs(faqs) {
+  const root = document.getElementById('faqs');
+  root.replaceChildren();
+  if (!faqs.length) { root.append(el('p', { class: 'empty-note' }, 'No FAQs.')); return; }
+  for (const f of faqs) {
+    root.append(el('div', { class: 'faq-item' },
+      el('div', { class: 'faq-q' }, f.question ?? ''),
+      el('div', { class: 'faq-a' }, f.answer ?? '')));
+  }
+}
+
+function renderTestimonials(items) {
+  const root = document.getElementById('testimonials');
+  root.replaceChildren();
+  if (!items.length) { root.append(el('p', { class: 'empty-note' }, 'No testimonials.')); return; }
+  for (const t of items) {
+    const attr = [t.author, t.role, t.company].filter(Boolean).join(', ');
+    const card = el('div', { class: 'testimonial-card' },
+      el('div', { class: 'testimonial-quote' }, '“' + (t.quote ?? '') + '”'));
+    const line = el('div', { class: 'testimonial-attr' }, attr || 'Anonymous');
+    if (t.source) line.append(el('span', { class: 'testimonial-src' }, t.source));
+    card.append(line);
+    root.append(card);
+  }
+}
+
+function renderSuggestions(data) {
+  const meta = document.getElementById('sug-meta');
+  const root = document.getElementById('suggestions');
+  meta.replaceChildren(); root.replaceChildren();
+  let list;
+  if (data && typeof data === 'object' && !Array.isArray(data)) {
+    meta.append(
+      el('span', { class: 'sug-title' }, data.title ?? ''),
+      el('span', { class: 'sug-sub' }, data.subtitle ?? ''),
+      el('span', { class: 'sug-ph' }, 'Placeholder: "' + (data.placeholder ?? '') + '"'));
+    list = data.suggestions ?? [];
+  } else {
+    list = Array.isArray(data) ? data : [];
+  }
+  if (!list.length) { root.append(el('p', { class: 'empty-note' }, 'No suggestions.')); return; }
+  for (const s of list) {
+    if (s && typeof s === 'object') {
+      root.append(el('div', { class: 'suggestion-chip' },
+        el('span', { class: 'sug-label' }, s.label ?? s.text ?? ''),
+        el('span', { class: 'sug-query' }, s.query ?? '')));
+    } else {
+      root.append(el('div', { class: 'suggestion-chip' }, el('span', { class: 'sug-label' }, String(s))));
+    }
+  }
+  return list.length;
+}
+
+function stat(num, label) {
+  return el('div', { class: 'stat' }, el('div', { class: 'stat-num' }, String(num)), el('div', { class: 'stat-label' }, label));
+}
+
+async function main() {
+  const missing = [];
+  const [meta, productsRaw, brand, personasRaw, useCasesRaw, featuresRaw, faqsRaw, suggestions, cta, testimonialsRaw] =
+    await Promise.all([
+      loadJson('config', missing),        // meta: { domain, owner, repo, branch }
+      loadJson('products', missing),
+      loadJson('brand-voice', missing),
+      loadJson('personas', missing),
+      loadJson('use-cases', missing),
+      loadJson('features', missing),
+      loadJson('faqs', missing),
+      loadJson('suggestions', missing),
+      loadJson('cta-template', missing),
+      loadJson('testimonials', missing),
+    ]);
+
+  const domain = (meta && meta.domain) || location.hostname;
+  document.getElementById('domain').textContent = domain;
+  document.title = 'Config Review - ' + domain;
+
+  const products = asArray(productsRaw, 'products');
+  const personas = asArray(personasRaw, 'personas');
+  const useCases = asArray(useCasesRaw, 'useCases');
+  const features = asArray(featuresRaw, 'features');
+  const faqs = asArray(faqsRaw, 'faqs');
+  const testimonials = asArray(testimonialsRaw, 'testimonials');
+  const totalImages = products.reduce((s, p) => s + (Array.isArray(p.images) ? p.images.length : 0), 0);
+
+  renderProducts(products);
+  renderBrand(brand);
+  renderPersonas(personas);
+  renderUsecases(useCases);
+  renderFeatures(features);
+  renderFaqs(faqs);
+  renderTestimonials(testimonials);
+  const sugCount = renderSuggestions(suggestions) || 0;
+  document.getElementById('cta').textContent = JSON.stringify(cta ?? {}, null, 2).slice(0, 2000);
+
+  // Stats + section counts
+  document.getElementById('stats').replaceChildren(
+    stat(products.length, 'Products'), stat(totalImages, 'Images'),
+    stat(personas.length, 'Personas'), stat(sugCount, 'Suggestions'),
+    stat(features.length, 'Features'), stat(useCases.length, 'Use Cases'),
+    stat(faqs.length, 'FAQs'), stat(testimonials.length, 'Testimonials'));
+  const setCount = (id, n) => { const e = document.getElementById(id); if (e) e.textContent = String(n); };
+  setCount('c-products', products.length); setCount('c-personas', personas.length);
+  setCount('c-usecases', useCases.length); setCount('c-features', features.length);
+  setCount('c-faqs', faqs.length); setCount('c-testimonials', testimonials.length);
+  setCount('c-suggestions', sugCount);
+
+  // Banner: config.json is optional (domain falls back to hostname); flag the rest.
+  const banner = document.getElementById('banner');
+  const realMissing = missing.filter((m) => !m.startsWith('config.json'));
+  if (realMissing.length) {
+    banner.className = 'banner banner-warn';
+    banner.replaceChildren(document.createTextNode(
+      'Missing or unreadable config (not yet pushed, or the content step did not run): ' + realMissing.join(', ') + '. Sections above may be empty.'));
+  } else {
+    banner.remove();
+  }
+}
+
+main();
+</script>
+</body>
+</html>

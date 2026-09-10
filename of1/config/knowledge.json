@@ -1,0 +1,754 @@
+[
+  {
+    "id": "primo",
+    "type": "product",
+    "title": "Arco Primo",
+    "description": "Arco's signature entry-level single-boiler espresso machine with PID temperature control and a commercial-grade 58mm group head.",
+    "keywords": [
+      "single boiler espresso machine",
+      "entry level espresso",
+      "PID temperature control",
+      "home espresso machine",
+      "compact espresso machine"
+    ],
+    "facts": [
+      "Price: $899. Category: Single Boiler.",
+      "The Arco Primo is Arco's signature entry into home espresso, built for cafe-quality shots without the complexity.",
+      "Single brass 250ml boiler with PID temperature control for consistent extraction.",
+      "Commercial-grade 58mm group head and a 15-bar vibratory pump.",
+      "2L water tank; weighs 8.5kg; dimensions 27x35x30cm.",
+      "Available in Matte Black, Brushed Steel, and Arctic White.",
+      "Anchors the Morning Minimalist setup, heating up in under three minutes for fast, consistent mornings."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-primo-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-primo-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-primo-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-primo-4.jpg"
+    ],
+    "persona": "morning-minimalist"
+  },
+  {
+    "id": "doppio",
+    "type": "product",
+    "title": "Arco Doppio",
+    "description": "Arco's dual-boiler espresso machine that lets you brew and steam milk simultaneously without temperature compromise.",
+    "keywords": [
+      "dual boiler espresso machine",
+      "brew and steam simultaneously",
+      "upgrade espresso machine",
+      "E61 group head",
+      "rotary pump espresso"
+    ],
+    "facts": [
+      "Price: $1,599. Category: Dual Boiler.",
+      "Independent dual-boiler system (250ml brew / 350ml steam) maintains rock-steady temperatures for espresso and milk steaming at the same time.",
+      "Rotary pump, dual PID control, 58mm E61 group head.",
+      "2.5L water tank; weighs 14kg; dimensions 30x42x35cm.",
+      "Available in Matte Black and Brushed Steel.",
+      "The foundation of The Upgrade Path setup, eliminating the wait-for-steam frustration of entry-level machines."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-doppio-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-doppio-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-doppio-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-doppio-4.jpg"
+    ],
+    "persona": "the-upgrade-path"
+  },
+  {
+    "id": "studio",
+    "type": "product",
+    "title": "Arco Studio",
+    "description": "Arco's prosumer flagship espresso machine with electronic pressure profiling and a saturated group head for the dedicated home barista.",
+    "keywords": [
+      "pressure profiling espresso machine",
+      "prosumer espresso machine",
+      "saturated group head",
+      "flagship home espresso",
+      "flow profiling espresso"
+    ],
+    "facts": [
+      "Price: $2,299. Category: Prosumer.",
+      "Dual stainless boilers (300ml/500ml), rotary pump with flow control, dual PID with a built-in shot timer.",
+      "Saturated 58mm group head with electronic pressure profiling and programmable, saveable pressure curves.",
+      "3L water tank or plumbed; weighs 18kg; dimensions 32x45x38cm.",
+      "Available in Matte Black and Walnut Accent.",
+      "Arco's flagship machine and centerpiece of the Craft at Home setup, with commercial-grade steam power."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-studio-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-studio-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-studio-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-studio-4.jpg"
+    ],
+    "persona": "craft-at-home"
+  },
+  {
+    "id": "studio-pro",
+    "type": "product",
+    "title": "Arco Studio Pro",
+    "description": "Arco's commercial-grade espresso machine with triple-boiler architecture, electronic pressure profiling, and IoT connectivity.",
+    "keywords": [
+      "commercial espresso machine",
+      "triple boiler espresso",
+      "touchscreen espresso machine",
+      "dual group espresso",
+      "gear pump espresso"
+    ],
+    "facts": [
+      "Price: $3,499. Category: Commercial.",
+      "Triple-boiler architecture with a gear pump and electronic pressure profiling.",
+      "Saturated 58mm group head, 4.3-inch touchscreen, IoT connectivity for firmware updates and brew logging.",
+      "3.5L tank or plumbed; weighs 24kg; dimensions 35x48x42cm.",
+      "Available in Matte Black.",
+      "Brings commercial DNA into a home-friendly footprint, and pairs naturally with the Macinino Pro grinder."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-studio-pro-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-studio-pro-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-studio-pro-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-studio-pro-4.jpg"
+    ],
+    "persona": "craft-at-home"
+  },
+  {
+    "id": "nano",
+    "type": "product",
+    "title": "Arco Nano",
+    "description": "Arco's compact thermoblock espresso machine designed for instant-on performance in small kitchens and offices.",
+    "keywords": [
+      "compact espresso machine",
+      "small kitchen espresso",
+      "thermoblock espresso",
+      "office espresso machine",
+      "instant on espresso"
+    ],
+    "facts": [
+      "Price: $649. Category: Compact.",
+      "Thermoblock heating delivers instant-on performance; 42mm group head optimized for single shots.",
+      "15-bar vibratory pump and PID temperature control.",
+      "1L water tank; weighs 4.2kg; dimensions 18x28x25cm, fits anywhere.",
+      "Available in Matte Black, Copper, and Arctic White."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-nano-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-nano-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-nano-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-nano-4.jpg"
+    ],
+    "persona": "morning-minimalist"
+  },
+  {
+    "id": "ufficio",
+    "type": "product",
+    "title": "Arco Ufficio",
+    "description": "Arco's shared-space espresso machine with auto-dosing, self-cleaning, and multi-user profiles for high daily volume.",
+    "keywords": [
+      "office espresso machine",
+      "shared office coffee machine",
+      "self cleaning espresso machine",
+      "multi user espresso",
+      "high volume espresso machine"
+    ],
+    "facts": [
+      "Price: $4,299. Category: Office.",
+      "Dual commercial boilers with a rotary commercial pump and two 58mm groups.",
+      "Auto-dosing, self-cleaning, and multi-user profiles; rated for 50+ cups per day.",
+      "Requires plumbed water; weighs 38kg; dimensions 58x52x45cm.",
+      "Available in Matte Black."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-ufficio-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-ufficio-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-ufficio-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-ufficio-4.jpg"
+    ],
+    "persona": "the-non-barista"
+  },
+  {
+    "id": "viaggio",
+    "type": "product",
+    "title": "Arco Viaggio",
+    "description": "Arco's manual lever portable espresso maker that needs no electricity, delivering full espresso pressure anywhere.",
+    "keywords": [
+      "portable espresso machine",
+      "travel espresso maker",
+      "manual lever espresso",
+      "espresso without electricity",
+      "camping espresso maker"
+    ],
+    "facts": [
+      "Price: $399. Category: Portable.",
+      "Hand-powered lever mechanism generates up to 9 bar of pressure with no electricity required.",
+      "Uses standard ESE pods or a fine-grind basket; weighs 1.2kg.",
+      "Dimensions 10x18x8cm; stainless steel and aluminum construction.",
+      "Available in Silver, Matte Black, and Forest Green.",
+      "The heart of the Espresso Anywhere travel kit, fitting in a carry-on with no plumbed water needed."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-viaggio-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-viaggio-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-viaggio-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-viaggio-4.jpg"
+    ],
+    "persona": "espresso-anywhere"
+  },
+  {
+    "id": "automatico",
+    "type": "product",
+    "title": "Arco Automatico",
+    "description": "Arco's fully automatic bean-to-cup espresso machine with a built-in grinder and one-touch operation.",
+    "keywords": [
+      "automatic espresso machine",
+      "bean to cup machine",
+      "one button espresso",
+      "built in grinder espresso machine",
+      "self cleaning espresso"
+    ],
+    "facts": [
+      "Price: $1,899. Category: Automatic.",
+      "Built-in conical burr grinder with automatic dosing, tamping, and extraction.",
+      "Thermoblock rapid-heat boiler, automatic milk frother, 8 programmable drinks, touchscreen control.",
+      "Adjusts grind and extraction parameters using pre-programmed light, medium, and dark roast profiles.",
+      "1.8L water tank, 250g bean hopper; weighs 9.5kg; dimensions 25x38x35cm.",
+      "Available in Matte Black and Brushed Steel.",
+      "Designed for The Non-Barista experience: press start and walk away."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-automatico-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-automatico-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-automatico-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-automatico-4.jpg"
+    ],
+    "persona": "the-non-barista"
+  },
+  {
+    "id": "macinino",
+    "type": "product",
+    "title": "Arco Macinino",
+    "description": "Arco's 64mm flat-burr grinder with stepless micrometric adjustment and low retention for espresso and filter.",
+    "keywords": [
+      "flat burr grinder",
+      "stepless grinder",
+      "low retention grinder",
+      "espresso grinder home",
+      "digital dose grinder"
+    ],
+    "facts": [
+      "Price: $549. Category: Flat Burr.",
+      "64mm Italian flat burrs for uniform particle distribution; stepless micrometric adjustment.",
+      "Retention under 0.5g; timed dosing; 300g hopper; 1400 RPM.",
+      "Weighs 5.8kg; dimensions 13x18x35cm.",
+      "Available in Matte Black and Walnut.",
+      "Flat burrs produce a uniform, unimodal grind that translates to clarity, with individual flavor notes standing out in a clean, transparent shot.",
+      "Digital dose control and anti-static technology deliver repeatable grinds with minimal waste, the centerpiece grinder of The Upgrade Path."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-macinino-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-macinino-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-macinino-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-macinino-4.jpg"
+    ],
+    "persona": "the-upgrade-path"
+  },
+  {
+    "id": "macinino-pro",
+    "type": "product",
+    "title": "Arco Macinino Pro",
+    "description": "Arco's 83mm flat-burr grinder with a digital position display and single-dose workflow for baristas who demand ultimate grind uniformity.",
+    "keywords": [
+      "commercial flat burr grinder",
+      "single dose grinder",
+      "digital display grinder",
+      "high end espresso grinder",
+      "zero retention grinder"
+    ],
+    "facts": [
+      "Price: $799. Category: Flat Burr.",
+      "83mm Italian flat burrs with stepless micrometric adjustment and a digital position display.",
+      "Near-zero retention (under 0.2g); programmable dose memory; high-torque, low-RPM (900 RPM) motor.",
+      "350g hopper, or usable single-dose; weighs 8.2kg; dimensions 17x22x42cm.",
+      "Available in Matte Black.",
+      "The natural grinder partner for the Arco Studio Pro."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-macinino-pro-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-macinino-pro-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-macinino-pro-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-macinino-pro-4.jpg"
+    ],
+    "persona": "craft-at-home"
+  },
+  {
+    "id": "preciso",
+    "type": "product",
+    "title": "Arco Preciso",
+    "description": "Arco's 48mm conical-burr grinder built for a sweeter, more forgiving espresso grind, ideal for medium-dark roasts.",
+    "keywords": [
+      "conical burr grinder",
+      "sweet espresso grind",
+      "forgiving coffee grinder",
+      "home espresso grinder",
+      "stepless conical grinder"
+    ],
+    "facts": [
+      "Price: $449. Category: Conical Burr.",
+      "48mm conical steel burrs; 40-step macro plus micro adjustment.",
+      "Retention under 0.8g; 250g hopper; 600 RPM.",
+      "Weighs 3.9kg; dimensions 12x17x32cm.",
+      "Available in Matte Black and Arctic White.",
+      "Conical burrs run at lower RPM, generating less heat and static, and produce a bimodal grind that creates a complex, full-bodied, forgiving cup.",
+      "Pairs with the Arco Primo in the Morning Minimalist setup: a stepless conical grind you set once and leave."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-preciso-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-preciso-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-preciso-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-preciso-4.jpg"
+    ],
+    "persona": "morning-minimalist"
+  },
+  {
+    "id": "zero",
+    "type": "product",
+    "title": "Arco Zero",
+    "description": "Arco's single-dose flat-burr grinder with a bellows-assisted system for near-zero retention.",
+    "keywords": [
+      "single dose grinder",
+      "zero retention grinder",
+      "flat burr clarity grinder",
+      "specialty coffee grinder",
+      "bellows assisted grinder"
+    ],
+    "facts": [
+      "Price: $699. Category: Single Dose.",
+      "83mm flat burrs (SSP compatible) with stepless adjustment and a dial indicator.",
+      "Bellows-assisted system delivers near-zero retention, letting you switch beans without waste.",
+      "1200 RPM; weighs 7.2kg; dimensions 15x20x38cm.",
+      "Available in Matte Black.",
+      "Large-format flat burrs paired with a low-RPM motor capture both clarity and body, ideal for showcasing single-origin character.",
+      "The grinder of choice for the Craft at Home setup, alongside the Arco Studio."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-zero-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-zero-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-zero-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-zero-4.jpg"
+    ],
+    "persona": "craft-at-home"
+  },
+  {
+    "id": "viaggio-grinder",
+    "type": "product",
+    "title": "Arco Viaggio Grinder",
+    "description": "Arco's palm-sized 38mm conical-burr travel grinder with a manual fold-out handle.",
+    "keywords": [
+      "travel grinder",
+      "portable hand grinder",
+      "manual coffee grinder",
+      "hand grinder for espresso",
+      "lightweight coffee grinder"
+    ],
+    "facts": [
+      "Price: $199. Category: Travel Grinder.",
+      "38mm hardened-steel conical burrs; 24-step clicked adjustment.",
+      "Retention under 0.3g; 25g capacity; manual fold-out handle drive.",
+      "Weighs just 320g; dimensions 6x6x18cm.",
+      "Available in Matte Black, Slate Grey, and Terracotta.",
+      "Delivers cafe-quality grinding wherever the journey takes you, pairing with the Arco Viaggio for a self-contained travel espresso station."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-viaggio-grinder-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-viaggio-grinder-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-viaggio-grinder-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-viaggio-grinder-4.jpg"
+    ],
+    "persona": "espresso-anywhere"
+  },
+  {
+    "id": "tamper-set",
+    "type": "product",
+    "title": "Arco Tamper Set",
+    "description": "Precision-machined 58mm tamper with a calibrated 30lb spring and matching leveling tool for consistent tamp pressure.",
+    "keywords": [
+      "espresso tamper",
+      "calibrated tamper",
+      "leveling tool espresso",
+      "puck preparation tool",
+      "WDT tool"
+    ],
+    "facts": [
+      "Price: $89. Category: Preparation.",
+      "Precision-machined 58mm tamper with a calibrated 30lb spring for consistent tamp pressure every time.",
+      "Includes a matching leveling tool for even puck distribution.",
+      "Made from stainless steel and aluminum.",
+      "A foundational accessory across every Arco setup, from the Morning Minimalist to the Craft at Home bar."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-tamper-set-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-tamper-set-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-tamper-set-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-tamper-set-4.jpg"
+    ],
+    "persona": "morning-minimalist"
+  },
+  {
+    "id": "precision-scale",
+    "type": "product",
+    "title": "Arco Precision Scale",
+    "description": "0.1g-accurate espresso scale with a built-in shot timer, auto-tare, and flow-rate display.",
+    "keywords": [
+      "espresso scale",
+      "precision coffee scale",
+      "shot timer scale",
+      "dosing scale espresso",
+      "flow rate scale"
+    ],
+    "facts": [
+      "Price: $129. Category: Preparation.",
+      "0.1g accuracy up to a 2kg maximum weight.",
+      "Built-in shot timer and LCD display with flow-rate readout.",
+      "Rechargeable via USB-C.",
+      "Brings data-driven discipline to your workflow: the tool that turns guesswork into data in The Upgrade Path setup."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-precision-scale-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-precision-scale-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-precision-scale-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-precision-scale-4.jpg"
+    ],
+    "persona": "the-upgrade-path"
+  },
+  {
+    "id": "cleaning-kit",
+    "type": "product",
+    "title": "Arco Cleaning Kit",
+    "description": "Complete espresso machine cleaning set with backflush detergent, group head brush, microfiber cloths, and a blind filter.",
+    "keywords": [
+      "espresso machine cleaning kit",
+      "backflush detergent",
+      "descaling kit espresso",
+      "machine maintenance kit",
+      "blind filter"
+    ],
+    "facts": [
+      "Price: $39. Category: Maintenance.",
+      "Includes backflush detergent (100g), a group head brush, two microfiber cloths, and a blind filter.",
+      "Compatible with all Arco machines.",
+      "Regular cleaning protects flavor and machine longevity: coffee oils oxidize and turn rancid within hours without it.",
+      "Recommended for quarterly deep cleaning of the Arco Automatico in The Non-Barista setup."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-cleaning-kit-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-cleaning-kit-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-cleaning-kit-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-cleaning-kit-4.jpg"
+    ],
+    "persona": "the-non-barista"
+  },
+  {
+    "id": "milk-pitcher",
+    "type": "product",
+    "title": "Arco Milk Pitcher",
+    "description": "350ml stainless steel milk pitcher with a precision pour spout, designed for latte art from beginners to pros.",
+    "keywords": [
+      "milk pitcher latte art",
+      "stainless steel milk jug",
+      "espresso milk frothing pitcher",
+      "latte art pitcher",
+      "milk steaming pitcher"
+    ],
+    "facts": [
+      "Price: $45. Category: Preparation.",
+      "350ml capacity stainless steel construction with a precision pour spout.",
+      "Sized and shaped for consistent latte art pours from beginner to advanced technique.",
+      "Best results come from stretching milk below 40°C and texturing between 55-65°C, where lactose sweetness and foam stability peak.",
+      "Completes the hands-on milk-steaming ritual central to the Craft at Home experience."
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-milk-pitcher-1.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-milk-pitcher-2.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-milk-pitcher-3.jpg",
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-milk-pitcher-4.jpg"
+    ],
+    "persona": "craft-at-home"
+  },
+  {
+    "id": "pressure-profiling-technology",
+    "type": "feature",
+    "title": "Pressure Profiling Technology",
+    "description": "Deliberately varying brew pressure during extraction, from gentle pre-infusion ramps to declining profiles, to shape sweetness, body, and clarity in the cup.",
+    "keywords": [
+      "pressure profiling",
+      "pre-infusion espresso",
+      "declining pressure profile",
+      "electronic pressure curves",
+      "flow profiling"
+    ],
+    "facts": [
+      "Pressure profiling means deliberately changing brew pressure at different stages of a shot instead of holding a flat 9 bars throughout.",
+      "A pre-infusion ramp wets the puck at 2-4 bar for several seconds before ramping to full pressure, reducing channeling and increasing sweetness.",
+      "A declining profile starts at 9 bar and drops to 6-4 bar as the shot progresses, reducing preferential water paths through the puck.",
+      "Manual lever machines like the Arco Viaggio give full physical control over pressure; the Arco Studio offers electronic pressure profiling with programmable, repeatable curves."
+    ],
+    "images": []
+  },
+  {
+    "id": "water-chemistry-optimization",
+    "type": "feature",
+    "title": "Water Chemistry Optimization",
+    "description": "The mineral balance and total dissolved solids (TDS) of your water directly shape espresso extraction, flavor clarity, and machine longevity.",
+    "keywords": [
+      "water quality espresso",
+      "TDS coffee water",
+      "descaling espresso machine",
+      "filtered water espresso",
+      "water hardness coffee"
+    ],
+    "facts": [
+      "Water makes up over 98% of every cup of espresso and is the single largest ingredient by volume.",
+      "The Specialty Coffee Association recommends a target TDS of 150 ppm, with an acceptable range of 75-250 ppm.",
+      "Hard water causes scale buildup that coats boilers and clogs solenoid valves, reducing heat-transfer efficiency over time.",
+      "Water that is too soft or pure becomes corrosive, slowly dissolving copper fittings and brass components.",
+      "A moderate mineral content with low alkalinity extracts well and protects equipment; activated carbon filters and remineralization packets both help achieve this balance."
+    ],
+    "images": []
+  },
+  {
+    "id": "repairable-serviceable-design",
+    "type": "feature",
+    "title": "Repairable, Serviceable Design",
+    "description": "Every Arco product is engineered from stainless steel, brass, and hardwood, and designed to be serviced and repaired rather than replaced.",
+    "keywords": [
+      "repairable espresso machine",
+      "sustainable coffee equipment",
+      "long lasting espresso machine",
+      "serviceable design",
+      "built to last"
+    ],
+    "facts": [
+      "Every Arco machine is engineered for a decade of daily use, with every part replaceable.",
+      "Arco machines are made from stainless steel, brass, and hardwood: materials that age with grace rather than planned obsolescence.",
+      "Arco designs for longevity, not replacement cycles, using durable materials and readily available service parts.",
+      "Sustainability starts with longevity: the greenest machine is the one that lasts a lifetime."
+    ],
+    "images": []
+  },
+  {
+    "id": "flat-vs-conical-burrs-faq",
+    "type": "faq",
+    "title": "What is the difference between flat and conical burr grinders?",
+    "description": "Flat burrs give a cleaner, more uniform grind and clarity in the cup; conical burrs run cooler and produce a fuller-bodied, more forgiving shot.",
+    "keywords": [
+      "flat burr vs conical burr",
+      "which grinder should I buy",
+      "burr geometry espresso"
+    ],
+    "facts": [
+      "Conical burrs use a cone-shaped inner burr inside a ring-shaped outer burr, operate at lower RPM, generate less heat and static, and produce a bimodal grind that creates a complex, forgiving, full-bodied cup, used in the Arco Preciso and Macinino.",
+      "Flat burrs use two parallel interlocking rings, run at higher RPM, and produce a more uniform unimodal grind that yields cleaner, more transparent flavor clarity, used in the Arco Zero and Macinino Pro.",
+      "Choose conical burrs for body, sweetness, and a forgiving brewing window; choose flat burrs for clarity, brightness, and tasting terroir."
+    ],
+    "images": []
+  },
+  {
+    "id": "espresso-machine-cleaning-faq",
+    "type": "faq",
+    "title": "How often should I clean and descale my espresso machine?",
+    "description": "Clean daily with a wipe and flush, backflush weekly with a chemical cleaner, and descale every two to three months depending on water hardness.",
+    "keywords": [
+      "how to clean espresso machine",
+      "descale espresso machine",
+      "backflush schedule",
+      "machine maintenance"
+    ],
+    "facts": [
+      "Daily: wipe the gasket and shower screen, flush a blank shot of water, and wipe the steam wand immediately after use.",
+      "Weekly: perform a chemical backflush with a dedicated cleaner like the Arco Cleaning Kit's backflush detergent, then rinse with several plain-water flushes.",
+      "Every two to three months: descale to remove mineral buildup from boilers and internal tubing; frequency depends on water hardness.",
+      "Coffee oils oxidize and turn rancid within hours of contact with metal, so regular cleaning is the single most important thing you can do to protect flavor and machine longevity."
+    ],
+    "images": []
+  },
+  {
+    "id": "water-quality-faq",
+    "type": "faq",
+    "title": "Why does water quality matter for espresso?",
+    "description": "Water makes up over 98% of espresso, and its mineral balance directly affects extraction, flavor clarity, and how long your machine lasts.",
+    "keywords": [
+      "water quality espresso",
+      "best water for espresso machine",
+      "TDS espresso"
+    ],
+    "facts": [
+      "The Specialty Coffee Association recommends a TDS target of 150 ppm, with an acceptable range of 75-250 ppm, for espresso.",
+      "Magnesium binds more readily to fruity, bright acids, while calcium enhances body and sweetness; the balance between them shapes flavor.",
+      "Hard water causes scale buildup in boilers and valves; water that's too soft or pure is corrosive to copper and brass components.",
+      "A purpose-built filtration system (activated carbon plus ion-exchange resin) or a remineralization recipe is the simplest path to well-balanced water."
+    ],
+    "images": []
+  },
+  {
+    "id": "dialing-in-espresso-faq",
+    "type": "faq",
+    "title": "How do I dial in a new bag of espresso beans?",
+    "description": "Start with a fixed 18g dose at a 1:2 ratio in 25-30 seconds, then adjust grind size based on taste.",
+    "keywords": [
+      "how to dial in espresso",
+      "espresso ratio",
+      "grind size adjustment",
+      "espresso extraction time"
+    ],
+    "facts": [
+      "Start with 18 grams of coffee in a standard double basket, distributed evenly and tamped with consistent pressure.",
+      "Target a 1:2 ratio (18g in, 36g out) in approximately 25 to 30 seconds; if it runs faster, grind finer, if it chokes, grind coarser.",
+      "Sourness and thin body signal underextraction (grind finer or increase yield); bitterness and a hollow finish signal overextraction (grind coarser or pull shorter).",
+      "Change only one variable at a time and keep a log of dose, grind setting, yield, time, and tasting notes to speed up the process."
+    ],
+    "images": []
+  },
+  {
+    "id": "single-origin-vs-blends-faq",
+    "type": "faq",
+    "title": "Should I use single-origin coffee or a blend for espresso?",
+    "description": "Blends are more forgiving and consistent for daily use; single origins reward careful dialing-in with a distinctive, transparent flavor.",
+    "keywords": [
+      "single origin vs blend espresso",
+      "best coffee for espresso",
+      "blend vs single origin"
+    ],
+    "facts": [
+      "Single-origin espresso showcases the unique character of one farm or region but can be unforgiving: small shifts in dose or time push the shot off balance, and availability changes seasonally.",
+      "Blends combine multiple origins so their strengths complement each other, producing a more forgiving, consistent shot across seasons.",
+      "A good approach: use a reliable blend as your daily driver and treat single origins as weekend exploration when you have time to dial in.",
+      "Pair lighter single origins with flat-burr grinders like the Arco Zero for clarity, and lean on conical burrs like the Arco Preciso for body with blends."
+    ],
+    "images": []
+  },
+  {
+    "id": "pressure-profiling-faq",
+    "type": "faq",
+    "title": "How does pressure profiling improve espresso extraction?",
+    "description": "Varying brew pressure during a shot, instead of holding a flat 9 bars, can increase sweetness, reduce bitterness, and smooth out mouthfeel.",
+    "keywords": [
+      "what is pressure profiling",
+      "pre-infusion espresso",
+      "declining pressure espresso"
+    ],
+    "facts": [
+      "A pre-infusion ramp wets the puck at 2-4 bar for several seconds before ramping to full pressure, reducing channeling risk and promoting even extraction.",
+      "A declining profile starts at 9 bar and drops to 6-4 bar as the shot progresses, often increasing sweetness and reducing bitterness.",
+      "Manual lever machines like the Arco Viaggio give full physical control over pressure; the Arco Studio offers electronic pressure profiling with saveable, repeatable curves."
+    ],
+    "images": []
+  },
+  {
+    "id": "travel-espresso-faq",
+    "type": "faq",
+    "title": "Can I bring my espresso setup when traveling?",
+    "description": "Yes: a manual lever portable like the Arco Viaggio plus a hand grinder makes a self-contained, sub-1kg travel espresso kit that needs no electricity.",
+    "keywords": [
+      "travel espresso setup",
+      "portable espresso for travel",
+      "espresso on the road",
+      "carry-on espresso"
+    ],
+    "facts": [
+      "Manual lever portables like the Arco Viaggio generate pressure through a hand-operated piston, need no electricity, and fit in a carry-on bag.",
+      "A hand grinder like the Arco Viaggio Grinder pairs with a portable machine for a fully self-contained setup weighing under a kilogram.",
+      "Grinding beans into single-dose vacuum-sealed containers before departure buys three to five days of reasonable freshness.",
+      "Bottled water around 100-150 ppm TDS is a safe travel choice; avoid distilled or heavily softened water, which underextracts."
+    ],
+    "images": []
+  },
+  {
+    "id": "milk-steaming-faq",
+    "type": "faq",
+    "title": "How do I steam milk for latte art at home?",
+    "description": "Stretch cold milk below 40°C to incorporate air, then texture between 55-65°C to build stable, glossy microfoam.",
+    "keywords": [
+      "how to steam milk",
+      "latte art technique",
+      "microfoam milk",
+      "milk steaming temperature"
+    ],
+    "facts": [
+      "Stretching (introducing air) should happen while milk is still below 40°C, when whey proteins are flexible enough to stabilize new bubbles.",
+      "Texturing (creating a vortex to break bubbles down to microfoam) works best between 55-65°C, where lactose sweetness and foam stability peak.",
+      "Past 70°C, whey proteins aggregate irreversibly, the foam turns coarse and stiff, and a sulfurous off-flavor develops with no way to recover it.",
+      "Whole milk foams most forgivingly for beginners and latte art; oat milk is the plant-based alternative that steams most similarly to dairy."
+    ],
+    "images": []
+  },
+  {
+    "id": "coffee-processing-faq",
+    "type": "faq",
+    "title": "What is the difference between washed, natural, and honey processed coffee?",
+    "description": "Washed coffee is clean and bright, natural coffee is sweet and fruit-forward, and honey processing lands in between.",
+    "keywords": [
+      "coffee processing methods",
+      "washed vs natural coffee",
+      "honey processed coffee",
+      "coffee bean processing"
+    ],
+    "facts": [
+      "Washed processing removes the cherry skin and fruit within hours of picking, producing clarity, brightness, and defined acidity for precise, transparent espresso shots.",
+      "Natural processing dries the whole cherry intact for two to four weeks, letting fruit sugars migrate into the bean for intense sweetness, heavy body, and bold fruit flavors.",
+      "Honey processing leaves some mucilage on the bean during drying (classified white, yellow, red, or black honey by the amount retained), balancing washed clarity with natural sweetness.",
+      "Naturals are forgiving of a slightly coarse grind and work well as the base of espresso blends; washed coffees reward careful, precise extraction."
+    ],
+    "images": []
+  },
+  {
+    "id": "marco-l-testimonial",
+    "type": "testimonial",
+    "title": "Marco L.",
+    "description": "Verified Arco Primo customer testimonial.",
+    "keywords": [
+      "Primo review",
+      "customer testimonial",
+      "morning routine espresso"
+    ],
+    "facts": [
+      "\"The Primo changed everything about my morning routine. It's the perfect balance of simplicity and performance.\" (Marco L., 5-star rating)"
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-marco-l-testimonial-1.jpg"
+    ]
+  },
+  {
+    "id": "sarah-k-testimonial",
+    "type": "testimonial",
+    "title": "Sarah K.",
+    "description": "Verified Arco Doppio customer testimonial.",
+    "keywords": [
+      "Doppio review",
+      "customer testimonial",
+      "commercial quality home machine"
+    ],
+    "facts": [
+      "\"I've used commercial machines for 15 years. The Doppio is the first home machine that matches that quality.\" (Sarah K., 5-star rating)"
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-sarah-k-testimonial-1.jpg"
+    ]
+  },
+  {
+    "id": "james-t-testimonial",
+    "type": "testimonial",
+    "title": "James T.",
+    "description": "Verified Arco Macinino customer testimonial.",
+    "keywords": [
+      "Macinino review",
+      "customer testimonial",
+      "grinder consistency"
+    ],
+    "facts": [
+      "\"The Macinino grinder is absurdly good at this price point. My espresso has never been more consistent.\" (James T., 5-star rating)"
+    ],
+    "images": [
+      "https://worktree-of1-data--arco--aem-growth-adoption.aem.page/media/product-james-t-testimonial-1.jpg"
+    ]
+  }
+]
